@@ -1,0 +1,39 @@
+{% load static %}
+
+{% block title %}
+    Создайте новую учетную запись
+{% endblock %}
+
+{% block content %}
+
+    <div>
+        {% if not form.is_valid %}
+        <div>
+            <br>
+            <h1 class="product_title text-center">Создайте новую учетную запись</h1>
+            <br>
+            <div class="col-9 col-sm-9 col-md-6 col-lg-5 mx-auto bg-light">
+                <br>
+                <p>Пожалуйста, введите следующую информацию, чтобы создать новую учетную запись</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <p>{{ form }}</p>
+                    <button type="submit" name="button" class="btn btn-secondary">SignUp</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="mx-auto">
+            <br>
+            <h1 class="product_title text-center">Ваша учётная запись успешно создана</h1>
+            <br>
+            <div>
+                <p>Ваша учётная запись успешно создана и готова к использованию!</p>
+                <br>
+                <a href="{% url 'tenant_home_page' %}">Перейти на домашнюю страницу</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
