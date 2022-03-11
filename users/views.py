@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from django.contrib.auth.models import Group, User
 from users.models import Tenant
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate, logout
 
 
 def sign_up(request):
@@ -17,6 +19,23 @@ def sign_up(request):
     else:
         form = SignUpForm()
     return render(request, 'users/signup.html', {'form': form})
+
+
+def log_in(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('tenant_home_page')
+            else:
+                return redirect('signup')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'users/login.html', {'form': form})
 
 
 def tenant_home_page(request):

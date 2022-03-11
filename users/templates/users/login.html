@@ -1,0 +1,38 @@
+{% block title %}
+    Авторизация
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <br>
+        <h1 class="product_title text-center">
+            Войдите в систему или создайте новую учетную запись
+        </h1>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-lg-6 text-center custom_div">
+                <br>
+                <h2 class="product_title">
+                    Для новых пользователей
+                </h2>
+                <br>
+                <a href="{% url 'signup' %}" class="btn btn-secondary">Создать новую учётную запись</a>
+            </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 bg-light">
+                <div>
+                    <br>
+                    <h2 class="product_title">
+                        Только для зарегистрированных пользователей
+                    </h2>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <p>{{ form }}</p>
+                        <button type="submit" class="btn btn-secondary">Авторизоваться</button>
+                    </form>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+    <br>
+{% endblock %}

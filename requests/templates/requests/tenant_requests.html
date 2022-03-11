@@ -1,0 +1,14 @@
+{% block content %}
+    <h1>Все заявки</h1>
+    {% if repairrequest_list %}
+    <ul>
+      {% for repairreq in repairrequest_list %}
+      <li>
+        <a href="#">{{repairreq.service}}</a> ({{ bookinst.due_back }})
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p>Не было подано ни одной заявки.</p>
+    {% endif %}
+{% endblock %}

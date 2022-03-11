@@ -1,1 +1,6 @@
 <h1>hello</h1>
+
+{% if user.is_authenticated %}
+    <span>Welcome, {{ user.get_username }}!</span>
+    <a href="{% url 'tenant_requests' %}">My requests</a>
+{% endif %}
