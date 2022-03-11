@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .forms import SignUpForm
 from django.contrib.auth.models import Group, User
+from users.models import Tenant
 
 
 def sign_up(request):
@@ -12,6 +13,7 @@ def sign_up(request):
             signup_user = User.objects.get(username=username)
             user_group = Group.objects.get(name='Tenant')
             user_group.user_set.add(signup_user)
+            Tenant.objects.create(user=signup_user, full_name=username)
     else:
         form = SignUpForm()
     return render(request, 'users/signup.html', {'form': form})

@@ -27,15 +27,6 @@ class Apartment(models.Model):
         return f"{self.building}, {self.apartment_number}"
 
 
-class Tenant(models.Model):
-    full_name = models.CharField(max_length=200, help_text="Введите ФИО")
-    contact_details = models.CharField(max_length=200, help_text="Введите контактные данные")
-    apartment = models.ForeignKey('Apartment', on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.full_name
-
-
 class Equipment(models.Model):
     title = models.CharField(max_length=200, help_text="Введите наименование оборудования")
     cost = models.IntegerField()
