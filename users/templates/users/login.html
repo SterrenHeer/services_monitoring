@@ -1,3 +1,9 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
 {% block title %}
     Авторизация
 {% endblock %}
@@ -5,7 +11,7 @@
 {% block content %}
     <div class="container">
         <br>
-        <h1 class="product_title text-center">
+        <h1 class="text-center">
             Войдите в систему или создайте новую учетную запись
         </h1>
         <div class="row">
@@ -21,11 +27,11 @@
                 <div>
                     <br>
                     <h2 class="product_title">
-                        Только для зарегистрированных пользователей
+                        Для зарегистрированных пользователей
                     </h2>
                     <form method="POST">
                         {% csrf_token %}
-                        <p>{{ form }}</p>
+                        <p>{{ form | crispy}}</p>
                         <button type="submit" class="btn btn-secondary">Авторизоваться</button>
                     </form>
                     <br>

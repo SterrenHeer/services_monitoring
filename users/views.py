@@ -41,6 +41,11 @@ def log_in(request):
     return render(request, 'users/login.html', {'form': form})
 
 
+def log_out(request):
+    logout(request)
+    return redirect('login')
+
+
 def tenant_home_page(request):
     return render(request, 'users/tenant_home_page.html')
 

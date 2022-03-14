@@ -1,4 +1,8 @@
+{% extends 'base.html' %}
+
 {% load static %}
+
+{% load crispy_forms_tags %}
 
 {% block title %}
     Создайте новую учетную запись
@@ -17,8 +21,8 @@
                 <p>Пожалуйста, введите следующую информацию, чтобы создать новую учетную запись</p>
                 <form method="POST">
                     {% csrf_token %}
-                    <p>{{ form }}</p>
-                    <button type="submit" name="button" class="btn btn-secondary">SignUp</button>
+                    <p>{{ form | crispy}}</p>
+                    <button type="submit" name="button" class="btn btn-secondary">Регистрация</button>
                 </form>
             </div>
         </div>
