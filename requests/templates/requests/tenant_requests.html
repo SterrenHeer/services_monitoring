@@ -17,13 +17,15 @@
 
     <div class="container">
         <div class="row">
-            {% if repairrequest_list %}
-            {% for repairreq in repairrequest_list %}
-            <div class="col-9 mx-auto col-md-6 col-lg-10">
+            {% if request_list %}
+            {% for request in request_list %}
+            <div class="col-9 mx-auto col-md-6 col-lg-6">
                 <div class="card mb-4">
                     <div class="card-footer d-flex justify-content-between">
-                        <h5 class="font-weight-bold mb-0">{{ repairreq.service }}</h5>
-                        <h5 class="text-info font-italic mb-0">{{ repairreq.submission_date }}</h5>
+                        <a href="{{ request.get_absolute_url }}"><h5 class="font-weight-bold mb-0">{{ request.service }}</h5></a>
+                        <h5 class="text-info font-italic mb-0">{{ request.status }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ request.service.price }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
                     </div>
                 </div>
             </div>
