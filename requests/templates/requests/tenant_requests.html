@@ -5,16 +5,32 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Все заявки</h1>
-    {% if repairrequest_list %}
-    <ul>
-      {% for repairreq in repairrequest_list %}
-      <li>
-        <a href="#">{{repairreq.service}}</a> ({{ bookinst.due_back }})
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-      <p>Не было подано ни одной заявки.</p>
-    {% endif %}
+    <div class="py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-10 mx-auto my-2 text-center">
+                    <h1 class="font-weight-bold">Все заявки</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            {% if repairrequest_list %}
+            {% for repairreq in repairrequest_list %}
+            <div class="col-9 mx-auto col-md-6 col-lg-10">
+                <div class="card mb-4">
+                    <div class="card-footer d-flex justify-content-between">
+                        <h5 class="font-weight-bold mb-0">{{ repairreq.service }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ repairreq.submission_date }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Не было подано ни одной заявки.</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
