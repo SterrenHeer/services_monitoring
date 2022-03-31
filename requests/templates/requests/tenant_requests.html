@@ -17,6 +17,7 @@
 
     <div class="container">
         <div class="row">
+            <a class="text-center" href="{% url 'request_create' %}">Добавить новую заявку</a>
             {% if request_list %}
             {% for request in request_list %}
             <div class="col-9 mx-auto col-md-6 col-lg-6">
