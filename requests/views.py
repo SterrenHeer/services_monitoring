@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView, CreateView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Request
 from users.models import Tenant
 
@@ -24,3 +24,13 @@ class RequestCreate(CreateView):
     def form_valid(self, form):
         form.instance.tenant = Tenant.objects.get(user=self.request.user)
         return super(RequestCreate, self).form_valid(form)
+
+
+class RequestUpdate(UpdateView):
+    model = Request
+    fields = ['service', 'start_time', 'end_time']
+
+
+class RequestDelete(DeleteView):
+    model = Request
+    success_url = reverse_lazy('tenant_requests')

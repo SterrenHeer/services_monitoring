@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Подтверждение удаления
+{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1>Delete Book</h1>
+        <p>Вы уверены, что хотите удалить заявку <strong>{{ request }}</strong>?</p>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <button class="btn btn-danger" type="submit">Да, я уверен(а)</button>
+            <a class="btn btn-secondary" href="{% url 'tenant_requests'%}">Нет, отменить и вернуться к просмотру</a>
+        </form>
+    </div>
+{% endblock %}
