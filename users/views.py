@@ -30,10 +30,7 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                if user.groups.filter(name='Tenant').exists():
-                    return redirect('tenant_home_page')
-                if user.groups.filter(name='Master').exists():
-                    return redirect('master_home_page')
+                return redirect('home_page')
             else:
                 return redirect('signup')
     else:
@@ -46,9 +43,5 @@ def log_out(request):
     return redirect('login')
 
 
-def tenant_home_page(request):
-    return render(request, 'users/tenant_home_page.html')
-
-
-def master_home_page(request):
-    return render(request, 'users/master_home_page.html')
+def home_page(request):
+    return render(request, 'users/home_page.html')
