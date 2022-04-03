@@ -5,26 +5,24 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    Создайте новую заявку
+    Изменение текущей заявки
 {% endblock %}
 
 {% block content %}
-
     <div>
         <div>
             <br>
-            <h1 class="text-center">Создайте новую заявку</h1>
+            <h1 class="text-center">Изменение текущей заявки</h1>
             <br>
             <div class="col-9 col-sm-9 col-md-6 col-lg-5 mx-auto bg-light">
                 <br>
-                <p>Пожалуйста, введите следующую информацию, чтобы создать новую заявку</p>
+                <p>Пожалуйста, измените необходимую информацию и сохраните изменения</p>
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
-                    <button type="submit" name="button" class="btn btn-secondary">Создать</button>
+                    <button type="submit" name="button" class="btn btn-secondary d-block mx-auto">Сохранить изменения</button>
                 </form>
             </div>
         </div>
     </div>
-
 {% endblock %}

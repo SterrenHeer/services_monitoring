@@ -19,6 +19,7 @@ class RequestDetailView(DetailView):
 
 class RequestCreate(CreateView):
     model = Request
+    template_name = 'requests/create_request.html'
     fields = ['service', 'start_time', 'end_time']
 
     def form_valid(self, form):
@@ -28,6 +29,7 @@ class RequestCreate(CreateView):
 
 class RequestUpdate(UpdateView):
     model = Request
+    template_name = 'requests/update_request.html'
     fields = ['service', 'start_time', 'end_time']
 
 
