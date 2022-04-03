@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group, User
 from users.models import Tenant
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
+from django.views.generic import UpdateView
 
 
 def sign_up(request):
@@ -45,3 +46,9 @@ def log_out(request):
 
 def home_page(request):
     return render(request, 'users/home_page.html')
+
+
+class TenantUpdate(UpdateView):
+    model = Tenant
+    template_name = 'users/update_tenant.html'
+    fields = ['full_name', 'contact_details', 'apartment']

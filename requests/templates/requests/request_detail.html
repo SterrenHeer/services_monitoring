@@ -13,6 +13,6 @@
         <p><strong>Время начала:</strong> {{ request.start_time }}</p>
         <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
         <p><strong>Закреплённый работник:</strong></p>
-        <a href="{% url 'tenant_requests' %}">Вернуться к выбору заявки</a>
+        <a href="{% url 'tenant_requests' user.tenant.full_name %}">Вернуться к выбору заявки</a>
     </div>
 {% endblock %}

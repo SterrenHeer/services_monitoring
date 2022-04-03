@@ -22,19 +22,19 @@
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
-                    <button type="submit" name="button" class="btn btn-secondary">Регистрация</button>
+                    <button type="submit" name="button" class="btn btn-secondary d-block mx-auto">Регистрация</button>
                 </form>
             </div>
         </div>
         {% else %}
-        <div class="mx-auto">
+        <div class="mx-auto text-center">
             <br>
-            <h1 class="text-center">Ваша учётная запись успешно создана</h1>
+            <h1>Ваша учётная запись успешно создана</h1>
             <br>
             <div>
                 <p>Ваша учётная запись успешно создана и готова к использованию!</p>
                 <br>
-                <a href="{% url 'tenant_home_page' %}">Перейти на домашнюю страницу</a>
+                <a href="{% url 'login' %}">Перейти к авторизации</a>
             </div>
         </div>
         {% endif %}

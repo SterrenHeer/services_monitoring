@@ -22,12 +22,13 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
     <div class="container-fluid justify-content-center">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
             {% if request.user.is_authenticated %}
                 {% if request.user|has_group:"Tenant" %}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_requests' %}">Мои заявки</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_requests' user.tenant.full_name %}">Мои заявки</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
                 {% elif request.user|has_group:"Manager"%}
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_requests' %}">Все заявки</a></li>
                 {% elif request.user|has_group:"Master"%}
