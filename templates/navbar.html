@@ -28,6 +28,10 @@
             {% if request.user.is_authenticated %}
                 {% if request.user|has_group:"Tenant" %}
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_requests' %}">Мои заявки</a></li>
+                {% elif request.user|has_group:"Manager"%}
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_requests' %}">Все заявки</a></li>
+                {% elif request.user|has_group:"Master"%}
+                {% elif request.user|has_group:"Worker"%}
                 {% endif %}
             {% endif %}
             </ul>

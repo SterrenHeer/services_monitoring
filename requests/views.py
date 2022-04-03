@@ -13,6 +13,13 @@ class TenantRequestsListView(ListView):
         return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
 
 
+class AllRequestsListView(ListView):
+    model = Request
+    template_name = 'requests/all_requests.html'
+    paginate_by = 10
+    order_by = 'submission_date'
+
+
 class RequestDetailView(DetailView):
     model = Request
 

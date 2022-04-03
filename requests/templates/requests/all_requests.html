@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Заявки
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <a class="text-center" href="{% url 'request_create' %}">Добавить новую заявку</a>
+            {% if request_list %}
+            {% for request in request_list %}
+            <div class="col-12 mx-auto col-md-12 col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="{{ request.get_absolute_url }}"><h5 class="font-weight-bold mb-0">{{ request.service }}</h5></a>
+                        <h5 class="text-info font-italic mb-0">{{ request.status }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ request.service.price }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
+                        <a href="{% url 'request_update' request.id %}"><i class="material-icons md-16">edit</i></a>
+                        <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-16">delete</i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Не было подано ни одной заявки.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
