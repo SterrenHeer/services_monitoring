@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load custom_filters %}
+
 {% block title %}
     Подтверждение удаления
 {% endblock %}
@@ -11,7 +13,11 @@
         <form action="" method="POST">
             {% csrf_token %}
             <button class="btn btn-danger" type="submit">Да, я уверен(а)</button>
+            {% if user|has_group:"Manager" %}
+            <a class="btn btn-secondary" href="{% url 'all_requests' %}">Нет, отменить удаление</a>
+            {% else %}
             <a class="btn btn-secondary" href="{% url 'tenant_requests' user.username %}">Нет, отменить и вернуться к просмотру</a>
+            {% endif %}
         </form>
     </div>
 {% endblock %}

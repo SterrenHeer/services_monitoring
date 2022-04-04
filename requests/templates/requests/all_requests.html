@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <a class="text-center" href="{% url 'request_create' %}">Добавить новую заявку</a>
+            <a class="text-center" href="{% url 'manager_request_create' %}">Добавить новую заявку</a>
             {% if request_list %}
             {% for request in request_list %}
             <div class="col-12 mx-auto col-md-12 col-lg-6">
