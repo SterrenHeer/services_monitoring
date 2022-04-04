@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load custom_filters %}
+
 {% block title %}
     Информация о заявке
 {% endblock %}
@@ -13,6 +15,11 @@
         <p><strong>Время начала:</strong> {{ request.start_time }}</p>
         <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
         <p><strong>Закреплённый работник:</strong></p>
+        {% if user|has_group:"Manager" %}
+        <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
+        <a href="{% url 'all_requests' %}">Вернуться к списку заявок</a>
+        {% else %}
         <a href="{% url 'tenant_requests' user.tenant.full_name %}">Вернуться к выбору заявки</a>
+        {% endif %}
     </div>
 {% endblock %}

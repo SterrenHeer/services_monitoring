@@ -13,10 +13,13 @@ def sign_up(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
+            first_name = form.cleaned_data.get("first_name")
+            last_name = form.cleaned_data.get("last_name")
+            patronymic = form.cleaned_data.get("patronymic")
             signup_user = User.objects.get(username=username)
             user_group = Group.objects.get(name='Tenant')
             user_group.user_set.add(signup_user)
-            Tenant.objects.create(user=signup_user, full_name=username)
+            Tenant.objects.filter(full_name=' '.join([last_name, first_name, patronymic])).update(user=signup_user)
     else:
         form = SignUpForm()
     return render(request, 'users/signup.html', {'form': form})

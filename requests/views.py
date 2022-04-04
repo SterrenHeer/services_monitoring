@@ -42,4 +42,7 @@ class RequestUpdate(UpdateView):
 
 class RequestDelete(DeleteView):
     model = Request
-    success_url = reverse_lazy('tenant_requests')
+
+    def get_success_url(self):
+        username = self.object.tenant.user.username
+        return reverse_lazy('tenant_requests', kwargs={'pk': username})
