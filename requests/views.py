@@ -20,6 +20,15 @@ class AllRequestsListView(ListView):
     paginate_by = 10
     order_by = 'submission_date'
 
+    def get_statuses(self):
+        return Request.objects.all().values('status').distinct()
+
+    def get_queryset(self):
+        if not self.request.GET.get('status'):
+            return Request.objects.all()
+        else:
+            return Request.objects.filter(status=self.request.GET.get('status'))
+
 
 class RequestDetailView(DetailView):
     model = Request
