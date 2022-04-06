@@ -29,6 +29,11 @@ class AllRequestsListView(ListView):
         else:
             return Request.objects.filter(status=self.request.GET.get('status'))
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
+        return context
+
 
 class RequestDetailView(DetailView):
     model = Request
