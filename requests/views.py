@@ -61,6 +61,12 @@ class UpdateRequest(UpdateView):
     fields = ['service', 'start_time', 'end_time']
 
 
+class ManagerUpdateRequest(UpdateView):
+    model = Request
+    template_name = 'requests/update_request.html'
+    fields = ['status', 'start_time', 'end_time']
+
+
 class DeleteRequest(DeleteView):
     model = Request
 

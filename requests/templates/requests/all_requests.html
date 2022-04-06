@@ -17,7 +17,7 @@
                         <h5 class="text-info font-italic mb-0">{{ request.status }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ request.service.price }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
-                        <a href="{% url 'request_update' request.id %}"><i class="material-icons md-16">edit</i></a>
+                        <a href="{% url 'manager_request_update' request.id %}"><i class="material-icons md-16">edit</i></a>
                         <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-16">delete</i></a>
                     </div>
                 </div>

@@ -4,10 +4,19 @@ from django.urls import reverse
 
 
 class Request(models.Model):
+    STATUS_CHOICES = (
+        ('На рассмотрении', 'На рассмотрении'),
+        ('В обработке', 'В обработке'),
+        ('Принята', 'Принята'),
+        ('Отклонена', 'Отклонена'),
+        ('Отложена', 'Отложена'),
+        ('В процессе', 'В процессе'),
+        ('Выполнена', 'Выполнена'),
+    )
     service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
     tenant = models.ForeignKey('users.Tenant', on_delete=models.SET_NULL, null=True)
     submission_date = models.DateField(auto_now_add=True)
-    status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
+    status = models.CharField(max_length=200, choices=STATUS_CHOICES, default="На рассмотрении", help_text="Введите статус заявки")
     start_time = models.TimeField(default=timezone.now)
     end_time = models.TimeField(default=timezone.now)
 
