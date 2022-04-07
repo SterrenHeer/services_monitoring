@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from django.conf import settings
 
 
 class Request(models.Model):
@@ -28,17 +29,18 @@ class Request(models.Model):
 
 
 class RequestComment (models.Model):
-    comment_text = models.CharField(max_length=200, help_text="Введите комментарий")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    text = models.CharField(max_length=600, help_text="Введите комментарий")
     status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
     submission_date = models.DateField(auto_now_add=True)
     request = models.ForeignKey('Request', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.comment_text} ({self.request.service})"
+        return f"{self.text} ({self.request.service})"
 
 
 class Comment(models.Model):
-    comment_text = models.CharField(max_length=200, help_text="Введите комментарий")
+    comment_text = models.CharField(max_length=600, help_text="Введите комментарий")
     status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
     submission_date = models.DateField(auto_now_add=True)
     service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)

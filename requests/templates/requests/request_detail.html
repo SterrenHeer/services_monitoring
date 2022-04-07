@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="rol-10 mx-auto col-md-6 my-3 text-center">
+    <div class="col-10 mx-auto col-md-6 my-3 text-center">
         <h1>{{ request.service }}</h1>
         <h5 class="text-info font-italic mb-4">{{ request.service.service_type }}</h5>
         <p><strong>Дата подачи:</strong> {{ request.submission_date }}</p>
@@ -21,5 +21,26 @@
         {% else %}
         <a href="{% url 'tenant_requests' user.tenant.full_name %}">Вернуться к выбору заявки</a>
         {% endif %}
+    </div>
+    <div class="col-10 mx-auto col-md-4 col-lg-6">
+        <h3 class="editContent text-center"></span>Оставить отзыв</h3>
+        <form action="{% url 'request_comment_create' request.id %}" method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="form-group editContent">
+                <label for="comment" class="editContent">Ваш комментарий *</label>
+                <textarea class="form-control border" rows="3" name="text" id="comment" required=""></textarea>
+                <button type="submit" class="col-12 btn btn-success d-block mx-auto">Отправить</button>
+            </div>
+        </form>
+    </div>
+    <div col-10 mx-auto col-md-4 col-lg-6>
+    {% for comment in request.requestcomment_set.all %}
+        <div class="py-3">
+            <div class="mt-4">
+                <h5 class="mt-0 editContent">{{ user.username }}</h5>
+                <p class="mt-2 editContent">{{ comment.text }}</p>
+            </div>
+        </div>
+    {% endfor %}
     </div>
 {% endblock %}

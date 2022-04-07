@@ -1,8 +1,10 @@
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Request
 from users.models import Tenant
-from django.contrib.auth.models import Group, User
+from django.views.generic.base import View
+from .forms import RequestCommentForm
 
 
 class TenantRequestsListView(ListView):
@@ -65,6 +67,19 @@ class ManagerUpdateRequest(UpdateView):
     model = Request
     template_name = 'requests/update_request.html'
     fields = ['status', 'start_time', 'end_time']
+
+
+class CreateRequestComment(View):
+    def post(self, request, pk):
+        form = RequestCommentForm(request.POST)
+        print(request.POST)
+        request = Request.objects.get(id=pk)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.request = request
+            form.user = self.request.user
+            form.save()
+        return redirect(request.get_absolute_url())
 
 
 class DeleteRequest(DeleteView):
