@@ -23,24 +23,43 @@
         {% endif %}
     </div>
     <div class="col-10 mx-auto col-md-4 col-lg-6">
-        <h3 class="editContent text-center"></span>Оставить отзыв</h3>
-        <form action="{% url 'request_comment_create' request.id %}" method="post" class="mt-4">
+        <h3 class="editContent text-center">Оставить отзыв</h3>
+        <form action="{% url 'request_comment_create' request.id %}" method="post" class="mt-4" id="comment_form">
             {% csrf_token %}
+            <input type="hidden" name="initial" id="initial_comment" value="">
             <div class="form-group editContent">
                 <label for="comment" class="editContent">Ваш комментарий *</label>
                 <textarea class="form-control border" rows="3" name="text" id="comment" required=""></textarea>
                 <button type="submit" class="col-12 btn btn-success d-block mx-auto">Отправить</button>
             </div>
         </form>
-    </div>
-    <div col-10 mx-auto col-md-4 col-lg-6>
-    {% for comment in request.requestcomment_set.all %}
-        <div class="py-3">
-            <div class="mt-4">
-                <h5 class="mt-0 editContent">{{ user.username }}</h5>
-                <p class="mt-2 editContent">{{ comment.text }}</p>
+        <div col-10 mx-auto col-md-4 col-lg-6>
+        {% for comment in request.get_comments %}
+            <div class="mt-3">
+                <div>
+                    <h5>{{ comment.user.username }}</h5>
+                    <p>{{ comment.submission_date }}</p>
+                    <p>{{ comment.text }}</p>
+                    <a href="#comment_form" onclick="reply('{{ user.username }}', '{{ comment.id }}')">Ответить</a>
+                </div>
             </div>
+            {% for comm in comment.requestcomment_set.all %}
+            <div class="ps-5 mt-3">
+                <div>
+                    <h5>{{ comm.user.username }}</h5>
+                    <p>{{ comm.submission_date }}</p>
+                    <p>{{ comm.text }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% endfor %}
         </div>
-    {% endfor %}
     </div>
+    <script>
+        function reply(username, id) {
+            document.getElementById("initial_comment").value = id;
+            document.getElementById("comment").innerText = `${ username },`
+        }
+    </script>
+
 {% endblock %}

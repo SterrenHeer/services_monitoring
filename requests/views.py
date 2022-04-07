@@ -78,6 +78,8 @@ class CreateRequestComment(View):
             form = form.save(commit=False)
             form.request = request
             form.user = self.request.user
+            if self.request.POST.get("initial", None):
+                form.initial_id = int(self.request.POST.get("initial"))
             form.save()
         return redirect(request.get_absolute_url())
 
