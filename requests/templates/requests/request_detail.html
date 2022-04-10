@@ -29,18 +29,38 @@
             <input type="hidden" name="initial" id="initial_comment" value="">
             <div class="form-group editContent">
                 <label for="comment" class="editContent">Ваш комментарий *</label>
-                <textarea class="form-control border" rows="3" name="text" id="comment" required=""></textarea>
+                {% if user|has_group:"Manager" %}
+                <div id="new_status_div" hidden>
+                    <label for="new_status">Статус замечания:</label>
+                    <select name="new_status" id="new_status">
+                        <option id="initial_status" value="">Не изменять статус</option>
+                        <option value="На рассмотрении">На рассмотрении</option>
+                        <option value="Отклонено">Отклонено</option>
+                        <option value="Принято к устранению">Принято к устранению</option>
+                        <option value="Устранено">Устранено</option>
+                    </select>
+                </div>
+                {% endif %}
+                {% if user|has_group:"Tenant" %}
+                <input type="radio" name="status" value="Отзыв" id="feedback" required checked>
+                <label for="feedback" class="editContent">Отзыв</label>
+                <input type="radio" name="status" value="Замечание" id="complaint" required>
+                <label for="complaint" class="editContent">Замечание</label>
+                {% endif %}
+                <textarea class="form-control border" rows="3" name="text" id="comment" required></textarea>
                 <button type="submit" class="col-12 btn btn-success d-block mx-auto">Отправить</button>
             </div>
         </form>
-        <div col-10 mx-auto col-md-4 col-lg-6>
+        <div>
         {% for comment in request.get_comments %}
             <div class="mt-3">
                 <div>
                     <h5>{{ comment.user.username }}</h5>
                     <p>{{ comment.submission_date }}</p>
                     <p>{{ comment.text }}</p>
-                    <a href="#comment_form" onclick="reply('{{ user.username }}', '{{ comment.id }}')">Ответить</a>
+                    {% if comment.status != 'Отзыв' and not comment.user|has_group:"Manager" %}
+                    <a href="#comment_form" onclick="reply('{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
+                    {% endif %}
                 </div>
             </div>
             {% for comm in comment.requestcomment_set.all %}
@@ -56,9 +76,11 @@
         </div>
     </div>
     <script>
-        function reply(username, id) {
-            document.getElementById("initial_comment").value = id;
-            document.getElementById("comment").innerText = `${ username },`
+        function reply(username, id, status) {
+            document.getElementById("initial_comment").value = id
+            document.getElementById("initial_status").value = status
+            document.getElementById("comment").innerText = `${ username }, `
+            document.getElementById("new_status_div").hidden = false
         }
     </script>
 

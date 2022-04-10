@@ -34,7 +34,7 @@ class Request(models.Model):
 class RequestComment (models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.CharField(max_length=600, help_text="Введите комментарий")
-    status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
+    status = models.CharField(max_length=200, default="Ответ", help_text="Введите статус заявки")
     submission_date = models.DateField(auto_now_add=True)
     request = models.ForeignKey('Request', on_delete=models.SET_NULL, null=True)
     initial = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)

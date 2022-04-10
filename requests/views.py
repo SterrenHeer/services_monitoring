@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Request
+from .models import Request, RequestComment
 from users.models import Tenant
 from django.views.generic.base import View
 from .forms import RequestCommentForm
@@ -72,14 +72,20 @@ class ManagerUpdateRequest(UpdateView):
 class CreateRequestComment(View):
     def post(self, request, pk):
         form = RequestCommentForm(request.POST)
-        print(request.POST)
         request = Request.objects.get(id=pk)
         if form.is_valid():
             form = form.save(commit=False)
             form.request = request
+            print(self.request.POST)
             form.user = self.request.user
+            if self.request.POST.get("status", None):
+                form.status = self.request.POST.get("status")
             if self.request.POST.get("initial", None):
-                form.initial_id = int(self.request.POST.get("initial"))
+                initial_comment = RequestComment.objects.get(id=int(self.request.POST.get("initial")))
+                form.initial_id = initial_comment.id
+                if self.request.POST.get("new_status", None):
+                    initial_comment.status = self.request.POST.get("new_status")
+                    initial_comment.save()
             form.save()
         return redirect(request.get_absolute_url())
 
