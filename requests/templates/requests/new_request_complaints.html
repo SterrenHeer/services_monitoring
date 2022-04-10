@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Замечания
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% if requestcomment_list %}
+            {% for comment in requestcomment_list %}
+            <div class="col-12 mx-auto col-md-12 col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-footer">
+                        <a href="{{ comment.request.get_absolute_url }}"><h5 class="font-weight-bold mb-0 text-center">{{ comment.get_summary }}</h5></a>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <h5 class="text-info font-italic mb-0">{{ comment.user }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ comment.request }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-center">Не было получено ни одного нового замечания.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

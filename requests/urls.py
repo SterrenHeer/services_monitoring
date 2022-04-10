@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('<str:pk>/requests/', views.TenantRequestsListView.as_view(), name='tenant_requests'),
     path('allrequests/', views.AllRequestsListView.as_view(), name='all_requests'),
+    path('complaints/new/', views.RequestComplaintsListView.as_view(), name='new_request_complaints'),
     path('details/<int:pk>', views.RequestDetailView.as_view(), name='request_details'),
     path("request/comment/<int:pk>/", views.CreateRequestComment.as_view(), name="request_comment_create"),
     path('request/create/', views.CreateRequest.as_view(), name='request_create'),

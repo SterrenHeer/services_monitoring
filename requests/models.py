@@ -42,6 +42,13 @@ class RequestComment (models.Model):
     def __str__(self):
         return f"{self.text} ({self.request.service})"
 
+    def get_summary(self):
+        if len(self.text) > 130:
+            summary = self.text[:130] + '...'
+        else:
+            summary = self.text
+        return summary
+
 
 class Comment(models.Model):
     comment_text = models.CharField(max_length=600, help_text="Введите комментарий")
@@ -60,5 +67,3 @@ class Recommendation(models.Model):
 
     def __str__(self):
         return f"{self.service} ({self.building})"
-
-

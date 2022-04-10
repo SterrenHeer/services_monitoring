@@ -16,6 +16,15 @@ class TenantRequestsListView(ListView):
         return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
 
 
+class RequestComplaintsListView(ListView):
+    model = RequestComment
+    template_name = 'requests/new_request_complaints.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return RequestComment.objects.filter(status='Замечание').order_by('submission_date')
+
+
 class AllRequestsListView(ListView):
     model = Request
     template_name = 'requests/all_requests.html'
