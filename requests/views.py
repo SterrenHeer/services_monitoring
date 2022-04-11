@@ -7,26 +7,6 @@ from django.views.generic.base import View
 from .forms import RequestCommentForm
 
 
-class TenantRequestsListView(ListView):
-    model = Request
-    template_name = 'requests/tenant_requests.html'
-    paginate_by = 10
-
-    def get_queryset(self):
-        if not self.request.GET.get('status'):
-            return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
-        else:
-            return Request.objects.filter(tenant=self.request.user.tenant, status=self.request.GET.get('status')).order_by('submission_date')
-
-    def get_statuses(self):
-        return Request.objects.filter(tenant=self.request.user.tenant).values('status').distinct()
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
-        return context
-
-
 class RequestComplaintsListView(ListView):
     model = RequestComment
     template_name = 'requests/new_request_complaints.html'
@@ -41,15 +21,24 @@ class AllRequestsListView(ListView):
     template_name = 'requests/all_requests.html'
     paginate_by = 10
 
-    @staticmethod
-    def get_statuses():
-        return Request.objects.all().values('status').distinct()
+    def get_statuses(self):
+        if self.request.user.groups.filter(name='Manager').exists():
+            return Request.objects.all().values('status').distinct()
+        elif self.request.user.groups.filter(name='Tenant').exists():
+            return Request.objects.filter(tenant=self.request.user.tenant).values('status').distinct()
 
     def get_queryset(self):
-        if not self.request.GET.get('status'):
-            return Request.objects.all().order_by('submission_date')
-        else:
-            return Request.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
+        if self.request.user.groups.filter(name='Manager').exists():
+            if not self.request.GET.get('status'):
+                return Request.objects.all().order_by('submission_date')
+            else:
+                return Request.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
+        elif self.request.user.groups.filter(name='Tenant').exists():
+            if not self.request.GET.get('status'):
+                return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+            else:
+                return Request.objects.filter(tenant=self.request.user.tenant,
+                                              status=self.request.GET.get('status')).order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -89,7 +78,7 @@ class ManagerUpdateRequest(UpdateView):
     fields = ['status', 'start_time', 'end_time']
 
 
-class CreateRequestComment(View):
+class WorkWithRequestComment(View):
     def post(self, request, pk):
         form = RequestCommentForm(request.POST)
         request = Request.objects.get(id=pk)
@@ -118,10 +107,7 @@ class DeleteRequest(DeleteView):
     model = Request
 
     def get_success_url(self):
-        if self.request.user.groups.filter(name='Manager').exists():
-            return reverse_lazy('all_requests')
-        username = self.object.tenant.user.username
-        return reverse_lazy('tenant_requests', kwargs={'pk': username})
+        return reverse_lazy('all_requests')
 
 
 class DeleteRequestComment(DeleteView):

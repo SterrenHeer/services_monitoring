@@ -18,11 +18,9 @@
         {% if user|has_group:"Manager" %}
         <p><strong>Закреплённый работник:</strong></p>
         <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
-        <a href="{% url 'all_requests' %}">Вернуться к списку заявок</a><br>
-        <a href="{% url 'new_request_complaints' %}">Вернуться к списку замечаний</a>
-        {% else %}
-        <a href="{% url 'tenant_requests' user.first_name %}">Вернуться к выбору заявки</a>
+        <a href="{% url 'new_request_complaints' %}">Вернуться к списку замечаний</a><br>
         {% endif %}
+        <a href="{% url 'all_requests' %}">Вернуться к списку заявок</a>
     </div>
     <div class="col-10 mx-auto col-md-4 col-lg-6">
         <h3 class="editContent text-center">Оставить отзыв</h3>
@@ -64,8 +62,8 @@
                         <a href="#comment_form" onclick="reply( '{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
                     {% endif %}
                     {% if comment.user == user and not comment.requestcomment_set.exists %}
-                    <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-16">edit</i></a>
-                    <a href="{% url 'request_comment_delete' comment.id %}"><i class="material-icons md-16">delete</i></a>
+                    <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-24">edit</i></a>
+                    <a href="{% url 'request_comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
                     {% endif %}
                 </div>
             </div>

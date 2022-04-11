@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load custom_filters %}
+
 {% block title %}
     Заявки
 {% endblock %}
@@ -7,7 +9,11 @@
 {% block content %}
     <div class="container">
         <div class="row">
+            {% if user|has_group:"Manager" %}
             <a class="text-center" href="{% url 'manager_request_create' %}">Добавить новую заявку</a>
+            {% elif user|has_group:"Tenant" %}
+                <a class="text-center" href="{% url 'request_create' %}">Добавить новую заявку</a>
+            {% endif %}
             {% if request_list %}
             {% for request in request_list %}
             <div class="col-12 mx-auto col-md-12 col-lg-6">
@@ -17,8 +23,12 @@
                         <h5 class="text-info font-italic mb-0">{{ request.status }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
                         <div>
-                            <a href="{% url 'manager_request_update' request.id %}"><i class="material-icons md-16">edit</i></a>
-                            <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-16">delete</i></a>
+                            {% if user|has_group:"Manager" %}
+                            <a href="{% url 'manager_request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
+                            {% elif user|has_group:"Tenant" %}
+                            <a href="{% url 'request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
+                            {% endif %}
+                            <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                         </div>
                     </div>
                 </div>

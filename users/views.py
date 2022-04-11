@@ -5,6 +5,7 @@ from users.models import Tenant
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import UpdateView
+from django.urls import reverse_lazy
 
 
 def sign_up(request):
@@ -55,3 +56,6 @@ class TenantUpdate(UpdateView):
     model = Tenant
     template_name = 'users/update_tenant.html'
     fields = ['full_name', 'contact_details', 'apartment']
+
+    def get_success_url(self):
+        return reverse_lazy('all_requests')
