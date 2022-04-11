@@ -13,7 +13,18 @@ class TenantRequestsListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+        if not self.request.GET.get('status'):
+            return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+        else:
+            return Request.objects.filter(tenant=self.request.user.tenant, status=self.request.GET.get('status')).order_by('submission_date')
+
+    def get_statuses(self):
+        return Request.objects.filter(tenant=self.request.user.tenant).values('status').distinct()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
+        return context
 
 
 class RequestComplaintsListView(ListView):
@@ -29,16 +40,16 @@ class AllRequestsListView(ListView):
     model = Request
     template_name = 'requests/all_requests.html'
     paginate_by = 10
-    order_by = 'submission_date'
 
-    def get_statuses(self):
+    @staticmethod
+    def get_statuses():
         return Request.objects.all().values('status').distinct()
 
     def get_queryset(self):
         if not self.request.GET.get('status'):
-            return Request.objects.all()
+            return Request.objects.all().order_by('submission_date')
         else:
-            return Request.objects.filter(status=self.request.GET.get('status'))
+            return Request.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -91,10 +102,14 @@ class CreateRequestComment(View):
                 form.status = self.request.POST.get("status")
             if self.request.POST.get("initial", None):
                 initial_comment = RequestComment.objects.get(id=int(self.request.POST.get("initial")))
-                form.initial_id = initial_comment.id
-                if self.request.POST.get("new_status", None):
+                if self.request.POST.get("new_status", None) and self.request.POST.get("text", None):
+                    form.initial_id = initial_comment.id
                     initial_comment.status = self.request.POST.get("new_status")
-                    initial_comment.save()
+                    initial_comment.save(update_fields=['status'])
+                elif self.request.POST.get("text", None):
+                    initial_comment.text = self.request.POST.get("text")
+                    initial_comment.save(update_fields=['text'])
+                    return redirect(request.get_absolute_url())
             form.save()
         return redirect(request.get_absolute_url())
 
@@ -107,3 +122,10 @@ class DeleteRequest(DeleteView):
             return reverse_lazy('all_requests')
         username = self.object.tenant.user.username
         return reverse_lazy('tenant_requests', kwargs={'pk': username})
+
+
+class DeleteRequestComment(DeleteView):
+    model = RequestComment
+
+    def get_success_url(self):
+        return reverse_lazy('request_details', kwargs={'pk': self.object.request.id})

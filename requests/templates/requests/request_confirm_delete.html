@@ -16,7 +16,7 @@
             {% if user|has_group:"Manager" %}
             <a class="btn btn-secondary" href="{% url 'all_requests' %}">Нет, отменить удаление</a>
             {% else %}
-            <a class="btn btn-secondary" href="{% url 'tenant_requests' user.username %}">Нет, отменить и вернуться к просмотру</a>
+            <a class="btn btn-secondary" href="{% url 'tenant_requests' user.first_name %}">Нет, отменить и вернуться к просмотру</a>
             {% endif %}
         </form>
     </div>

@@ -12,4 +12,5 @@ urlpatterns = [
     path('request/<int:pk>/update/', views.UpdateRequest.as_view(), name='request_update'),
     path('request/<int:pk>/update/manager', views.ManagerUpdateRequest.as_view(), name='manager_request_update'),
     path('request/<int:pk>/delete/', views.DeleteRequest.as_view(), name='request_delete'),
+    path('request/comment/<int:pk>/delete/', views.DeleteRequestComment.as_view(), name='request_comment_delete'),
 ]

@@ -21,7 +21,7 @@
         <a href="{% url 'all_requests' %}">Вернуться к списку заявок</a><br>
         <a href="{% url 'new_request_complaints' %}">Вернуться к списку замечаний</a>
         {% else %}
-        <a href="{% url 'tenant_requests' user.tenant.full_name %}">Вернуться к выбору заявки</a>
+        <a href="{% url 'tenant_requests' user.first_name %}">Вернуться к выбору заявки</a>
         {% endif %}
     </div>
     <div class="col-10 mx-auto col-md-4 col-lg-6">
@@ -60,8 +60,12 @@
                     <h5>{{ comment.user.username }}</h5>
                     <p>{{ comment.submission_date }}</p>
                     <p>{{ comment.text }}</p>
-                    {% if comment.status != 'Отзыв' and not comment.user|has_group:"Manager" %}
-                    <a href="#comment_form" onclick="reply('{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
+                    {% if comment.status != 'Отзыв' and user|has_group:"Manager" and not comment.user|has_group:"Manager" %}
+                        <a href="#comment_form" onclick="reply( '{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
+                    {% endif %}
+                    {% if comment.user == user and not comment.requestcomment_set.exists %}
+                    <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-16">edit</i></a>
+                    <a href="{% url 'request_comment_delete' comment.id %}"><i class="material-icons md-16">delete</i></a>
                     {% endif %}
                 </div>
             </div>
@@ -83,6 +87,10 @@
             document.getElementById("initial_status").value = status
             document.getElementById("comment").innerText = `${ username }, `
             document.getElementById("new_status_div").hidden = false
+        }
+        function edit(text, id) {
+            document.getElementById("comment").innerText = text
+            document.getElementById("initial_comment").value = id
         }
     </script>
 
