@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('allrequests/', views.AllRequestsListView.as_view(), name='all_requests'),
+    path('search/', views.Search.as_view(), name='search'),
     path('complaints/new/', views.RequestComplaintsListView.as_view(), name='new_request_complaints'),
     path('details/<int:pk>', views.RequestDetailView.as_view(), name='request_details'),
     path("request/comment/<int:pk>/", views.WorkWithRequestComment.as_view(), name="request_comment_create"),

@@ -5,6 +5,7 @@ from .models import Request, RequestComment
 from users.models import Tenant
 from django.views.generic.base import View
 from .forms import RequestCommentForm
+from django.db.models import Q
 
 
 class RequestComplaintsListView(ListView):
@@ -115,3 +116,27 @@ class DeleteRequestComment(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('request_details', kwargs={'pk': self.object.request.id})
+
+
+class Search(ListView):
+    paginate_by = 10
+
+    def get_queryset(self):
+        self.template_name = 'requests/all_requests.html'
+        search = self.request.GET.get("search")
+        previous_page = self.request.GET.get("previous_page")
+        # if 'request' in previous_page:
+        self.template_name = 'requests/all_requests.html'
+        if self.request.user.groups.filter(name='Manager').exists():
+            return Request.objects.filter(Q(tenant__full_name__icontains=search) |
+                                          Q(service__name__icontains=search) |
+                                          Q(submission_date__icontains=search) |
+                                          Q(tenant__user__username__icontains=search)).order_by('submission_date')
+        if self.request.user.groups.filter(name='Tenant').exists():
+            return Request.objects.filter(Q(service__name__icontains=search) |
+                                          Q(submission_date__icontains=search)).order_by('submission_date')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["search"] = f"search={self.request.GET.get('search')}&"
+        return context
