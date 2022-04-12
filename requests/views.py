@@ -10,11 +10,25 @@ from django.db.models import Q
 
 class RequestComplaintsListView(ListView):
     model = RequestComment
-    template_name = 'requests/new_request_complaints.html'
+    template_name = 'requests/request_comments.html'
     paginate_by = 10
 
     def get_queryset(self):
-        return RequestComment.objects.filter(status='Замечание').order_by('submission_date')
+        if not self.request.GET.get('status'):
+            return RequestComment.objects.all().order_by('submission_date')
+        else:
+            return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
+
+    @staticmethod
+    def get_statuses():
+        return RequestComment.objects.exclude(Q(status='Ответ') |
+                                              Q(status='Замечание') |
+                                              Q(status='Отзыв')).values('status').distinct()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
+        return context
 
 
 class AllRequestsListView(ListView):
@@ -120,12 +134,10 @@ class DeleteRequestComment(DeleteView):
 
 class Search(ListView):
     paginate_by = 10
+    template_name = 'requests/all_requests.html'
 
     def get_queryset(self):
-        self.template_name = 'requests/all_requests.html'
         search = self.request.GET.get("search")
-        previous_page = self.request.GET.get("previous_page")
-        # if 'request' in previous_page:
         self.template_name = 'requests/all_requests.html'
         if self.request.user.groups.filter(name='Manager').exists():
             return Request.objects.filter(Q(tenant__full_name__icontains=search) |

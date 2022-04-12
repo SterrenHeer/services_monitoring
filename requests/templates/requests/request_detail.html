@@ -18,7 +18,7 @@
         {% if user|has_group:"Manager" %}
         <p><strong>Закреплённый работник:</strong></p>
         <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
-        <a href="{% url 'new_request_complaints' %}">Вернуться к списку замечаний</a><br>
+        <a href="{% url 'request_comments' %}">Вернуться к списку замечаний</a><br>
         {% endif %}
         <a href="{% url 'all_requests' %}">Вернуться к списку заявок</a>
     </div>
@@ -54,10 +54,11 @@
         <div>
         {% for comment in request.get_comments %}
             <div class="mt-3">
-                <div>
+                <div class="text-white {% if comment.status == 'Замечание' %}bg-danger{% elif comment.status == 'Отзыв'%}bg-success{% else %}bg-info{% endif %}">
                     <h5>{{ comment.user.username }}</h5>
                     <p>{{ comment.submission_date }}</p>
                     <p>{{ comment.text }}</p>
+                    <p>{{ comment.status }}</p>
                     {% if comment.status != 'Отзыв' and user|has_group:"Manager" and not comment.user|has_group:"Manager" %}
                         <a href="#comment_form" onclick="reply( '{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
                     {% endif %}

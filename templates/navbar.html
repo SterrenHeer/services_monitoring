@@ -39,14 +39,28 @@
                     <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Заявки</a>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'all_requests' %}">Все заявки</a>
+                            {% if 'request' in request.path %}
                             {% for request in view.get_statuses %}
                             <a class="dropdown-item" href="{% url 'all_requests' %}?status={{ request.status }}">{{ request.status }}</a>
                             {% endfor %}
+                            {% endif %}
                         </div>
                     </li>
                 {% endif %}
                 {% if request.user|has_group:"Manager" %}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'new_request_complaints' %}">Новые замечания</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Замечание">Новые замечания</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Отзывы</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'request_comments' %}">Все замечания</a>
+                            {% if 'complaint' in request.path %}
+                            {% for request in view.get_statuses %}
+                            <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">{{ request.status }}</a>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </li>
                 {% elif  request.user|has_group:"Tenant" %}
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
                 {% elif request.user|has_group:"Master"%}
