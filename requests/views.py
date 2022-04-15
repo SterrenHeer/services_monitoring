@@ -19,17 +19,17 @@ class RequestComplaintsListView(ListView):
                 return RequestComment.objects.exclude(Q(status='Ответ') |
                                                       Q(status='Замечание') |
                                                       Q(status='Отзыв')).order_by('submission_date')
-            return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
+            return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('-submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
             if not self.request.GET.get('status'):
                 return RequestComment.objects.exclude(Q(status='Ответ') |
-                                                      Q(status='Отзыв')).filter(user=self.request.user).order_by('submission_date')
+                                                      Q(status='Отзыв')).filter(user=self.request.user).order_by('-submission_date')
             else:
                 if self.request.GET.get('status') == 'Ответ':
-                    return RequestComment.objects.filter(
-                        initial_id__in=RequestComment.objects.filter(user=self.request.user).values('id'))
+                    user_comments = RequestComment.objects.filter(user=self.request.user).values('id')
+                    return RequestComment.objects.filter(initial_id__in=user_comments).order_by('-submission_date')
                 return RequestComment.objects.filter(user=self.request.user,
-                                                     status=self.request.GET.get('status')).order_by('submission_date')
+                                                     status=self.request.GET.get('status')).order_by('-submission_date')
 
     @staticmethod
     def get_statuses():
@@ -158,8 +158,8 @@ class Search(ListView):
                                           Q(submission_date__icontains=search) |
                                           Q(tenant__user__username__icontains=search)).order_by('submission_date')
         if self.request.user.groups.filter(name='Tenant').exists():
-            return Request.objects.filter(Q(service__name__icontains=search) |
-                                          Q(submission_date__icontains=search)).order_by('submission_date')
+            return Request.objects.filter(Q(service__name__icontains=search, tenant=self.request.user.tenant) |
+                                          Q(submission_date__icontains=search, tenant=self.request.user.tenant)).order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
