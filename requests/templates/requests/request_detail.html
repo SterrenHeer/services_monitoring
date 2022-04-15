@@ -53,7 +53,7 @@
         </form>
         <div>
         {% for comment in request.get_comments %}
-            <div class="mt-3">
+            <div class="mt-3" id="{{ comment.id }}">
                 <div class="text-white {% if comment.status == 'Замечание' %}bg-danger{% elif comment.status == 'Отзыв'%}bg-success{% else %}bg-info{% endif %}">
                     <h5>{{ comment.user.username }}</h5>
                     <p>{{ comment.submission_date }}</p>
@@ -69,7 +69,7 @@
                 </div>
             </div>
             {% for comm in comment.requestcomment_set.all %}
-            <div class="ps-5 mt-3">
+            <div class="ps-5 mt-3" id="{{ comm.id }}">
                 <div>
                     <h5>{{ comm.user.username }}</h5>
                     <p>{{ comm.submission_date }}</p>

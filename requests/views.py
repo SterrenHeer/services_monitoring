@@ -14,10 +14,22 @@ class RequestComplaintsListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        if not self.request.GET.get('status'):
-            return RequestComment.objects.all().order_by('submission_date')
-        else:
+        if self.request.user.groups.filter(name='Manager').exists():
+            if not self.request.GET.get('status'):
+                return RequestComment.objects.exclude(Q(status='Ответ') |
+                                                      Q(status='Замечание') |
+                                                      Q(status='Отзыв')).order_by('submission_date')
             return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
+        elif self.request.user.groups.filter(name='Tenant').exists():
+            if not self.request.GET.get('status'):
+                return RequestComment.objects.exclude(Q(status='Ответ') |
+                                                      Q(status='Отзыв')).filter(user=self.request.user).order_by('submission_date')
+            else:
+                if self.request.GET.get('status') == 'Ответ':
+                    return RequestComment.objects.filter(
+                        initial_id__in=RequestComment.objects.filter(user=self.request.user).values('id'))
+                return RequestComment.objects.filter(user=self.request.user,
+                                                     status=self.request.GET.get('status')).order_by('submission_date')
 
     @staticmethod
     def get_statuses():
@@ -28,6 +40,7 @@ class RequestComplaintsListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
+        context["complaints_count"] = RequestComment.objects.filter(status='Замечание').count()
         return context
 
 

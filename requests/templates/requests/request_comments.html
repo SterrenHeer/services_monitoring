@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load custom_filters %}
+
 {% block title %}
     Замечания
 {% endblock %}
@@ -12,11 +14,20 @@
             <div class="col-12 mx-auto col-md-12 col-lg-6">
                 <div class="card mb-4">
                     <div class="card-footer">
-                        <a href="{{ comment.request.get_absolute_url }}"><h5 class="font-weight-bold mb-0 text-center">{{ comment.get_summary }}</h5></a>
+                        <a href="{{ comment.request.get_absolute_url }}#{{ comment.id }}"><h5 class="font-weight-bold mb-0 text-center">{{ comment.get_summary }}</h5></a>
                     </div>
                     <div class="card-footer d-flex justify-content-between">
+                        {% if user|has_group:"Manager" %}
                         <h5 class="text-info font-italic mb-0">{{ comment.user }}</h5>
+                        {% endif %}
                         <h5 class="text-info font-italic mb-0">{{ comment.request }}</h5>
+                        {% if user|has_group:"Tenant" %}
+                            {% if comment.status == 'Замечание' %}
+                            <h5 class="text-info font-italic mb-0">Не рассмотрено</h5>
+                            {% elif comment.status != 'Отзыв'%}
+                            <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
+                            {% endif %}
+                        {% endif %}
                         <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
                     </div>
                 </div>
