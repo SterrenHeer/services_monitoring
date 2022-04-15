@@ -35,7 +35,7 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home_page')
+                return redirect('all_requests')
             else:
                 return redirect('signup')
     else:
@@ -46,10 +46,6 @@ def log_in(request):
 def log_out(request):
     logout(request)
     return redirect('login')
-
-
-def home_page(request):
-    return render(request, 'users/home_page.html')
 
 
 class TenantUpdate(UpdateView):

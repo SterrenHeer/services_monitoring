@@ -67,6 +67,8 @@ class AllRequestsListView(ListView):
             else:
                 return Request.objects.filter(tenant=self.request.user.tenant,
                                               status=self.request.GET.get('status')).order_by('submission_date')
+        elif self.request.user.groups.filter(name='Master').exists():
+            return Request.objects.filter(status='В обработке').order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
