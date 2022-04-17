@@ -2,9 +2,9 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Request, RequestComment
-from users.models import Tenant
+from users.models import Tenant, Worker
 from django.views.generic.base import View
-from .forms import RequestCommentForm
+from .forms import RequestCommentForm, RequestForm
 from django.db.models import Q
 from django.http import HttpResponse
 import xlwt
@@ -121,22 +121,35 @@ class WorkWithRequestComment(View):
         if form.is_valid():
             form = form.save(commit=False)
             form.request = request
-            print(self.request.POST)
             form.user = self.request.user
-            if self.request.POST.get("status", None):
+            if self.request.POST.get("status"):
                 form.status = self.request.POST.get("status")
-            if self.request.POST.get("initial", None):
+            if self.request.POST.get("initial"):
                 initial_comment = RequestComment.objects.get(id=int(self.request.POST.get("initial")))
-                if self.request.POST.get("new_status", None) and self.request.POST.get("text", None):
+                if self.request.POST.get("new_status", "text"):
                     form.initial_id = initial_comment.id
                     initial_comment.status = self.request.POST.get("new_status")
                     initial_comment.save(update_fields=['status'])
-                elif self.request.POST.get("text", None):
+                elif self.request.POST.get("text"):
                     initial_comment.text = self.request.POST.get("text")
                     initial_comment.save(update_fields=['text'])
                     return redirect(request.get_absolute_url())
             form.save()
         return redirect(request.get_absolute_url())
+
+
+class WorkerAppointment(View):
+    def post(self, request, pk):
+        form = RequestForm(request.POST)
+        request = Request.objects.get(id=pk)
+        print(self.request.POST)
+        if form.is_valid():
+            if self.request.POST.get("worker"):
+                request.worker_id = self.request.POST.get("worker")
+            else:
+                request.worker_id = None
+            request.save(update_fields=['worker'])
+        return redirect(reverse_lazy('all_requests'))
 
 
 class DeleteRequest(DeleteView):

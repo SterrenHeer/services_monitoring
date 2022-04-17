@@ -34,6 +34,26 @@
                             <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                         </div>
                     </div>
+                    {% if user|has_group:"Master" %}
+                    <div class="card-footer d-flex justify-content-between">
+                        <form action="{% url 'worker_appointment' request.id %}" method="post">
+                            {% csrf_token %}
+                            <label for="worker">Закреплённый работник:</label>
+                            <select name="worker" id="worker">
+                                {% if request.worker_id %}
+                                <option value="{{ request.worker_id }}">{{ request.worker.full_name }}</option>
+                                {% else %}
+                                <option value="{{ request.worker_id }}">Не закреплён</option>
+                                {% endif %}
+                                {% for worker in request.get_workers %}
+                                <option value="{{ worker.id }}">{{ worker.full_name }}</option>
+                                {% endfor %}
+                                <option value="">Снять с заявки</option>
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

@@ -9,6 +9,7 @@ urlpatterns = [
     path('complaints/new/', views.RequestComplaintsListView.as_view(), name='request_comments'),
     path('details/<int:pk>', views.RequestDetailView.as_view(), name='request_details'),
     path("request/comment/<int:pk>/", views.WorkWithRequestComment.as_view(), name="request_comment_create"),
+    path("request/<int:pk>/appointment/", views.WorkerAppointment.as_view(), name="worker_appointment"),
     path('request/create/', views.CreateRequest.as_view(), name='request_create'),
     path('request/create/manager', views.ManagerRequestCreate.as_view(), name='manager_request_create'),
     path('request/<int:pk>/update/', views.UpdateRequest.as_view(), name='request_update'),

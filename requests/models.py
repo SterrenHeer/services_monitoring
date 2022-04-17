@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
+from users.models import Worker
 
 
 class Request(models.Model):
@@ -16,6 +17,7 @@ class Request(models.Model):
     )
     service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
     tenant = models.ForeignKey('users.Tenant', on_delete=models.SET_NULL, null=True)
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     submission_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=200, choices=STATUS_CHOICES, default="На рассмотрении", help_text="Введите статус заявки")
     start_time = models.TimeField(default=timezone.now)
@@ -29,6 +31,9 @@ class Request(models.Model):
 
     def get_comments(self):
         return self.requestcomment_set.filter(initial__isnull=True)
+
+    def get_workers(self):
+        return Worker.objects.filter(position__service_type=self.service.service_type)
 
 
 class RequestComment (models.Model):

@@ -15,8 +15,10 @@
         <p><strong>Время начала:</strong> {{ request.start_time }}</p>
         <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
         <p><strong>Предполагаемая стоимость:</strong> {{ request.service.price }} руб.</p>
-        {% if user|has_group:"Manager" %}
-        <p><strong>Закреплённый работник:</strong></p>
+        {% if user|has_group:"Manager" or user|has_group:"Master" %}
+        {% if request.worker %}
+        <p><strong>Закреплённый работник:</strong> {{ request.worker.full_name }}</p>
+        {% endif %}
         <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
         <a href="{% url 'request_comments' %}">Вернуться к списку замечаний</a><br>
         {% endif %}
