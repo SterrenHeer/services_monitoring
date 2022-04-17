@@ -55,7 +55,7 @@ class ServiceType(models.Model):
 
 class Position(models.Model):
     name = models.CharField(max_length=200, help_text="Введите название должности")
-    service_type = models.ForeignKey('ServiceType', on_delete=models.SET_NULL, null=True)
+    service_type = models.ManyToManyField('ServiceType')
 
     def __str__(self):
         return self.name

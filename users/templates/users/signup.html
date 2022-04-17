@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load static %}
+{% load custom_filters %}
 
 {% load crispy_forms_tags %}
 
@@ -29,12 +29,21 @@
         {% else %}
         <div class="mx-auto text-center">
             <br>
+        {% if user|has_group:"Master" %}
+            <h1>Новый работник успешно зарегистрирован</h1>
+            <br>
+            <div>
+                <p>Новый профиль успешно зарегистрирован и готов к аутентификации</p>
+                <br>
+                <a href="{% url 'all_workers' %}">Вернуться к списку работников</a>
+        {% else %}
             <h1>Ваша учётная запись успешно создана</h1>
             <br>
             <div>
                 <p>Ваша учётная запись успешно создана и готова к использованию!</p>
                 <br>
                 <a href="{% url 'login' %}">Перейти к авторизации</a>
+        {% endif %}
             </div>
         </div>
         {% endif %}

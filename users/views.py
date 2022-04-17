@@ -1,16 +1,19 @@
 from django.shortcuts import render, redirect
-from .forms import SignUpForm
+from .forms import SignUpTenantForm, SignUpWorkerForm
 from django.contrib.auth.models import Group, User
-from users.models import Tenant
+from users.models import Tenant, Worker
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, ListView
 from django.urls import reverse_lazy
 
 
 def sign_up(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        if request.user.groups.filter(name='Master').exists():
+            form = SignUpWorkerForm(request.POST)
+        else:
+            form = SignUpTenantForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -18,11 +21,19 @@ def sign_up(request):
             last_name = form.cleaned_data.get("last_name")
             patronymic = form.cleaned_data.get("patronymic")
             signup_user = User.objects.get(username=username)
-            user_group = Group.objects.get(name='Tenant')
-            user_group.user_set.add(signup_user)
-            Tenant.objects.filter(full_name=' '.join([last_name, first_name, patronymic])).update(user=signup_user)
+            if request.user.groups.filter(name='Master').exists():
+                user_group = Group.objects.get(name='Worker')
+                user_group.user_set.add(signup_user)
+                Worker.objects.filter(full_name=' '.join([last_name, first_name, patronymic])).update(user=signup_user)
+            else:
+                user_group = Group.objects.get(name='Tenant')
+                user_group.user_set.add(signup_user)
+                Tenant.objects.filter(full_name=' '.join([last_name, first_name, patronymic])).update(user=signup_user)
     else:
-        form = SignUpForm()
+        if request.user.groups.filter(name='Master').exists():
+            form = SignUpWorkerForm()
+        else:
+            form = SignUpTenantForm()
     return render(request, 'users/signup.html', {'form': form})
 
 
@@ -55,3 +66,10 @@ class TenantUpdate(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('all_requests')
+
+
+class WorkersListView(ListView):
+    model = Worker
+    template_name = 'users/all_users.html'
+    queryset = Worker.objects.filter(user__isnull=False)
+    paginate_by = 10

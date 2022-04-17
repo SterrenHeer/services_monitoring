@@ -67,6 +67,8 @@
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
                 {% elif request.user|has_group:"Master"%}
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_requests' %}">Заявки</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_workers' %}">Работники участка</a></li>
                 {% elif request.user|has_group:"Worker"%}
                 {% endif %}
             {% endif %}
