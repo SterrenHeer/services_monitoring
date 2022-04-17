@@ -13,6 +13,9 @@
             <a class="text-center" href="{% url 'manager_request_create' %}">Добавить новую заявку</a>
             {% elif user|has_group:"Tenant" %}
                 <a class="text-center" href="{% url 'request_create' %}">Добавить новую заявку</a>
+            {% elif user|has_group:"Master" %}
+                <a class="btn btn-secondary" href="{% url 'export_to_excel' %}">Экспортировать в Excel</a>
+                <a class="btn btn-secondary" href="{% url 'export_to_pdf' %}">Экспортировать в PDF</a>
             {% endif %}
             {% if request_list %}
             {% for request in request_list %}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Экспорт в PDF</title>
+	<style>
+		@page{
+			size: a4;
+			margin: 2cm 1cm 2cm 3cm;
+			@top-center{
+				content: 'Акт выполненных работ';
+			}
+            @bottom-right {
+                content: 'Страница ' counter(page) ' из ' counter(pages);
+            }
+		}
+	</style>
+</head>
+<body>
+    <h2>Список заявок</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Услуга</th>
+                <th>Жилец</th>
+                <th>Дата подачи</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for request in requests %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ request.service.name }}</td>
+                <td>{{ request.tenant.full_name}}</td>
+                <td>{{ request.submission_date}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

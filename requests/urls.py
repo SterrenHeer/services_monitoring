@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     path('allrequests/', views.AllRequestsListView.as_view(), name='all_requests'),
     path('search/', views.Search.as_view(), name='search'),
+    path('export/excel', views.export_to_excel, name='export_to_excel'),
+    path('export/pdf', views.export_to_pdf, name='export_to_pdf'),
     path('complaints/new/', views.RequestComplaintsListView.as_view(), name='request_comments'),
     path('details/<int:pk>', views.RequestDetailView.as_view(), name='request_details'),
     path("request/comment/<int:pk>/", views.WorkWithRequestComment.as_view(), name="request_comment_create"),

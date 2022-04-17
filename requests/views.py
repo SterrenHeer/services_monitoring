@@ -6,6 +6,12 @@ from users.models import Tenant
 from django.views.generic.base import View
 from .forms import RequestCommentForm
 from django.db.models import Q
+from django.http import HttpResponse
+import xlwt
+import datetime
+from weasyprint import HTML
+from django.template.loader import render_to_string
+import tempfile
 
 
 class RequestComplaintsListView(ListView):
@@ -167,3 +173,40 @@ class Search(ListView):
         context = super().get_context_data(*args, **kwargs)
         context["search"] = f"search={self.request.GET.get('search')}&"
         return context
+
+
+def export_to_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.date.today()) + '.xls'
+    work_book = xlwt.Workbook(encoding='utf-8')
+    sheet = work_book.add_sheet('Акт выполненных работ')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    columns = ['Услуга', 'Жилец', 'Дата подачи']
+    for col_num in range(len(columns)):
+        sheet.write(row_num, col_num, columns[col_num], font_style)
+    font_style = xlwt.XFStyle()
+    rows = Request.objects.filter(status='В обработке').values_list('service__name', 'tenant__full_name', 'submission_date')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            sheet.write(row_num, col_num, str(row[col_num]), font_style)
+    work_book.save(response)
+    return response
+
+
+def export_to_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    requests = Request.objects.filter(status='В обработке')
+    html_string = render_to_string('requests/pdf_output.html', {'requests': requests})
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output.seek(0)
+        response.write(output.read())
+    return response
