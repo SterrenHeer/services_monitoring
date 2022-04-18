@@ -63,6 +63,7 @@
                     </li>
                 {% elif  request.user|has_group:"Tenant" %}
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}">Мои замечания</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>

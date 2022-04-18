@@ -56,14 +56,14 @@ class RequestComment (models.Model):
 
 
 class Comment(models.Model):
-    comment_text = models.CharField(max_length=600, help_text="Введите комментарий")
+    text = models.CharField(max_length=85, help_text="Введите комментарий длиной не более 85 символов")
     status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
     submission_date = models.DateField(auto_now_add=True)
     service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
     tenant = models.ForeignKey('users.Tenant', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.comment_text} ({self.service})"
+        return f"{self.text} ({self.service})"
 
 
 class Recommendation(models.Model):

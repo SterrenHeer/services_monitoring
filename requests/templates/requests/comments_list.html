@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+    Рекомендации
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% if user|has_group:"Tenant" %}
+                <a class="text-center" href="{% url 'comment_create' %}">Добавить новую рекомендацию</a>
+            {% endif %}
+            {% if comment_list %}
+            {% for comment in comment_list %}
+            <div class="col-12 mx-auto col-md-12 col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-footer d-flex justify-content-between">
+                        <h5 class="font-weight-bold mb-0">{{ comment.text }}</h5>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <h5 class="text-info font-italic mb-0">{{ comment.service }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
+                        <div>
+                            {% if user|has_group:"Tenant" %}
+                            <a href="{% url 'comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-center">Не было подано ни одной рекомендации.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

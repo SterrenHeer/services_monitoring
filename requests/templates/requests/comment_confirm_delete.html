@@ -7,11 +7,11 @@
 {% block content %}
     <div class="text-center">
         <h1>Удаление заявки</h1>
-        <p>Вы уверены, что хотите удалить заявку <strong>{{ request }}</strong>?</p>
+        <p>Вы уверены, что хотите удалить рекомендацию по услуге <strong>{{ comment.service }}</strong>?</p>
         <form action="" method="POST">
             {% csrf_token %}
             <button class="btn btn-danger" type="submit">Да, я уверен(а)</button>
-            <a class="btn btn-secondary" href="{% url 'all_requests' %}">Нет, отменить удаление</a>
+            <a class="btn btn-secondary" href="{% url 'comments' %}">Нет, отменить удаление</a>
         </form>
     </div>
 {% endblock %}

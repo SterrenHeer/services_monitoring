@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Создайте новую рекомендацию
+{% endblock %}
+
+{% block content %}
+    <div>
+        <div>
+            <br>
+            <h1 class="text-center">Создание новой рекомендации</h1>
+            <br>
+            <div class="col-9 col-sm-9 col-md-6 col-lg-5 mx-auto bg-light">
+                <br>
+                <p>Пожалуйста, введите следующую информацию, чтобы создать новую рекомендацию</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <p>{{ form | crispy}}</p>
+                    <button type="submit" name="button" class="btn btn-secondary d-block mx-auto">Создать рекомендацию</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

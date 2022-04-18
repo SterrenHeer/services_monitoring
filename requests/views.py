@@ -1,7 +1,8 @@
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Request, RequestComment
+from .models import Request, RequestComment, Comment
+from documentation.models import Service
 from users.models import Tenant, Worker
 from django.views.generic.base import View
 from .forms import RequestCommentForm, RequestForm
@@ -14,9 +15,9 @@ from django.template.loader import render_to_string
 import tempfile
 
 
-class RequestComplaintsListView(ListView):
+class RequestCommentsListView(ListView):
     model = RequestComment
-    template_name = 'requests/request_comments.html'
+    template_name = 'requests/request_comments_list.html'
     paginate_by = 10
 
     def get_queryset(self):
@@ -52,7 +53,7 @@ class RequestComplaintsListView(ListView):
 
 class AllRequestsListView(ListView):
     model = Request
-    template_name = 'requests/all_requests.html'
+    template_name = 'requests/requests_list.html'
     paginate_by = 10
 
     def get_statuses(self):
@@ -82,6 +83,15 @@ class AllRequestsListView(ListView):
         return context
 
 
+class CommentListView(ListView):
+    model = Comment
+    template_name = 'requests/comments_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Comment.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+
+
 class RequestDetailView(DetailView):
     model = Request
 
@@ -94,6 +104,29 @@ class CreateRequest(CreateView):
     def form_valid(self, form):
         form.instance.tenant = Tenant.objects.get(user=self.request.user)
         return super(CreateRequest, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__title='Ремонтные работы')
+        return context
+
+
+class CreateComment(CreateView):
+    model = Comment
+    template_name = 'requests/create_comment.html'
+    fields = ['text', 'service']
+
+    def form_valid(self, form):
+        form.instance.tenant = Tenant.objects.get(user=self.request.user)
+        return super(CreateComment, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['form'].fields['service'].queryset = Service.objects.exclude(service_type__title='Ремонтные работы')
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('comments')
 
 
 class ManagerRequestCreate(CreateView):
@@ -166,13 +199,20 @@ class DeleteRequestComment(DeleteView):
         return reverse_lazy('request_details', kwargs={'pk': self.object.request.id})
 
 
+class DeleteComment(DeleteView):
+    model = Comment
+
+    def get_success_url(self):
+        return reverse_lazy('comments')
+
+
 class Search(ListView):
     paginate_by = 10
-    template_name = 'requests/all_requests.html'
+    template_name = 'requests/requests_list.html'
 
     def get_queryset(self):
         search = self.request.GET.get("search")
-        self.template_name = 'requests/all_requests.html'
+        self.template_name = 'requests/requests_list.html'
         if self.request.user.groups.filter(name='Manager').exists():
             return Request.objects.filter(Q(tenant__full_name__icontains=search) |
                                           Q(service__name__icontains=search) |
