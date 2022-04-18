@@ -24,11 +24,32 @@
                         <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
                         <div>
-                            {% if user|has_group:"Tenant" %}
+                            {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
                             <a href="{% url 'comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
                         </div>
                     </div>
+                    {% if user|has_group:"Master" %}
+                    <div class="card-footer d-flex justify-content-between">
+                        <form action="{% url 'worker_appointment' comment.id %}" method="post">
+                            {% csrf_token %}
+                             <input type="hidden" name="comment" value="true">
+                            <label for="worker">Закреплённый работник:</label>
+                            <select name="worker" id="worker">
+                                {% if comment.worker_id %}
+                                <option value="{{ comment.worker_id }}">{{ comment.worker.full_name }}</option>
+                                {% else %}
+                                <option value="{{ comment.worker_id }}">Не закреплён</option>
+                                {% endif %}
+                                {% for worker in comment.get_workers %}
+                                <option value="{{ worker.id }}">{{ worker.full_name }}</option>
+                                {% endfor %}
+                                <option value="">Снять с заявки</option>
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

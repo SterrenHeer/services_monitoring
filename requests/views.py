@@ -5,7 +5,7 @@ from .models import Request, RequestComment, Comment
 from documentation.models import Service
 from users.models import Tenant, Worker
 from django.views.generic.base import View
-from .forms import RequestCommentForm, RequestForm
+from .forms import RequestCommentForm, RequestForm, CommentForm
 from django.db.models import Q
 from django.http import HttpResponse
 import xlwt
@@ -61,6 +61,10 @@ class AllRequestsListView(ListView):
             return Request.objects.all().values('status').distinct()
         elif self.request.user.groups.filter(name='Tenant').exists():
             return Request.objects.filter(tenant=self.request.user.tenant).values('status').distinct()
+        if self.request.user.groups.filter(name='Master').exists():
+            service_types = self.request.user.worker.position.service_type.all()
+            return Request.objects.exclude(Q(status='На рассмотрении') |
+                                           Q(status='Отклонена')).filter(service__service_type__in=service_types).values('status').distinct()
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
@@ -75,7 +79,13 @@ class AllRequestsListView(ListView):
                 return Request.objects.filter(tenant=self.request.user.tenant,
                                               status=self.request.GET.get('status')).order_by('submission_date')
         elif self.request.user.groups.filter(name='Master').exists():
-            return Request.objects.filter(status='В обработке').order_by('submission_date')
+            service_types = self.request.user.worker.position.service_type.all()
+            if not self.request.GET.get('status'):
+                return Request.objects.filter(service__service_type__in=service_types,
+                                              status='В обработке').order_by('submission_date')
+            else:
+                return Request.objects.filter(service__service_type__in=service_types,
+                                              status=self.request.GET.get('status')).order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -89,7 +99,11 @@ class CommentListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Comment.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+        if self.request.user.groups.filter(name='Tenant').exists():
+            return Comment.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+        if self.request.user.groups.filter(name='Master').exists():
+            service_types = self.request.user.worker.position.service_type.all()
+            return Comment.objects.filter(service__service_type__in=service_types).order_by('submission_date')
 
 
 class RequestDetailView(DetailView):
@@ -173,16 +187,31 @@ class WorkWithRequestComment(View):
 
 class WorkerAppointment(View):
     def post(self, request, pk):
-        form = RequestForm(request.POST)
-        request = Request.objects.get(id=pk)
-        print(self.request.POST)
-        if form.is_valid():
-            if self.request.POST.get("worker"):
-                request.worker_id = self.request.POST.get("worker")
-            else:
-                request.worker_id = None
-            request.save(update_fields=['worker'])
-        return redirect(reverse_lazy('all_requests'))
+        if self.request.POST.get("comment"):
+            form = CommentForm(request.POST)
+            comment = Comment.objects.get(id=pk)
+            print(self.request.POST)
+            if form.is_valid():
+                if self.request.POST.get("worker"):
+                    comment.worker_id = self.request.POST.get("worker")
+                    comment.status = 'Принято'
+                else:
+                    comment.worker_id = None
+                    comment.status = 'На рассмотрении'
+                comment.save(update_fields=['worker', 'status'])
+            return redirect(reverse_lazy('comments'))
+        else:
+            form = RequestForm(request.POST)
+            request = Request.objects.get(id=pk)
+            if form.is_valid():
+                if self.request.POST.get("worker"):
+                    request.worker_id = self.request.POST.get("worker")
+                    request.status = 'Принята'
+                else:
+                    request.worker_id = None
+                    request.status = 'В обработке'
+                request.save(update_fields=['worker', 'status'])
+            return redirect(reverse_lazy('all_requests'))
 
 
 class DeleteRequest(DeleteView):

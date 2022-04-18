@@ -71,5 +71,8 @@ class TenantUpdate(UpdateView):
 class WorkersListView(ListView):
     model = Worker
     template_name = 'users/all_users.html'
-    queryset = Worker.objects.filter(user__isnull=False)
     paginate_by = 10
+
+    def get_queryset(self):
+        service_types = self.request.user.worker.position.service_type.all()
+        return Worker.objects.filter(user__isnull=False, position__service_type__in=service_types).distinct()

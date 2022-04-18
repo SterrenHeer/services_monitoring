@@ -61,9 +61,13 @@ class Comment(models.Model):
     submission_date = models.DateField(auto_now_add=True)
     service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
     tenant = models.ForeignKey('users.Tenant', on_delete=models.SET_NULL, null=True)
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.text} ({self.service})"
+
+    def get_workers(self):
+        return Worker.objects.filter(position__service_type=self.service.service_type)
 
 
 class Recommendation(models.Model):
