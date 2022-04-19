@@ -45,7 +45,7 @@ class RequestComment (models.Model):
     initial = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.text} ({self.request.service})"
+        return f"{self.text} ({self.request})"
 
     def get_summary(self):
         if len(self.text) > 130:

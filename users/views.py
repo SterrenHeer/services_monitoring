@@ -46,7 +46,10 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('all_requests')
+                if request.user.groups.filter(name='Master').exists() and not request.user.has_perm('requests.change_repairrequest'):
+                    return redirect('comments')
+                else:
+                    return redirect('all_requests')
             else:
                 return redirect('signup')
     else:

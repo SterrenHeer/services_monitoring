@@ -21,7 +21,7 @@ class SignUpTenantForm(UserCreationForm):
         patronymic = cleaned_data.get("patronymic")
 
         if not Tenant.objects.filter(full_name=' '.join([last_name, first_name, patronymic])).exists():
-            message = "Вы не являетесь жильцом данного участка"
+            message = "Вы не являетесь жильцом данного участка."
             self.add_error('first_name', message)
             self.add_error('last_name', message)
             self.add_error('patronymic', message)

@@ -35,7 +35,7 @@
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
             {% if request.user.is_authenticated %}
-                {% if request.user|has_group:"Manager" or request.user|has_group:"Tenant" or request.user|has_group:"Master"%}
+                {% if request.user|has_group:"Manager" or request.user|has_group:"Tenant" or request.user|has_group:"Master" and perms.requests %}
                     <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Заявки</a>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'all_requests' %}">Все заявки</a>

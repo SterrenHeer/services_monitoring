@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Request, RequestComment, Comment
 from documentation.models import Service
-from users.models import Tenant, Worker
+from users.models import Tenant
 from django.views.generic.base import View
 from .forms import RequestCommentForm, RequestForm, CommentForm
 from django.db.models import Q
@@ -116,11 +116,14 @@ class CreateRequest(CreateView):
     fields = ['service', 'start_time', 'end_time']
 
     def form_valid(self, form):
+        if form.cleaned_data['start_time'] >= form.cleaned_data['end_time']:
+            form.add_error('start_time', 'Введите правильное время.')
+            return self.form_invalid(form)
         form.instance.tenant = Tenant.objects.get(user=self.request.user)
         return super(CreateRequest, self).form_valid(form)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__title='Ремонтные работы')
         return context
 
@@ -134,8 +137,8 @@ class CreateComment(CreateView):
         form.instance.tenant = Tenant.objects.get(user=self.request.user)
         return super(CreateComment, self).form_valid(form)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.exclude(service_type__title='Ремонтные работы')
         return context
 
@@ -148,17 +151,35 @@ class ManagerRequestCreate(CreateView):
     template_name = 'requests/create_request.html'
     fields = ['tenant', 'service', 'start_time', 'end_time']
 
+    def form_valid(self, form):
+        if form.cleaned_data['start_time'] >= form.cleaned_data['end_time']:
+            form.add_error('start_time', 'Введите правильное время.')
+            return self.form_invalid(form)
+        return super(ManagerRequestCreate, self).form_valid(form)
+
 
 class UpdateRequest(UpdateView):
     model = Request
     template_name = 'requests/update_request.html'
     fields = ['service', 'start_time', 'end_time']
 
+    def form_valid(self, form):
+        if form.cleaned_data['start_time'] >= form.cleaned_data['end_time']:
+            form.add_error('start_time', 'Введите правильное время.')
+            return self.form_invalid(form)
+        return super(UpdateRequest, self).form_valid(form)
+
 
 class ManagerUpdateRequest(UpdateView):
     model = Request
     template_name = 'requests/update_request.html'
     fields = ['status', 'start_time', 'end_time']
+
+    def form_valid(self, form):
+        if form.cleaned_data['start_time'] >= form.cleaned_data['end_time']:
+            form.add_error('start_time', 'Введите правильное время.')
+            return self.form_invalid(form)
+        return super(ManagerUpdateRequest, self).form_valid(form)
 
 
 class WorkWithRequestComment(View):
