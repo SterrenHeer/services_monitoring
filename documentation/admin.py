@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Street, Building, Apartment, ServiceType, Service, Equipment, Position
+from .models import Street, Building, Apartment, ServiceType, Service, Equipment, Position, CleaningSchedule
 
 admin.site.register(Street)
 admin.site.register(Building)
@@ -8,3 +8,4 @@ admin.site.register(ServiceType)
 admin.site.register(Service)
 admin.site.register(Equipment)
 admin.site.register(Position)
+admin.site.register(CleaningSchedule)

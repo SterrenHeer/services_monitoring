@@ -1,4 +1,7 @@
 from django.db import models
+from django.conf import settings
+import datetime
+from django.db.models import Sum
 
 
 class Street(models.Model):
@@ -10,7 +13,7 @@ class Street(models.Model):
 
 class Building(models.Model):
     number = models.IntegerField()
-    street = models.ForeignKey('Street', on_delete=models.SET_NULL, null=True)
+    street = models.ForeignKey('Street', on_delete=models.CASCADE)
     apartments_quantity = models.IntegerField()
 
     def __str__(self):
@@ -18,7 +21,7 @@ class Building(models.Model):
 
 
 class Apartment(models.Model):
-    building = models.ForeignKey('Building', on_delete=models.SET_NULL, null=True)
+    building = models.ForeignKey('Building', on_delete=models.CASCADE)
     apartment_number = models.IntegerField()
     area = models.IntegerField()
     tenants_quantity = models.IntegerField()
@@ -29,8 +32,6 @@ class Apartment(models.Model):
 
 class Equipment(models.Model):
     title = models.CharField(max_length=200, help_text="Введите наименование оборудования")
-    cost = models.IntegerField()
-    quantity = models.IntegerField()
 
     def __str__(self):
         return self.title
@@ -39,8 +40,9 @@ class Equipment(models.Model):
 class Service(models.Model):
     name = models.CharField(max_length=200, help_text="Введите название услуги")
     price = models.IntegerField()
-    service_type = models.ForeignKey('ServiceType', on_delete=models.SET_NULL, null=True)
+    service_type = models.ForeignKey('ServiceType', on_delete=models.CASCADE)
     equipment = models.ManyToManyField('Equipment')
+    duration = models.TimeField(default=datetime.time(1, 0))
 
     def __str__(self):
         return self.name
@@ -60,3 +62,18 @@ class Position(models.Model):
     def __str__(self):
         return self.name
 
+
+class CleaningSchedule(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    building = models.ForeignKey('Building', on_delete=models.CASCADE)
+    service = models.ForeignKey('Service', on_delete=models.CASCADE)
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True)
+    date = models.DateField(default=datetime.date.today)
+    status = models.CharField(max_length=200, default="Запланирована")
+    start_time = models.TimeField(default=datetime.time(8, 0))
+
+    def __str__(self):
+        return f"{self.service} ({self.building})"
+
+    def get_end_time(self):
+        return datetime.time(self.start_time.hour + self.service.duration.hour)

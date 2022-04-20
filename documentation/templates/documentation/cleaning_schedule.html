@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+    График уборки
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% if user|has_group:"Master" %}
+                <a class="btn btn-secondary" href="{% url 'export_to_excel' %}">Экспортировать в Excel</a>
+                <a class="btn btn-secondary" href="{% url 'export_to_pdf' %}">Экспортировать в PDF</a>
+            {% endif %}
+            {% if cleaningschedule_list %}
+            {% for item in cleaningschedule_list %}
+            <div class="col-12 mx-auto col-md-12 col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-footer d-flex justify-content-between">
+                        <h5 class="text-info font-italic mb-0">{{ item.date }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ item.start_time }}-{{ item.get_end_time }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ item.service }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ item.building }}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ item.worker}}</h5>
+                        <h5 class="text-info font-italic mb-0">{{ item.status }}</h5>
+                        <div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-center">Не было подано ни одной заявки.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
