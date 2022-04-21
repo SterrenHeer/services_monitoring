@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('allrequests/', views.AllRequestsListView.as_view(), name='all_requests'),
     path('comments/', views.CommentListView.as_view(), name='comments'),
-    path('search/', views.Search.as_view(), name='search'),
+    path('search/requests/', views.SearchByRequests.as_view(), name='search_requests'),
     path('export/excel', views.export_to_excel, name='export_to_excel'),
     path('export/pdf', views.export_to_pdf, name='export_to_pdf'),
     path('request/comment/new/', views.RequestCommentsListView.as_view(), name='request_comments'),

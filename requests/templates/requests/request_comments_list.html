@@ -22,9 +22,7 @@
                         {% endif %}
                         <h5 class="text-info font-italic mb-0">{{ comment.request }}</h5>
                         {% if user|has_group:"Tenant" %}
-                            {% if comment.status == 'Замечание' %}
-                            <h5 class="text-info font-italic mb-0">Не рассмотрено</h5>
-                            {% elif comment.status != 'Отзыв' and comment.status != 'Ответ'%}
+                            {% if comment.status != 'Отзыв' and comment.status != 'Ответ'%}
                             <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
                             {% endif %}
                         {% endif %}

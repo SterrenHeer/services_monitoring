@@ -14,17 +14,6 @@
                 <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'login' %}">Авторизация<span class="material-icons md-24">login</span></a></li>
                 {% endif %}
             </ul>
-            <form action="{% url 'search' %}?previous_page={{ request.path }}" class="form-inline" method="get">
-                <div class="input-group">
-                    {% if not 'search' in request.path %}
-                    <input type="hidden" name="previous_page" value="{{ request.path }}">
-                    {% endif %}
-                    <input type="text" placeholder="Поиск по заявкам" name="search" required>
-                    <div>
-                        <button type="submit" class="btn-success"><span class="material-icons md-24">search</span></button>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 </nav>
@@ -35,7 +24,8 @@
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
             {% if request.user.is_authenticated %}
-                {% if request.user|has_group:"Manager" or request.user|has_group:"Tenant" or request.user|has_group:"Master" and perms.requests %}
+                {% if not perms.requests and request.user|has_group:"Master"%}
+                {% else %}
                     <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Заявки</a>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'all_requests' %}">Все заявки</a>
@@ -48,7 +38,7 @@
                     </li>
                 {% endif %}
                 {% if request.user|has_group:"Manager" %}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Замечание">Новые замечания{% if complaints_count %}({{ complaints_count  }}){% endif %}</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=На рассмотрении">Новые замечания{% if complaints_count %}({{ complaints_count  }}){% endif %}</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Отзывы</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
                     <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>

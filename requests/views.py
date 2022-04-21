@@ -24,13 +24,14 @@ class RequestCommentsListView(ListView):
         if self.request.user.groups.filter(name='Manager').exists():
             if not self.request.GET.get('status'):
                 return RequestComment.objects.exclude(Q(status='Ответ') |
-                                                      Q(status='Замечание') |
+                                                      Q(status='На рассотрении') |
                                                       Q(status='Отзыв')).order_by('submission_date')
             return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('-submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
             if not self.request.GET.get('status'):
                 return RequestComment.objects.exclude(Q(status='Ответ') |
-                                                      Q(status='Отзыв')).filter(user=self.request.user).order_by('-submission_date')
+                                                      Q(status='Отзыв')).filter(user=self.request.user)\
+                                             .order_by('-submission_date')
             else:
                 if self.request.GET.get('status') == 'Ответ':
                     user_comments = RequestComment.objects.filter(user=self.request.user).values('id')
@@ -41,13 +42,13 @@ class RequestCommentsListView(ListView):
     @staticmethod
     def get_statuses():
         return RequestComment.objects.exclude(Q(status='Ответ') |
-                                              Q(status='Замечание') |
+                                              Q(status='На рассмотрении') |
                                               Q(status='Отзыв')).values('status').distinct()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
-        context["complaints_count"] = RequestComment.objects.filter(status='Замечание').count()
+        context["complaints_count"] = RequestComment.objects.filter(status='На рассмотрении').count()
         return context
 
 
@@ -64,7 +65,8 @@ class AllRequestsListView(ListView):
         if self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
             return Request.objects.exclude(Q(status='На рассмотрении') |
-                                           Q(status='Отклонена')).filter(service__service_type__in=service_types).values('status').distinct()
+                                           Q(status='Отклонена')).filter(service__service_type__in=service_types)\
+                                  .values('status').distinct()
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
@@ -81,8 +83,10 @@ class AllRequestsListView(ListView):
         elif self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
             if not self.request.GET.get('status'):
-                return Request.objects.filter(service__service_type__in=service_types,
-                                              status='В обработке').order_by('submission_date')
+                return Request.objects.exclude(Q(status='На рассмотрении') |
+                                               Q(status='Отклонена'))\
+                                      .filter(service__service_type__in=service_types)\
+                                      .order_by('submission_date')
             else:
                 return Request.objects.filter(service__service_type__in=service_types,
                                               status=self.request.GET.get('status')).order_by('submission_date')
@@ -256,7 +260,7 @@ class DeleteComment(DeleteView):
         return reverse_lazy('comments')
 
 
-class Search(ListView):
+class SearchByRequests(ListView):
     paginate_by = 10
     template_name = 'requests/requests_list.html'
 
@@ -270,7 +274,15 @@ class Search(ListView):
                                           Q(tenant__user__username__icontains=search)).order_by('submission_date')
         if self.request.user.groups.filter(name='Tenant').exists():
             return Request.objects.filter(Q(service__name__icontains=search, tenant=self.request.user.tenant) |
-                                          Q(submission_date__icontains=search, tenant=self.request.user.tenant)).order_by('submission_date')
+                                          Q(submission_date__icontains=search, tenant=self.request.user.tenant))\
+                                  .order_by('submission_date')
+        if self.request.user.groups.filter(name='Master').exists():
+            service_types = self.request.user.worker.position.service_type.all()
+            return Request.objects.exclude(Q(status='На рассмотрении') |
+                                           Q(status='Отклонена'))\
+                                  .filter(Q(service__name__icontains=search, service__service_type__in=service_types) |
+                                          Q(submission_date__icontains=search, service__service_type__in=service_types))\
+                                  .order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -290,7 +302,8 @@ def export_to_excel(request):
     for col_num in range(len(columns)):
         sheet.write(row_num, col_num, columns[col_num], font_style)
     font_style = xlwt.XFStyle()
-    rows = Request.objects.filter(status='В обработке').values_list('service__name', 'tenant__full_name', 'submission_date')
+    rows = Request.objects.filter(status='В обработке')\
+                          .values_list('service__name', 'tenant__full_name', 'submission_date')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):

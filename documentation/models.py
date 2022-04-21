@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 import datetime
-from django.db.models import Sum
 
 
 class Street(models.Model):
