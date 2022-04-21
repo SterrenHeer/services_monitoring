@@ -15,8 +15,8 @@ class Request(models.Model):
         ('В процессе', 'В процессе'),
         ('Выполнена', 'Выполнена'),
     )
-    service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
-    tenant = models.ForeignKey('users.Tenant', on_delete=models.SET_NULL, null=True)
+    service = models.ForeignKey('documentation.Service', on_delete=models.CASCADE)
+    tenant = models.ForeignKey('users.Tenant', on_delete=models.CASCADE)
     worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     submission_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=200, choices=STATUS_CHOICES, default="На рассмотрении", help_text="Введите статус заявки")
@@ -41,7 +41,7 @@ class RequestComment (models.Model):
     text = models.CharField(max_length=600, help_text="Введите комментарий")
     status = models.CharField(max_length=200, default="Ответ", help_text="Введите статус заявки")
     submission_date = models.DateField(auto_now_add=True)
-    request = models.ForeignKey('Request', on_delete=models.SET_NULL, null=True)
+    request = models.ForeignKey('Request', on_delete=models.CASCADE)
     initial = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
@@ -59,8 +59,8 @@ class Comment(models.Model):
     text = models.CharField(max_length=85, help_text="Введите комментарий длиной не более 85 символов")
     status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
     submission_date = models.DateField(auto_now_add=True)
-    service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
-    tenant = models.ForeignKey('users.Tenant', on_delete=models.SET_NULL, null=True)
+    service = models.ForeignKey('documentation.Service', on_delete=models.CASCADE)
+    tenant = models.ForeignKey('users.Tenant', on_delete=models.CASCADE)
     worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
