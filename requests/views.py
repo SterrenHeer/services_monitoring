@@ -266,7 +266,6 @@ class SearchByRequests(ListView):
 
     def get_queryset(self):
         search = self.request.GET.get("search")
-        self.template_name = 'requests/requests_list.html'
         if self.request.user.groups.filter(name='Manager').exists():
             return Request.objects.filter(Q(tenant__full_name__icontains=search) |
                                           Q(service__name__icontains=search) |

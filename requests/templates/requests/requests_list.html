@@ -12,7 +12,8 @@
             <form action="{% url 'search_requests' %}" method="get">
                 <div class="d-flex flex-row justify-content-center">
                     <input type="text" placeholder="Поиск по заявкам" name="search" required>
-                    <button type="submit" class="btn-success"><span class="material-icons md-24">search</span></button>
+                    <button type="submit" class="btn btn-success"><span class="material-icons md-24">search</span></button>
+                    <a class="btn btn-success" href="{% url 'all_requests' %}"><span class="material-icons md-24">refresh</span></a>
                 </div>
             </form>
             <div class="d-flex justify-content-center">

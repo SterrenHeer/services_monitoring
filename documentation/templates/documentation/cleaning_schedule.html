@@ -8,6 +8,13 @@
 
 {% block content %}
     <div class="container">
+        <form action="{% url 'search_schedule' %}" method="get">
+            <div class="d-flex flex-row justify-content-center mt-2">
+                <input type="text" placeholder="Поиск по расписанию" name="search" required>
+                <button type="submit" class="btn btn-success"><span class="material-icons md-24">search</span></button>
+                <a class="btn btn-success" href="{% url 'cleaning_schedule' %}"><span class="material-icons md-24">refresh</span></a>
+            </div>
+        </form>
         {% if user|has_group:"Master" %}
         <div class="d-flex flex-row justify-content-center">
             <a class="btn btn-secondary" href="{% url 'export_to_excel' %}">Экспортировать в Excel</a>
@@ -26,7 +33,9 @@
                 <div class="card-footer d-flex flex-lg-row flex-column justify-content-between">
                     <h5 class="text-info font-italic mb-0">{{ item.start_time }}-{{ item.get_end_time }}</h5>
                     <h5 class="text-info font-italic mb-0">{{ item.service }}</h5>
+                    {% if not user|has_group:"Tenant" %}
                     <h5 class="text-info font-italic mb-0">{{ item.building }}</h5>
+                    {% endif %}
                     <h5 class="text-info font-italic mb-0">{{ item.worker}}</h5>
                     <h5 class="text-info font-italic mb-0">{{ item.status }}</h5>
                     <div>
@@ -35,11 +44,10 @@
                 </div>
             {% endfor %}
             </div>
-
         </div>
         {% endfor %}
         {% else %}
-        <p class="text-center">Не было подано ни одной заявки.</p>
+        <p class="text-center">В расписании нет ни одной записи.</p>
         {% endif %}
     </div>
 {% endblock %}
