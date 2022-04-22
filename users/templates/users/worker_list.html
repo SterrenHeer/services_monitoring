@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+    Пользователи
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="d-flex justify-content-center my-2">
+            <a class="btn btn-outline-primary" href="{% url 'signup' %}">Добавить нового работника</a>
+        </div>
+        <div class="row d-flex justify-content-center">
+            {% if worker_list %}
+            {% for worker in worker_list %}
+            {% if worker.id != user.worker.id%}
+            <div class="col-lg-6 col-md-12 mb-3">
+                <div class="card-footer d-flex justify-content-between">
+                    <h5 class="text-info font-italic mb-0">{{ worker.full_name }}</h5>
+                    <h5 class="text-info font-italic mb-0">{{ worker.position }}</h5>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div>
+                        {% for service in worker.get_services %}
+                        <h5 class="text-info font-italic mb-0">{{ service }}</h5>
+                        {% endfor %}
+                        <form action="{% url 'worker_update' worker.id %}" method="post">
+                            {% csrf_token %}
+                            <label for="position">Должность:</label>
+                            <select name="position">
+                                <option value="{{ worker.position_id }}">{{ worker.position }}</option>
+                                {% for position in worker.get_positions %}
+                                {% if position != worker.position %}
+                                <option value="{{ position.id }}">{{ position }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <p class="text-center">В базе не зарегистрирован ни один работник данного участка.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

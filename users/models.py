@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from documentation.models import Service, Position
 
 
 class Tenant(models.Model):
@@ -20,3 +21,10 @@ class Worker(models.Model):
 
     def __str__(self):
         return f"{self.full_name} ({self.position})"
+
+    def get_services(self):
+        return Service.objects.filter(service_type__in=self.position.service_type.all())
+
+    def get_positions(self):
+        return Position.objects.exclude(name__icontains='Мастер')\
+                               .filter(service_type__in=self.position.service_type.all()).distinct()

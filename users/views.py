@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
-from .forms import SignUpTenantForm, SignUpWorkerForm
+from .forms import SignUpTenantForm, SignUpWorkerForm, WorkerForm
 from django.contrib.auth.models import Group, User
 from users.models import Tenant, Worker
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import UpdateView, ListView
 from django.urls import reverse_lazy
+from django.views.generic.base import View
 
 
 def sign_up(request):
@@ -73,9 +74,20 @@ class TenantUpdate(UpdateView):
 
 class WorkersListView(ListView):
     model = Worker
-    template_name = 'users/all_users.html'
+    template_name = 'users/worker_list.html'
     paginate_by = 10
 
     def get_queryset(self):
         service_types = self.request.user.worker.position.service_type.all()
         return Worker.objects.filter(user__isnull=False, position__service_type__in=service_types).distinct()
+
+
+class PositionChanging(View):
+    def post(self, request, pk):
+        form = WorkerForm(request.POST)
+        worker = Worker.objects.get(id=pk)
+        if form.is_valid():
+            if self.request.POST.get("position"):
+                worker.position_id = self.request.POST.get("position")
+                worker.save()
+        return redirect(reverse_lazy('all_workers'))

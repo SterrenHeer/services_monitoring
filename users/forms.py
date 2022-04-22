@@ -47,3 +47,9 @@ class SignUpWorkerForm(UserCreationForm):
             self.add_error('first_name', message)
             self.add_error('last_name', message)
             self.add_error('patronymic', message)
+
+
+class WorkerForm(forms.ModelForm):
+    class Meta:
+        model = Worker
+        fields = ('position',)
