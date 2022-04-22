@@ -20,32 +20,48 @@
             <a class="btn btn-secondary" href="{% url 'export_to_excel' %}">Экспортировать в Excel</a>
             <a class="btn btn-secondary" href="{% url 'export_to_pdf' %}">Экспортировать в PDF</a>
         </div>
+        <div class="d-flex justify-content-center mt-3">
+            <a class="btn btn-outline-primary mb-3" href="{% url 'schedule_item_create' %}">Добавить новую запись</a>
+        </div>
         {% endif %}
         {% if cleaningschedule_list %}
-        {% regroup cleaningschedule_list by date as date_list %}
-        {% for date in date_list %}
-        <div class="d-flex flex-row mb-2">
-            <div class="card-footer d-flex flex-column justify-content-center">
-                <h5 class="text-info font-italic mb-0">{{ date.grouper }}</h5>
-            </div>
-            <div class="d-flex flex-column flex-grow-1">
-            {% for item in date.list %}
-                <div class="card-footer d-flex flex-lg-row flex-column justify-content-between">
-                    <h5 class="text-info font-italic mb-0">{{ item.start_time }}-{{ item.get_end_time }}</h5>
-                    <h5 class="text-info font-italic mb-0">{{ item.service }}</h5>
-                    {% if not user|has_group:"Tenant" %}
-                    <h5 class="text-info font-italic mb-0">{{ item.building }}</h5>
-                    {% endif %}
-                    <h5 class="text-info font-italic mb-0">{{ item.worker}}</h5>
-                    <h5 class="text-info font-italic mb-0">{{ item.status }}</h5>
-                    <div>
+        {% regroup cleaningschedule_list by building as building_list %}
+        <div class="d-flex flex-column">
+            {% for building in building_list %}
+            <div class="d-flex flex-column my-2">
+                {% if not user|has_group:"Tenant" %}
+                <div class="card-footer d-flex flex-row justify-content-center">
+                    <h5 class="text-info font-italic mb-0">{{ building.grouper }}</h5>
+                </div>
+                {% endif %}
+                {% regroup building.list by date as date_list %}
+                {% for date in date_list %}
+                <div class="d-flex flex-row">
+                    <div class="card-footer d-flex flex-column justify-content-center">
+                        <h5 class="text-info font-italic mb-0">{{ date.grouper }}</h5>
+                    </div>
+                    <div class="card-footer d-flex flex-column flex-grow-1">
+                        {% for item in date.list %}
+                        <div class="card-footer d-flex flex-lg-row flex-column justify-content-between flex-grow-1">
+                            <h5 class="text-info font-italic mb-0">{{ item.start_time }}-{{ item.get_end_time }}</h5>
+                            <h5 class="text-info font-italic mb-0">{{ item.service }}</h5>
+                            <h5 class="text-info font-italic mb-0">{{ item.worker}}</h5>
+                            <h5 class="text-info font-italic mb-0">{{ item.status }}</h5>
+                        </div>
+                        <div>
 
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            {% endfor %}
+                {% endfor %}
+
             </div>
+            {% if user|has_group:"Master" %}
+            <a class="btn btn-outline-primary mb-3" href="{% url 'schedule_item_create' %}">Добавить новую запись для данного дома</a>
+            {% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
         {% else %}
         <p class="text-center">В расписании нет ни одной записи.</p>
         {% endif %}
