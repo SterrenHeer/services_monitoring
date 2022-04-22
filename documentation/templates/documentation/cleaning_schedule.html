@@ -47,23 +47,23 @@
                             <h5 class="text-info font-italic mb-0">{{ item.service }}</h5>
                             <h5 class="text-info font-italic mb-0">{{ item.worker}}</h5>
                             <h5 class="text-info font-italic mb-0">{{ item.status }}</h5>
-                        </div>
-                        <div>
-
+                            <div>
+                                <a href="{% url 'schedule_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
+                                <a href="{% url 'schedule_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                 {% endfor %}
-
             </div>
             {% if user|has_group:"Master" %}
-            <a class="btn btn-outline-primary mb-3" href="{% url 'schedule_item_create' %}">Добавить новую запись для данного дома</a>
+            <a class="btn btn-outline-primary mb-3" href="{% url 'schedule_item_create' %}?building={{ building.grouper.id }}">Добавить новую запись для данного дома</a>
             {% endif %}
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-center">В расписании нет ни одной записи.</p>
+        <p class="text-center">В графики уборки нет ни одной записи.</p>
         {% endif %}
     </div>
 {% endblock %}

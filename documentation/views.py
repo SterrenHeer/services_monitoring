@@ -1,7 +1,8 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import CleaningSchedule
 from django.db.models import Q
+from .models import Service
 import datetime
 
 
@@ -13,7 +14,8 @@ class CleaningScheduleListView(ListView):
         if self.request.user.groups.filter(name__in=['Master', 'Manager']).exists():
             return CleaningSchedule.objects.all().order_by('building', 'date')
         elif self.request.user.groups.filter(name='Tenant').exists():
-            return CleaningSchedule.objects.filter(building_id=self.request.user.tenant.apartment.building).order_by('date')
+            return CleaningSchedule.objects.filter(building_id=self.request.user.tenant.apartment.building)\
+                                   .order_by('date')
 
 
 class SearchByCleaningSchedule(ListView):
@@ -53,9 +55,44 @@ class CreateScheduleItem(CreateView):
             form.add_error('start_time', 'Введите правильное время.')
         if form.errors:
             return self.form_invalid(form)
-
         form.instance.user = self.request.user
         return super(CreateScheduleItem, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        service_types = self.request.user.worker.position.service_type.all()
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__in=service_types)
+        return context
+
+    def get_initial(self):
+        initial = super(CreateScheduleItem, self).get_initial()
+        initial['building'] = self.request.GET.get("building")
+        return initial
+
+    def get_success_url(self):
+        return reverse_lazy('cleaning_schedule')
+
+
+class UpdateScheduleItem(UpdateView):
+    model = CleaningSchedule
+    template_name = 'documentation/update_schedule_item.html'
+    fields = ['building', 'service', 'worker', 'date', 'start_time']
+
+    def form_valid(self, form):
+        if form.cleaned_data['date'] < datetime.date.today():
+            form.add_error('date', 'Введите правильную дату.')
+        elif form.cleaned_data['date'] == datetime.date.today() and form.cleaned_data['start_time'] <= datetime.datetime.now().time():
+            form.add_error('start_time', 'Введите правильное время.')
+        if form.errors:
+            return self.form_invalid(form)
+        return super(UpdateScheduleItem, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('cleaning_schedule')
+
+
+class DeleteScheduleItem(DeleteView):
+    model = CleaningSchedule
 
     def get_success_url(self):
         return reverse_lazy('cleaning_schedule')

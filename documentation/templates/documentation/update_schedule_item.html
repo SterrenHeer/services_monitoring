@@ -3,22 +3,22 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    Создайте новую запись в графике уборки
+    Изменение записи в графике уборки
 {% endblock %}
 
 {% block content %}
     <div>
         <div>
             <br>
-            <h1 class="text-center">Создание новой записи графика уборки</h1>
+            <h1 class="text-center">Изменение записи в графике уборки</h1>
             <br>
             <div class="col-9 col-sm-9 col-md-6 col-lg-5 mx-auto bg-light">
                 <br>
-                <p>Пожалуйста, введите следующую информацию</p>
+                <p>Пожалуйста, измените необходимую информацию и сохраните изменения</p>
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
-                    <button type="submit" name="button" class="btn btn-secondary d-block mx-auto">Создать запись</button>
+                    <button type="submit" name="button" class="btn btn-secondary d-block mx-auto">Сохранить изменения</button>
                 </form>
             </div>
         </div>
