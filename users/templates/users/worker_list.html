@@ -14,7 +14,7 @@
         <div class="row d-flex justify-content-center">
             {% if worker_list %}
             {% for worker in worker_list %}
-            {% if worker.id != user.worker.id%}
+            {% if not worker.user|has_group:"Master" %}
             <div class="col-lg-6 col-md-12 mb-3">
                 <div class="card-footer d-flex justify-content-between">
                     <h5 class="text-info font-italic mb-0">{{ worker.full_name }}</h5>
@@ -25,10 +25,11 @@
                         {% for service in worker.get_services %}
                         <h5 class="text-info font-italic mb-0">{{ service }}</h5>
                         {% endfor %}
-                        <form action="{% url 'worker_update' worker.id %}" method="post">
+                        {% if user|has_group:"Master" %}
+                        <form action="{% url 'worker_update' worker.id %}" method="post" class="my-2">
                             {% csrf_token %}
                             <label for="position">Должность:</label>
-                            <select name="position">
+                            <select name="position" class="my-2">
                                 <option value="{{ worker.position_id }}">{{ worker.position }}</option>
                                 {% for position in worker.get_positions %}
                                 {% if position != worker.position %}
@@ -38,6 +39,7 @@
                             </select>
                             <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
                         </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>

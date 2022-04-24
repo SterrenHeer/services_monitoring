@@ -16,6 +16,8 @@ class CleaningScheduleListView(ListView):
         elif self.request.user.groups.filter(name='Tenant').exists():
             return CleaningSchedule.objects.filter(building_id=self.request.user.tenant.apartment.building)\
                                    .order_by('date')
+        elif self.request.user.groups.filter(name='Worker').exists():
+            return CleaningSchedule.objects.filter(worker=self.request.user.worker).order_by('building', 'date')
 
 
 class SearchByCleaningSchedule(ListView):

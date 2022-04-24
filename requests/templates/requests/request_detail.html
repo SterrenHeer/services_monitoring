@@ -10,6 +10,9 @@
     <div class="col-10 mx-auto col-md-6 my-3 text-center">
         <h1>{{ request.service }}</h1>
         <h5 class="text-info font-italic mb-4">{{ request.service.service_type }}</h5>
+        {% if request.answer %}
+        <p><strong>Ответ от работника:</strong> {{ request.answer }}</p>
+        {% endif %}
         <p><strong>Дата подачи:</strong> {{ request.submission_date }}</p>
         <p><strong>Состояние:</strong> {{ request.status }}</p>
         <p><strong>Время начала:</strong> {{ request.start_time }}</p>
@@ -29,7 +32,7 @@
         <h3 class="editContent text-center">Оставить отзыв</h3>
         <form action="{% url 'request_comment_create' request.id %}" method="post" class="mt-4" id="comment_form">
             {% csrf_token %}
-            <input type="hidden" name="initial" id="initial_comment" value="">
+            <input hidden name="initial" id="initial_comment" value="">
             <div class="form-group editContent">
                 <label for="comment" class="editContent">Ваш комментарий *</label>
                 {% if user|has_group:"Manager" %}
@@ -45,10 +48,12 @@
                 </div>
                 {% endif %}
                 {% if user|has_group:"Tenant" %}
-                <input type="radio" name="status" value="Отзыв" id="feedback" required checked>
-                <label for="feedback" class="editContent">Отзыв</label>
-                <input type="radio" name="status" value="На рассмотрении" id="complaint" required>
-                <label for="complaint" class="editContent">Замечание</label>
+                <span id="status_div">
+                    <input type="radio" name="status" value="Отзыв" id="feedback" required checked>
+                    <label for="feedback" class="editContent">Отзыв</label>
+                    <input type="radio" name="status" value="На рассмотрении" id="complaint" required>
+                    <label for="complaint" class="editContent">Замечание</label>
+                </span>
                 {% endif %}
                 <textarea class="form-control border" rows="3" name="text" id="comment" placeholder="Допустимая длина комментария - 600 символов" required></textarea>
                 <button type="submit" class="col-12 btn btn-success d-block mx-auto">Отправить</button>
@@ -93,6 +98,7 @@
         function edit(text, id) {
             document.getElementById("comment").innerText = text
             document.getElementById("initial_comment").value = id
+            document.getElementById("status_div").hidden = true
         }
     </script>
 

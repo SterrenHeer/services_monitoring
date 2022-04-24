@@ -23,12 +23,19 @@
                         <h5 class="text-info font-italic mb-0">{{ comment.service }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
-                        <div>
-                            {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
+                        {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
                             <a href="{% url 'comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
-                            {% endif %}
-                        </div>
+                        {% endif %}
                     </div>
+                    {% if not user|has_group:"Tenant" %}
+                    <div class="card-footer d-flex justify-content-between">
+                        <h5 class="text-info font-italic mb-0">{{ comment.tenant.full_name }}</h5>
+                    </div>
+                    <div class="card-footer d-flex justify-content-start">
+                        <h5 class="text-info font-italic mb-0">{{ comment.tenant.apartment }}</h5>
+                        <h5 class="text-info font-italic mb-0 mx-5">{{ comment.tenant.contact_details}}</h5>
+                    </div>
+                    {% endif %}
                     {% if user|has_group:"Master" %}
                     <div class="card-footer d-flex justify-content-between">
                         <form action="{% url 'worker_appointment' comment.id %}" method="post">
