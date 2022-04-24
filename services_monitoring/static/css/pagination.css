@@ -82,7 +82,7 @@
 }
 
 @media only screen and (min-width: 1025px) {
-    .pagination__item.active:hover
+    .pagination__item.active:hover,
     .pagination__link {
         color: #fff;
         background: #6658af

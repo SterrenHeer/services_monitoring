@@ -7,6 +7,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.generic import UpdateView, ListView
 from django.urls import reverse_lazy
 from django.views.generic.base import View
+import re
 
 
 def sign_up(request):
@@ -47,7 +48,8 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                if request.user.groups.filter(name='Master').exists() and not request.user.has_perm('requests.change_repairrequest'):
+                if request.user.groups.filter(name='Master').exists() and not request.user.has_perm(
+                        'requests.change_repairrequest'):
                     return redirect('comments')
                 else:
                     return redirect('all_requests')
@@ -67,6 +69,13 @@ class TenantUpdate(UpdateView):
     model = Tenant
     template_name = 'users/update_tenant.html'
     fields = ['full_name', 'contact_details', 'apartment']
+
+    def form_valid(self, form):
+        regex = '^(\+375|80)(29|25|44|33)(\d{3})(\d{2})(\d{2})$'
+        if re.match(regex, form.cleaned_data['contact_details']) is None:
+            form.add_error('contact_details', 'Введите номер в правильном формате.')
+            return self.form_invalid(form)
+        return super(TenantUpdate, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('all_requests')
