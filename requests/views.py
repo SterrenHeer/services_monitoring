@@ -250,8 +250,11 @@ class WorkerAppointment(View):
 
 class ChangeStatus(View):
     def post(self, request, pk):
-        if self.request.POST.get("comment"):
-            comment = RequestComment.objects.get(id=pk)
+        if self.request.POST.get("request_comment") or self.request.POST.get("comment"):
+            if self.request.POST.get("request_comment"):
+                comment = RequestComment.objects.get(id=pk)
+            else:
+                comment = Comment.objects.get(id=pk)
             if self.request.POST.get("status"):
                 comment.status = self.request.POST.get("status")
                 if self.request.POST.get("answer"):
@@ -259,7 +262,10 @@ class ChangeStatus(View):
                 else:
                     comment.answer = None
                 comment.save()
-            return redirect(reverse_lazy('request_comments'))
+            if self.request.POST.get("request_comment"):
+                return redirect(reverse_lazy('request_comments'))
+            else:
+                return redirect(reverse_lazy('comments'))
         else:
             request = Request.objects.get(id=pk)
             if self.request.POST.get("status"):

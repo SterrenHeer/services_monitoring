@@ -47,10 +47,12 @@
                             <h5 class="text-info font-italic mb-0">{{ item.service }}</h5>
                             <h5 class="text-info font-italic mb-0">{{ item.worker}}</h5>
                             <h5 class="text-info font-italic mb-0">{{ item.status }}</h5>
+                            {% if user|has_group:"Master" %}
                             <div>
                                 <a href="{% url 'schedule_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
                                 <a href="{% url 'schedule_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
                             </div>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>

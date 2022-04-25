@@ -15,7 +15,7 @@
             {% if comment_list %}
             {% for comment in comment_list %}
             <div class="col-12 mx-auto col-md-12 col-lg-6">
-                <div class="card mb-4">
+                <div class="card my-2">
                     <div class="card-footer d-flex justify-content-between">
                         <h5 class="font-weight-bold mb-0">{{ comment.text }}</h5>
                     </div>
@@ -56,6 +56,24 @@
                             <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
                         </form>
                     </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <form action="{% url 'change_status' comment.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="comment" value="true">
+                            <div class="d-flex flex-row">
+                                <div id="form{{ comment.id }}" hidden>
+                                    <label for="{{ comment.id }}">Статус:</label>
+                                    <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
+                                        <option value="{{ comment.status }}">{{ comment.status }}</option>
+                                        <option value="Принято">Принято</option>
+                                        <option value="Отклонено">Отклонено</option>
+                                    </select>
+                                    <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
+                                </div>
+                                <button type="submit" onmouseover="document.getElementById('form'+ {{ comment.id }}).hidden = false" class="btn btn-outline-primary btn-sm mx-2">Изменить статус</button>
+                            </div>
+                        </form>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -65,4 +83,11 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        function reply(id) {
+            let select = document.getElementById(id)
+            let answer = document.getElementById('answer'+ id)
+            answer.hidden = select.options[select.selectedIndex].value === 'Принято'
+        }
+    </script>
 {% endblock %}

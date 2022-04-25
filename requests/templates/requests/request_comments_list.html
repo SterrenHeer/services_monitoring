@@ -41,7 +41,7 @@
                     <div class="card-footer d-flex justify-content-between">
                         <form action="{% url 'change_status' comment.id %}" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="comment" value="true">
+                            <input type="hidden" name="request_comment" value="true">
                             <div class="d-flex flex-row">
                                 <label for="{{ comment.id }}">Статус замечания:</label>
                                 <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
