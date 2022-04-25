@@ -28,6 +28,38 @@
                         {% endif %}
                         <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
                     </div>
+                    {% if comment.status == 'Отложено' or comment.status == 'Устранено' %}
+                    <div class="card-footer d-flex justify-content-center">
+                        {% if comment.status == 'Отложено' %}
+                        <p class="text-danger">{{ comment.answer }}</p>
+                        {% else %}
+                        <p class="text-success">{{ comment.answer }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% if user|has_group:"Worker" %}
+                    <div class="card-footer d-flex justify-content-between">
+                        <form action="{% url 'change_status' comment.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="comment" value="true">
+                            <div class="d-flex flex-row">
+                                <label for="{{ comment.id }}">Статус замечания:</label>
+                                <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
+                                    {% if comment.status == 'Принято к устранению' %}
+                                    <option value="Принято к устранению">Принято</option>
+                                    {% else %}
+                                    <option value="{{ comment.status }}">{{ comment.status }}</option>
+                                    {% endif %}
+                                    <option value="Принято к устранению">Принято</option>
+                                    <option value="Отложено">Отложено</option>
+                                    <option value="Устранено">Устранено</option>
+                                </select>
+                                <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
+                                <button type="submit" class="btn btn-outline-primary btn-sm mx-2">Изменить</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -36,4 +68,11 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        function reply(id) {
+            let select = document.getElementById(id)
+            let answer = document.getElementById('answer'+ id)
+            answer.hidden = select.options[select.selectedIndex].value === 'Принято к устранению'
+        }
+    </script>
 {% endblock %}

@@ -37,6 +37,9 @@ class Request(models.Model):
     def get_workers(self):
         return Worker.objects.filter(position__service_type=self.service.service_type)
 
+    def get_complaint(self):
+        return self.requestcomment_set.exclude(status__in=['Устранено', 'Ответ', 'Отклонено']).exists()
+
 
 class RequestComment (models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -45,6 +48,7 @@ class RequestComment (models.Model):
     submission_date = models.DateField(auto_now_add=True)
     request = models.ForeignKey('Request', on_delete=models.CASCADE)
     initial = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
+    answer = models.CharField(max_length=85, null=True, blank=True)
 
     def __str__(self):
         return f"{self.text} ({self.request})"

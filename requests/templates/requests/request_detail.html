@@ -18,12 +18,15 @@
         <p><strong>Время начала:</strong> {{ request.start_time }}</p>
         <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
         <p><strong>Предполагаемая стоимость:</strong> {{ request.service.price }} руб.</p>
-        {% if user|has_group:"Manager" or user|has_group:"Master" %}
+        {% if not user|has_group:"Tenant" %}
         {% if request.worker %}
         <p><strong>Закреплённый работник:</strong> {{ request.worker.full_name }}</p>
         {% endif %}
         <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
         <p><strong>Адрес:</strong> {{ request.tenant.apartment }}</p>
+        {% if user|has_group:"Worker" %}
+        <p><strong>Контактные данные:</strong> {{ request.tenant.contact_details }}</p>
+        {% endif %}
         <a href="{% url 'request_comments' %}">Вернуться к списку замечаний</a><br>
         {% endif %}
         <a href="{% url 'all_requests' %}">Вернуться к списку заявок</a>
@@ -66,9 +69,10 @@
                     <h5>{{ comment.user.username }}</h5>
                     <p>{{ comment.submission_date }}</p>
                     <p>{{ comment.text }}</p>
-                    <p>{{ comment.status }}</p>
+                    <p><strong>Статус замечания:</strong> {{ comment.status }}</p>
+                    <p><strong>Ответ от работника:</strong> {{ comment.answer }}</p>
                     {% if comment.status != 'Отзыв' and user|has_group:"Manager" and not comment.user|has_group:"Manager" %}
-                        <a href="#comment_form" onclick="reply( '{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
+                        <a href="#comment_form" onclick="reply('{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')">Ответить</a>
                     {% endif %}
                     {% if comment.user == user and not comment.requestcomment_set.exists %}
                     <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-24">edit</i></a>

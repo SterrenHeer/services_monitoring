@@ -40,7 +40,7 @@
                     <div class="card-footer d-flex justify-content-between">
                         <form action="{% url 'worker_appointment' comment.id %}" method="post">
                             {% csrf_token %}
-                             <input type="hidden" name="comment" value="true">
+                            <input type="hidden" name="comment" value="true">
                             <label for="worker">Закреплённый работник:</label>
                             <select name="worker" id="worker">
                                 {% if comment.worker_id %}

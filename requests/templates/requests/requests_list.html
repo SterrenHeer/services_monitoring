@@ -42,8 +42,11 @@
                         <div>
                             {% if user|has_group:"Tenant" %}
                             <a href="{% url 'request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
+                            {% if request.status == 'На рассмотрении' %}
+                            <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
+                            {% endif %}
                             {% elif user|has_group:"Manager" %}
-                            <a href="{% url 'manager_request_update' request.id %}" class="material-icons md-24">edit</a>
+                            <a href="{% url 'manager_request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
                             <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
                         </div>
@@ -69,7 +72,7 @@
                             <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
                         </form>
                         {% elif user|has_group:"Worker" %}
-                        <form action="{% url 'change_request_status' request.id %}" method="post">
+                        <form action="{% url 'change_status' request.id %}" method="post">
                             {% csrf_token %}
                             <div class="d-flex flex-row">
                                 <label for="{{ request.id }}">Статус заявки:</label>
@@ -81,6 +84,11 @@
                                 </select>
                                 <input type="text" name="answer" id="answer{{ request.id }}" hidden placeholder="Введите ответ">
                                 <button type="submit" class="btn btn-outline-primary btn-sm mx-2">Изменить</button>
+                            </div>
+                            <div>
+                                {% if request.get_complaint %}
+                                <p class="text-danger">Есть не устранённые замечания</p>
+                                {% endif %}
                             </div>
                         </form>
                         {% endif %}
@@ -97,7 +105,7 @@
     <script>
         function reply(id) {
             let select = document.getElementById(id)
-            let answer = document.getElementById('answer'+ id)
+            let answer = document.getElementById('answer' + id)
             answer.hidden = select.options[select.selectedIndex].value === 'Принята'
         }
     </script>

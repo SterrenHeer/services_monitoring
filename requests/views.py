@@ -38,6 +38,10 @@ class RequestCommentsListView(ListView):
                     return RequestComment.objects.filter(initial_id__in=user_comments).order_by('-submission_date')
                 return RequestComment.objects.filter(user=self.request.user,
                                                      status=self.request.GET.get('status')).order_by('-submission_date')
+        if self.request.user.groups.filter(name='Worker').exists():
+            return RequestComment.objects.filter(request__worker=self.request.user.worker,
+                                                 status__in=['Принято к устранению', 'Отложено', 'Устранено'])\
+                                 .order_by('-submission_date')
 
     @staticmethod
     def get_statuses():
@@ -62,11 +66,13 @@ class AllRequestsListView(ListView):
             return Request.objects.all().values('status').distinct()
         elif self.request.user.groups.filter(name='Tenant').exists():
             return Request.objects.filter(tenant=self.request.user.tenant).values('status').distinct()
-        if self.request.user.groups.filter(name='Master').exists():
+        elif self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
             return Request.objects.exclude(Q(status='На рассмотрении') |
                                            Q(status='Отклонена')).filter(service__service_type__in=service_types)\
                                   .values('status').distinct()
+        elif self.request.user.groups.filter(name='Worker').exists():
+            return Request.objects.filter(worker=self.request.user.worker).values('status').distinct()
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
@@ -242,17 +248,32 @@ class WorkerAppointment(View):
             return redirect(reverse_lazy('all_requests'))
 
 
-class ChangeRequestStatus(View):
+class ChangeStatus(View):
     def post(self, request, pk):
-        request = Request.objects.get(id=pk)
-        if self.request.POST.get("status"):
-            request.status = self.request.POST.get("status")
-            if self.request.POST.get("answer"):
-                request.answer = self.request.POST.get("answer")
-            else:
-                request.answer = None
-            request.save(update_fields=['status', 'answer'])
-        return redirect(reverse_lazy('all_requests'))
+        if self.request.POST.get("comment"):
+            comment = RequestComment.objects.get(id=pk)
+            if self.request.POST.get("status"):
+                comment.status = self.request.POST.get("status")
+                if self.request.POST.get("answer"):
+                    comment.answer = self.request.POST.get("answer")
+                else:
+                    comment.answer = None
+                comment.save()
+            return redirect(reverse_lazy('request_comments'))
+        else:
+            request = Request.objects.get(id=pk)
+            if self.request.POST.get("status"):
+                if self.request.POST.get("status") == "Выполнена":
+                    if not request.get_complaint():
+                        request.status = self.request.POST.get("status")
+                else:
+                    request.status = self.request.POST.get("status")
+                if self.request.POST.get("answer"):
+                    request.answer = self.request.POST.get("answer")
+                else:
+                    request.answer = None
+                request.save(update_fields=['status', 'answer'])
+            return redirect(reverse_lazy('all_requests'))
 
 
 class DeleteRequest(DeleteView):
