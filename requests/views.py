@@ -257,6 +257,10 @@ class ChangeStatus(View):
                 comment = Comment.objects.get(id=pk)
             if self.request.POST.get("status"):
                 comment.status = self.request.POST.get("status")
+                if self.request.POST.get("comment") and comment.status == "Выполнена":
+                    comment.completion_date = datetime.date.today()
+                else:
+                    comment.completion_date = None
                 if self.request.POST.get("answer"):
                     comment.answer = self.request.POST.get("answer")
                 else:
@@ -272,13 +276,15 @@ class ChangeStatus(View):
                 if self.request.POST.get("status") == "Выполнена":
                     if not request.get_complaint():
                         request.status = self.request.POST.get("status")
+                        request.completion_date = datetime.date.today()
                 else:
                     request.status = self.request.POST.get("status")
+                    request.completion_date = None
                 if self.request.POST.get("answer"):
                     request.answer = self.request.POST.get("answer")
                 else:
                     request.answer = None
-                request.save(update_fields=['status', 'answer'])
+                request.save(update_fields=['status', 'answer', 'completion_date'])
             return redirect(reverse_lazy('all_requests'))
 
 

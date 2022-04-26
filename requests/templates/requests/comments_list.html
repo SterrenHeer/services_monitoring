@@ -22,7 +22,11 @@
                     <div class="card-footer d-flex justify-content-between">
                         <h5 class="text-info font-italic mb-0">{{ comment.service }}</h5>
                         <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
-                        <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
+                        {% if comment.completion_date and comment.status == 'Выполнена' %}
+                            <h5 class="text-success font-italic mb-0">{{ comment.completion_date }}</h5>
+                        {% else %}
+                            <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
+                        {% endif %}
                         {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
                             <a href="{% url 'comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
                         {% endif %}
@@ -56,6 +60,8 @@
                             <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
                         </form>
                     </div>
+                    {% endif %}
+                    {% if user|has_group:"Master" or user|has_group:"Worker" %}
                     <div class="card-footer d-flex justify-content-center">
                         <form action="{% url 'change_status' comment.id %}" method="post">
                             {% csrf_token %}
@@ -65,8 +71,13 @@
                                     <label for="{{ comment.id }}">Статус:</label>
                                     <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
                                         <option value="{{ comment.status }}">{{ comment.status }}</option>
-                                        <option value="Принято">Принято</option>
-                                        <option value="Отклонено">Отклонено</option>
+                                        <option value="Принята">Принята</option>
+                                        {% if user|has_group:"Master" %}
+                                        <option value="Отклонена">Отклонена</option>
+                                        {% elif user|has_group:"Worker" %}
+                                        <option value="Отложена">Отложена</option>
+                                        <option value="Выполнена">Выполнена</option>
+                                        {% endif %}
                                     </select>
                                     <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
                                 </div>
@@ -87,7 +98,7 @@
         function reply(id) {
             let select = document.getElementById(id)
             let answer = document.getElementById('answer'+ id)
-            answer.hidden = select.options[select.selectedIndex].value === 'Принято'
+            answer.hidden = select.options[select.selectedIndex].value === 'Принята'
         }
     </script>
 {% endblock %}

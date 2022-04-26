@@ -37,7 +37,11 @@
                     <div class="card-footer d-flex flex-row justify-content-between">
                         <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5">{{ request.service }}</a>
                         <h5 class="text-info font-italic mb-0">{{ request.status }}</h5>
-                        <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
+                        {% if request.completion_date and request.status == 'Выполнена' %}
+                            <h5 class="text-success font-italic mb-0">{{ request.completion_date }}</h5>
+                        {% else %}
+                            <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
+                        {% endif %}
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
                         <div>
                             {% if user|has_group:"Tenant" %}
