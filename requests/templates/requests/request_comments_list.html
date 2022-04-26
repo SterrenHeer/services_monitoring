@@ -20,10 +20,10 @@
                         {% if user|has_group:"Manager" %}
                         <h6>{{ comment.user }}</h6>
                         {% endif %}
-                        <h6 class=" mb-0">{{ comment.request }}</h6>
+                        <h6 class="mb-0">{{ comment.request }}</h6>
                         {% if user|has_group:"Tenant" %}
                             {% if comment.status != 'Отзыв' and comment.status != 'Ответ'%}
-                            <h5>{{ comment.status }}</h5>
+                            <h5 class="mb-0">{{ comment.status }}</h5>
                             {% endif %}
                         {% endif %}
                         <h6>{{ comment.submission_date }}</h6>
@@ -31,9 +31,9 @@
                     {% if comment.status == 'Отложено' or comment.status == 'Устранено' %}
                     <div class="card-footer d-flex justify-content-center">
                         {% if comment.status == 'Отложено' %}
-                        <p class="text-danger">{{ comment.answer }}</p>
+                        <p class="text-danger mb-0">{{ comment.answer }}</p>
                         {% else %}
-                        <p class="text-success">{{ comment.answer }}</p>
+                        <p class="text-success mb-0">{{ comment.answer }}</p>
                         {% endif %}
                     </div>
                     {% endif %}

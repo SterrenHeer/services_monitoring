@@ -42,7 +42,7 @@
                     {% endif %}
                     {% if user|has_group:"Master" %}
                     <div class="card-footer d-flex justify-content-between">
-                        <form action="{% url 'worker_appointment' comment.id %}" method="post">
+                        <form action="{% url 'worker_appointment' comment.id %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
                             <label for="worker" class="h6">Закреплённый работник:</label>
@@ -63,7 +63,7 @@
                     {% endif %}
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}
                     <div class="card-footer">
-                        <form action="{% url 'change_status' comment.id %}" method="post">
+                        <form action="{% url 'change_status' comment.id %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
                             <div class="d-flex flex-row">

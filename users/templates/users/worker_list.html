@@ -26,7 +26,7 @@
                         <h6 class="mb-0">{{ service }}</h6>
                         {% endfor %}
                         {% if user|has_group:"Master" %}
-                        <form action="{% url 'worker_update' worker.id %}" method="post" class="my-2">
+                        <form action="{% url 'worker_update' worker.id %}" method="post" class="mt-2 mb-0">
                             {% csrf_token %}
                             <label for="position" class="h6">Должность:</label>
                             <select name="position" class="my-2">

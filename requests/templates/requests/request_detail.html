@@ -71,7 +71,7 @@
                 <h5>{{ comment.user.username }}</h5>
                 <p>{{ comment.submission_date }}</p>
                 <p>{{ comment.text }}</p>
-                <p><strong>Статус комментария:</strong> {{ comment.status }}</p>
+                <p class="mb-0"><strong>Статус комментария:</strong> {{ comment.status }}</p>
                 {% if comment.answer %}
                 <p><strong>Ответ от работника:</strong> {{ comment.answer }}</p>
                 {% endif %}

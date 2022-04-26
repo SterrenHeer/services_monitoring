@@ -59,7 +59,7 @@
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}
                     <div class="card-footer d-flex justify-content-between">
                         {% if user|has_group:"Master" %}
-                        <form action="{% url 'worker_appointment' request.id %}" method="post">
+                        <form action="{% url 'worker_appointment' request.id %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <label for="worker" class="h6">Закреплённый работник:</label>
                             <select name="worker" id="worker">
@@ -76,7 +76,7 @@
                             <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
                         </form>
                         {% elif user|has_group:"Worker" %}
-                        <form action="{% url 'change_status' request.id %}" method="post">
+                        <form action="{% url 'change_status' request.id %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <div class="d-flex flex-row">
                                 <label for="{{ request.id }}">Статус заявки:</label>
@@ -91,7 +91,7 @@
                             </div>
                             <div>
                                 {% if request.get_complaint %}
-                                <p class="text-danger">Есть не устранённые замечания</p>
+                                <p class="text-danger mb-0">Есть не устранённые замечания</p>
                                 {% endif %}
                             </div>
                         </form>
