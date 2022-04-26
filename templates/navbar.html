@@ -1,74 +1,72 @@
 {% load custom_filters %}
 
-<nav class="navbar navbar-expand-md navbar-light bg-dark">
-    <div class="container-fluid justify-content-center">
-        <a href="/" class="navbar-brand"><span class="material-icons md-48 text-success">apartment</span></a>
-        <button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#navbar"><span class="navbar-toggler-icon"></span></button>
-        <div id="navbar" class="collapse navbar-collapse justify-content-center">
-            <ul class="navbar-nav">
-                {% if user.is_authenticated and user.first_name %}
-                <li class="nav-item"><span class="nav-link text-light text-uppercase font-weight-bold px-3">Добро пожаловать, {{ request.user.first_name }}!<span class="material-icons md-24">account_circle</span></span></li>
-                <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3 pb-3" href="{% url 'logout' %}">Выйти<span class="material-icons md-24">logout</span></a></li>
-                {% else %}
-                <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'signup' %}">Регистрация<span class="material-icons md-24">add</span></a></li>
-                <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'login' %}">Авторизация<span class="material-icons md-24">login</span></a></li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
     <div class="container-fluid justify-content-center">
-        <button class="navbar-toggler bg-light col-10" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <a href="/" class="navbar-brand position-absolute top-0 start-0 d-none d-lg-block">
+            <span class="material-icons md-48 text-secondary">villa</span>
+            <span class="material-icons md-48 text-secondary">apartment</span>
+            <span class="material-icons md-48 text-secondary">cottage</span>
+        </a>
+        <button class="navbar-toggler bg-light col-12" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-            <ul class="navbar-nav">
-            {% if request.user.is_authenticated %}
-                {% if not perms.requests and request.user|has_group:"Master"%}
-                {% else %}
-                    <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Заявки</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'all_requests' %}">Все заявки</a>
-                            {% if 'request' in request.path %}
-                            {% for request in view.get_statuses %}
-                            <a class="dropdown-item" href="{% url 'all_requests' %}?status={{ request.status }}">{{ request.status }}</a>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </li>
+            <div>
+                <ul class="navbar-nav justify-content-center">
+                    {% if user.is_authenticated and user.first_name %}
+                    <li class="nav-item"><span class="nav-link text-light text-uppercase font-weight-bold px-3">Добро пожаловать, {{ request.user.first_name }}!</span></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'logout' %}"><span class="material-icons md-24">logout</span></a></li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'signup' %}">Регистрация</a></li>
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'login' %}">Авторизация</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                {% if request.user.is_authenticated %}
+                    {% if not perms.requests and request.user|has_group:"Master"%}
+                    {% else %}
+                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Заявки</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'all_requests' %}">Все заявки</a>
+                                {% if 'request' in request.path %}
+                                {% for request in view.get_statuses %}
+                                <a class="dropdown-item" href="{% url 'all_requests' %}?status={{ request.status }}">{{ request.status }}</a>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if request.user|has_group:"Manager" %}
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=На рассмотрении">Новые замечания{% if complaints_count %}({{ complaints_count  }}){% endif %}</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Отзывы</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
+                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'request_comments' %}">Все замечания</a>
+                                {% if 'comment' in request.path %}
+                                {% for request in view.get_statuses %}
+                                <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">{{ request.status }}</a>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% elif  request.user|has_group:"Tenant" %}
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}">Мои замечания</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
+                    {% elif request.user|has_group:"Master"%}
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_workers' %}">Работники участка</a></li>
+                    {% elif request.user|has_group:"Worker"%}
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}">Замечания по заявкам</a></li>
+                    {% endif %}
+                    {% if not perms.requests %}
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'cleaning_schedule' %}">График уборки</a></li>
+                    {% endif %}
                 {% endif %}
-                {% if request.user|has_group:"Manager" %}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=На рассмотрении">Новые замечания{% if complaints_count %}({{ complaints_count  }}){% endif %}</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Отзывы</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
-                    <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'request_comments' %}">Все замечания</a>
-                            {% if 'comment' in request.path %}
-                            {% for request in view.get_statuses %}
-                            <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">{{ request.status }}</a>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </li>
-                {% elif  request.user|has_group:"Tenant" %}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}">Мои замечания</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
-                {% elif request.user|has_group:"Master"%}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_workers' %}">Работники участка</a></li>
-                {% elif request.user|has_group:"Worker"%}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Рекомендации</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}">Замечания по заявкам</a></li>
-                {% endif %}
-                {% if not perms.requests %}
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'cleaning_schedule' %}">График уборки</a></li>
-                {% endif %}
-            {% endif %}
-            </ul>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>

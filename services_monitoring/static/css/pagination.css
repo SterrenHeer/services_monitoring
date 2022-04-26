@@ -85,13 +85,13 @@
     .pagination__item.active:hover,
     .pagination__link {
         color: #fff;
-        background: #6658af
+        background: #0d6efd
     }
 }
 
 .pagination__item.active .pagination__link {
     color: #fff;
-    background: #6658af
+    background: #0d6efd
 }
 
 .pagination__item--dots .pagination__link {

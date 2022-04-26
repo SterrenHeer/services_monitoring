@@ -115,7 +115,7 @@ class CommentListView(ListView):
             return Comment.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
         elif self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
-            return Comment.objects.filter(service__service_type__in=service_types).order_by('submission_date')
+            return Comment.objects.exclude(status='Выполнена').filter(service__service_type__in=service_types).order_by('submission_date')
         elif self.request.user.groups.filter(name='Worker').exists():
             return Comment.objects.filter(worker=self.request.user.worker).order_by('submission_date')
 

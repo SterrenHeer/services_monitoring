@@ -10,8 +10,8 @@
         <p>Вы уверены, что хотите удалить рекомендацию по услуге <strong>{{ comment.service }}</strong>?</p>
         <form action="" method="POST">
             {% csrf_token %}
-            <button class="btn btn-danger" type="submit">Да, я уверен(а)</button>
-            <a class="btn btn-secondary" href="{% url 'comments' %}">Нет, отменить удаление</a>
+            <button class="btn btn-outline-danger" type="submit">Да, я уверен(а)</button>
+            <a class="btn btn-outline-primary" href="{% url 'comments' %}">Нет, отменить удаление</a>
         </form>
     </div>
 {% endblock %}

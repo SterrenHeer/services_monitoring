@@ -11,20 +11,20 @@
         <div class="d-flex flex-column justify-content-center my-2">
             <form action="{% url 'search_requests' %}" method="get">
                 <div class="d-flex flex-row justify-content-center">
-                    <input type="text" placeholder="Поиск по заявкам" name="search" required>
-                    <button type="submit" class="btn btn-success"><span class="material-icons md-24">search</span></button>
-                    <a class="btn btn-success" href="{% url 'all_requests' %}"><span class="material-icons md-24">refresh</span></a>
+                    <input type="text" class="border border-primary" placeholder="Поиск по заявкам" name="search" required>
+                    <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
+                    <a href="{% url 'all_requests' %}" class="btn btn-outline-primary"><span class="material-icons md-24">refresh</span></a>
                 </div>
             </form>
             <div class="d-flex justify-content-center">
                 {% if user|has_group:"Manager" %}
-                <a class="btn btn-outline-primary" href="{% url 'manager_request_create' %}">Добавить новую заявку</a>
+                <a href="{% url 'manager_request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
                 {% elif user|has_group:"Tenant" %}
-                <a class="btn btn-outline-primary" href="{% url 'request_create' %}">Добавить новую заявку</a>
+                <a href="{% url 'request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
                 {% elif user|has_group:"Master" %}
                 <div class="d-flex flex-row justify-content-center">
-                    <a class="btn btn-outline-primary mx-1" href="{% url 'export_to_excel' %}">Экспортировать в Excel</a>
-                    <a class="btn btn-outline-primary mx-1" href="{% url 'export_to_pdf' %}">Экспортировать в PDF</a>
+                    <a href="{% url 'export_to_excel' %}" class="btn btn-outline-primary mx-1">Экспортировать в Excel</a>
+                    <a href="{% url 'export_to_pdf' %}" class="btn btn-outline-primary mx-1">Экспортировать в PDF</a>
                 </div>
                 {% endif %}
             </div>
@@ -36,11 +36,11 @@
                 <div class="card mb-4">
                     <div class="card-footer d-flex flex-row justify-content-between">
                         <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5">{{ request.service }}</a>
-                        <h5 class="text-info font-italic mb-0">{{ request.status }}</h5>
+                        <h6 class="mb-0">{{ request.status }}</h6>
                         {% if request.completion_date and request.status == 'Выполнена' %}
-                            <h5 class="text-success font-italic mb-0">{{ request.completion_date }}</h5>
+                            <h6 class="mb-0">{{ request.completion_date }}</h6>
                         {% else %}
-                            <h5 class="text-info font-italic mb-0">{{ request.submission_date }}</h5>
+                            <h6 class="mb-0">{{ request.submission_date }}</h6>
                         {% endif %}
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
                         <div>
@@ -61,7 +61,7 @@
                         {% if user|has_group:"Master" %}
                         <form action="{% url 'worker_appointment' request.id %}" method="post">
                             {% csrf_token %}
-                            <label for="worker">Закреплённый работник:</label>
+                            <label for="worker" class="h6">Закреплённый работник:</label>
                             <select name="worker" id="worker">
                                 {% if request.worker_id %}
                                 <option value="{{ request.worker_id }}">{{ request.worker.full_name }}</option>

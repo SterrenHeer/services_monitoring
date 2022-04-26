@@ -21,7 +21,7 @@
                     Для новых пользователей
                 </h2>
                 <br>
-                <a href="{% url 'signup' %}" class="btn btn-secondary">Создать новую учётную запись</a>
+                <a href="{% url 'signup' %}" class="btn btn-outline-primary">Создать новую учётную запись</a>
             </div>
             <div class="col-12 col-sm-12 col-md-12 col-lg-6 bg-light">
                 <div>
@@ -30,7 +30,7 @@
                     <form method="POST">
                         {% csrf_token %}
                         <p>{{ form | crispy}}</p>
-                        <button type="submit" class="btn btn-secondary d-block mx-auto">Авторизоваться</button>
+                        <button type="submit" class="btn btn-outline-primary d-block mx-auto">Авторизоваться</button>
                     </form>
                     <br>
                 </div>

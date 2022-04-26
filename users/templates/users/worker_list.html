@@ -17,18 +17,18 @@
             {% if not worker.user|has_group:"Master" %}
             <div class="col-lg-6 col-md-12 mb-3">
                 <div class="card-footer d-flex justify-content-between">
-                    <h5 class="text-info font-italic mb-0">{{ worker.full_name }}</h5>
-                    <h5 class="text-info font-italic mb-0">{{ worker.position }}</h5>
+                    <h5 class="text-primary mb-0">{{ worker.full_name }}</h5>
+                    <h6 class="mb-0">{{ worker.position }}</h6>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <div>
                         {% for service in worker.get_services %}
-                        <h5 class="text-info font-italic mb-0">{{ service }}</h5>
+                        <h6 class="mb-0">{{ service }}</h6>
                         {% endfor %}
                         {% if user|has_group:"Master" %}
                         <form action="{% url 'worker_update' worker.id %}" method="post" class="my-2">
                             {% csrf_token %}
-                            <label for="position">Должность:</label>
+                            <label for="position" class="h6">Должность:</label>
                             <select name="position" class="my-2">
                                 <option value="{{ worker.position_id }}">{{ worker.position }}</option>
                                 {% for position in worker.get_positions %}

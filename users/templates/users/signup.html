@@ -22,7 +22,7 @@
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
-                    <button type="submit" name="button" class="btn btn-secondary d-block mx-auto">Регистрация</button>
+                    <button type="submit" name="button" class="btn btn-outline-primary d-block mx-auto">Регистрация</button>
                 </form>
             </div>
         </div>
@@ -35,14 +35,14 @@
             <div>
                 <p>Новый профиль успешно зарегистрирован и готов к аутентификации</p>
                 <br>
-                <a href="{% url 'all_workers' %}">Вернуться к списку работников</a>
+                <a href="{% url 'all_workers' %}" class="btn btn-outline-primary">Вернуться к списку работников</a>
         {% else %}
             <h1>Ваша учётная запись успешно создана</h1>
             <br>
             <div>
                 <p>Ваша учётная запись успешно создана и готова к использованию!</p>
                 <br>
-                <a href="{% url 'login' %}">Перейти к авторизации</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary">Перейти к авторизации</a>
         {% endif %}
             </div>
         </div>

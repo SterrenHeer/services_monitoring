@@ -17,15 +17,15 @@
             <div class="col-12 mx-auto col-md-12 col-lg-6">
                 <div class="card my-2">
                     <div class="card-footer d-flex justify-content-between">
-                        <h5 class="font-weight-bold mb-0">{{ comment.text }}</h5>
+                        <h5 class="text-primary mb-0">{{ comment.text }}</h5>
                     </div>
                     <div class="card-footer d-flex justify-content-between">
-                        <h5 class="text-info font-italic mb-0">{{ comment.service }}</h5>
-                        <h5 class="text-info font-italic mb-0">{{ comment.status }}</h5>
+                        <h6 class="mb-0">{{ comment.service }}</h6>
+                        <h6 class="mb-0">{{ comment.status }}</h6>
                         {% if comment.completion_date and comment.status == 'Выполнена' %}
-                            <h5 class="text-success font-italic mb-0">{{ comment.completion_date }}</h5>
+                            <h6 class="text-success font-italic mb-0">{{ comment.completion_date }}</h6>
                         {% else %}
-                            <h5 class="text-info font-italic mb-0">{{ comment.submission_date }}</h5>
+                            <h6 class="mb-0">{{ comment.submission_date }}</h6>
                         {% endif %}
                         {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
                             <a href="{% url 'comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
@@ -33,11 +33,11 @@
                     </div>
                     {% if not user|has_group:"Tenant" %}
                     <div class="card-footer d-flex justify-content-between">
-                        <h5 class="text-info font-italic mb-0">{{ comment.tenant.full_name }}</h5>
+                        <h6 class="mb-0">{{ comment.tenant.full_name }}</h6>
                     </div>
                     <div class="card-footer d-flex justify-content-start">
-                        <h5 class="text-info font-italic mb-0">{{ comment.tenant.apartment }}</h5>
-                        <h5 class="text-info font-italic mb-0 mx-5">{{ comment.tenant.contact_details}}</h5>
+                        <h6 class="mb-0">{{ comment.tenant.apartment }}</h6>
+                        <h6 class="mb-0 mx-5">{{ comment.tenant.contact_details}}</h6>
                     </div>
                     {% endif %}
                     {% if user|has_group:"Master" %}
@@ -45,7 +45,7 @@
                         <form action="{% url 'worker_appointment' comment.id %}" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
-                            <label for="worker">Закреплённый работник:</label>
+                            <label for="worker" class="h6">Закреплённый работник:</label>
                             <select name="worker" id="worker">
                                 {% if comment.worker_id %}
                                 <option value="{{ comment.worker_id }}">{{ comment.worker.full_name }}</option>
@@ -62,13 +62,12 @@
                     </div>
                     {% endif %}
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}
-                    <div class="card-footer d-flex justify-content-center">
+                    <div class="card-footer">
                         <form action="{% url 'change_status' comment.id %}" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
                             <div class="d-flex flex-row">
-                                <div id="form{{ comment.id }}" hidden>
-                                    <label for="{{ comment.id }}">Статус:</label>
+                                    <label for="{{ comment.id }}" class="h6">Статус рекомендации:</label>
                                     <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
                                         <option value="{{ comment.status }}">{{ comment.status }}</option>
                                         <option value="Принята">Принята</option>
@@ -80,8 +79,7 @@
                                         {% endif %}
                                     </select>
                                     <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
-                                </div>
-                                <button type="submit" onmouseover="document.getElementById('form'+ {{ comment.id }}).hidden = false" class="btn btn-outline-primary btn-sm mx-2">Изменить статус</button>
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Изменить</button>
                             </div>
                         </form>
                     </div>
