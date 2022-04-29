@@ -95,3 +95,16 @@ class CleaningSchedule(models.Model):
 
     def get_overdue(self):
         return self.date < datetime.date.today()
+
+
+class ImprovementPlan(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    building = models.ForeignKey('Building', on_delete=models.CASCADE)
+    service = models.ForeignKey('Service', on_delete=models.CASCADE)
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
+    date = models.DateField(default=datetime.date.today)
+    status = models.CharField(max_length=200, default="Запланирована")
+    start_time = models.TimeField(default=datetime.time(8, 0))
+
+    def __str__(self):
+        return f"{self.service} ({self.building})"

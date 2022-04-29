@@ -4,7 +4,7 @@ from django.views.generic.base import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import CleaningSchedule
 from django.db.models import Q
-from .models import Service
+from .models import Service, ImprovementPlan
 import datetime
 
 
@@ -20,6 +20,20 @@ class CleaningScheduleListView(ListView):
                                    .order_by('date')
         elif self.request.user.groups.filter(name='Worker').exists():
             return CleaningSchedule.objects.filter(worker=self.request.user.worker).order_by('building', 'date')
+
+
+class ImprovementPlanListView(ListView):
+    model = ImprovementPlan
+    template_name = 'documentation/improvement_plan.html'
+
+    def get_queryset(self):
+        if self.request.user.groups.filter(name__in=['Master', 'Manager']).exists():
+            return ImprovementPlan.objects.all().order_by('building', 'date')
+        elif self.request.user.groups.filter(name='Tenant').exists():
+            return ImprovementPlan.objects.filter(building_id=self.request.user.tenant.apartment.building)\
+                                   .order_by('date')
+        elif self.request.user.groups.filter(name='Worker').exists():
+            return ImprovementPlan.objects.filter(worker=self.request.user.worker).order_by('building', 'date')
 
 
 class SearchByCleaningSchedule(ListView):
@@ -77,6 +91,27 @@ class CreateScheduleItem(CreateView):
         return reverse_lazy('cleaning_schedule')
 
 
+class CreateImprovementItem(CreateView):
+    model = ImprovementPlan
+    template_name = 'documentation/create_plan_item.html'
+    fields = ['building', 'service', 'date']
+
+    def form_valid(self, form):
+        if form.cleaned_data['date'] < datetime.date.today():
+            form.add_error('date', 'Введите правильную дату.')
+            return self.form_invalid(form)
+        form.instance.user = self.request.user
+        return super(CreateImprovementItem, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Благоустройство')
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('improvement_plan')
+
+
 class UpdateScheduleItem(UpdateView):
     model = CleaningSchedule
     template_name = 'documentation/update_schedule_item.html'
@@ -95,9 +130,23 @@ class UpdateScheduleItem(UpdateView):
         return reverse_lazy('cleaning_schedule')
 
 
+class UpdateImprovementItem(UpdateView):
+    model = ImprovementPlan
+    template_name = 'documentation/update_schedule_item.html'
+    fields = ['building', 'service', 'worker', 'date']
+
+    def form_valid(self, form):
+        if form.cleaned_data['date'] < datetime.date.today():
+            form.add_error('date', 'Введите правильную дату.')
+            return self.form_invalid(form)
+        return super(UpdateImprovementItem, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('improvement_plan')
+
+
 class ChangeStatus(View):
     def post(self, request, pk):
-        print(self.request.POST)
         item = CleaningSchedule.objects.get(id=pk)
         if self.request.POST.get("completed"):
             if item.get_current_date():
@@ -116,3 +165,10 @@ class DeleteScheduleItem(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('cleaning_schedule')
+
+
+class DeleteImprovementItem(DeleteView):
+    model = ImprovementPlan
+
+    def get_success_url(self):
+        return reverse_lazy('improvement_plan')
