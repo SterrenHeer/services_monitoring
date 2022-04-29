@@ -7,4 +7,5 @@ urlpatterns = [
     path('schedule/item/create/', views.CreateScheduleItem.as_view(), name='schedule_item_create'),
     path('schedule/item/<int:pk>/update/', views.UpdateScheduleItem.as_view(), name='schedule_item_update'),
     path('schedule/item/<int:pk>/delete/', views.DeleteScheduleItem.as_view(), name='schedule_item_delete'),
+    path("schedule/item/<int:pk>/status/", views.ChangeStatus.as_view(), name="change_item_status"),
 ]

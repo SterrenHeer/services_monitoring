@@ -89,3 +89,9 @@ class CleaningSchedule(models.Model):
             minute %= 60
             hour += 1
         return datetime.time(hour, minute)
+
+    def get_current_date(self):
+        return self.date <= datetime.date.today()
+
+    def get_overdue(self):
+        return self.date < datetime.date.today()

@@ -49,11 +49,27 @@
                                 <h6 class="mb-0">{{ item.worker.full_name }}</h6>
                                 <h6 class="mb-0">{{ item.worker.position }}</h6>
                             </div>
-                            <h6 class="mb-0 col-lg-2">{{ item.status }}</h6>
+                            {% if item.status != 'Выполнена' and item.get_overdue %}
+                                <h6 class="mb-0 col-lg-2 text-danger">{{ item.status }}</h6>
+                            {% elif item.status == 'Выполнена' %}
+                                <h6 class="mb-0 col-lg-2 text-success">{{ item.status }}</h6>
+                            {% else %}
+                                <h6 class="mb-0 col-lg-2">{{ item.status }}</h6>
+                            {% endif %}
                             {% if user|has_group:"Master" %}
                             <div class="col-lg-1">
                                 <a href="{% url 'schedule_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
                                 <a href="{% url 'schedule_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
+                            </div>
+                            {% elif user|has_group:"Worker" %}
+                            <div class="col-lg-1">
+                                <form action="{% url 'change_item_status' item.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div>
+                                        <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 text-primary">check_circle</button>
+                                        <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 text-primary">cancel</button>
+                                    </div>
+                                </form>
                             </div>
                             {% endif %}
                         </div>

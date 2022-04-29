@@ -1,4 +1,6 @@
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.views.generic.base import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import CleaningSchedule
 from django.db.models import Q
@@ -91,6 +93,22 @@ class UpdateScheduleItem(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('cleaning_schedule')
+
+
+class ChangeStatus(View):
+    def post(self, request, pk):
+        print(self.request.POST)
+        item = CleaningSchedule.objects.get(id=pk)
+        if self.request.POST.get("completed"):
+            if item.get_current_date():
+                item.status = self.request.POST.get("completed")
+        else:
+            if item.status == 'Отменена':
+                item.status = 'Запланирована'
+            else:
+                item.status = self.request.POST.get("cancelled")
+        item.save(update_fields=['status'])
+        return redirect(reverse_lazy('cleaning_schedule'))
 
 
 class DeleteScheduleItem(DeleteView):
