@@ -48,7 +48,15 @@ class Service(models.Model):
 
 
 class ServiceType(models.Model):
+    NATURE_CHOICES = (
+        ('Заявка', 'Заявка'),
+        ('Замечание', 'Замечание'),
+        ('Уборка', 'Уборка'),
+        ('Ремонт', 'Ремонт'),
+        ('Благоустройство', 'Благоустройство'),
+    )
     title = models.CharField(max_length=200, help_text="Введите тип услуги")
+    nature = models.CharField(max_length=20, choices=NATURE_CHOICES, default='Замечание')
 
     def __str__(self):
         return self.title
@@ -75,4 +83,9 @@ class CleaningSchedule(models.Model):
         return f"{self.service} ({self.building})"
 
     def get_end_time(self):
-        return datetime.time(self.start_time.hour + self.service.duration.hour)
+        hour = self.start_time.hour + self.service.duration.hour
+        minute = self.start_time.minute + self.service.duration.minute
+        if minute >= 60:
+            minute %= 60
+            hour += 1
+        return datetime.time(hour, minute)

@@ -16,9 +16,8 @@
             {% for worker in worker_list %}
             {% if not worker.user|has_group:"Master" %}
             <div class="col-lg-6 col-md-12 mb-3">
-                <div class="card-footer d-flex justify-content-between">
+                <div class="card-footer">
                     <h5 class="text-primary mb-0">{{ worker.full_name }}</h5>
-                    <h6 class="mb-0">{{ worker.position }}</h6>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <div>

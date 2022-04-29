@@ -14,6 +14,9 @@
             <p><strong>Ответ от работника:</strong> {{ request.answer }}</p>
             {% endif %}
             <p><strong>Дата подачи:</strong> {{ request.submission_date }}</p>
+            {% if request.completion_date %}
+                <p><strong>Дата выполнения:</strong> {{ request.completion_date }}</p>
+            {% endif %}
             <p><strong>Состояние:</strong> {{ request.status }}</p>
             <p><strong>Время начала:</strong> {{ request.start_time }}</p>
             <p><strong>Время завершения:</strong> {{ request.end_time }}</p>

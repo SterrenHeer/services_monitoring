@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
 from users.models import Worker
-import datetime
 
 
 class Request(models.Model):
@@ -20,7 +19,8 @@ class Request(models.Model):
     worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     submission_date = models.DateField(auto_now_add=True)
     completion_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=200, choices=STATUS_CHOICES, default="На рассмотрении", help_text="Введите статус заявки")
+    status = models.CharField(max_length=200, choices=STATUS_CHOICES, default="На рассмотрении",
+                              help_text="Введите статус заявки")
     start_time = models.TimeField(default=timezone.now)
     end_time = models.TimeField(default=timezone.now)
     answer = models.CharField(max_length=85, null=True, blank=True)
@@ -38,7 +38,7 @@ class Request(models.Model):
         return Worker.objects.filter(position__service_type=self.service.service_type)
 
     def get_complaint(self):
-        return self.requestcomment_set.exclude(status__in=['Устранено', 'Ответ', 'Отклонено']).exists()
+        return self.requestcomment_set.exclude(status__in=['Устранено', 'Ответ', 'Отклонено', 'Отзыв']).exists()
 
 
 class RequestComment (models.Model):

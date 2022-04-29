@@ -37,20 +37,21 @@
                 {% regroup building.list by date as date_list %}
                 {% for date in date_list %}
                 <div class="d-flex flex-row">
-                    <div class="card-footer d-flex flex-column justify-content-center">
+                    <div class="card-footer d-flex flex-column justify-content-center col-lg-2">
                         <h5 class="text-primary mb-0">{{ date.grouper }}</h5>
                     </div>
-                    <div class="card-footer d-flex flex-column flex-grow-1">
+                    <div class="card-footer d-flex flex-column flex-grow-1 col-lg-10">
                         {% for item in date.list %}
-                        <div class="card-footer d-flex flex-lg-row flex-column justify-content-between flex-grow-1">
-                            <h6 class="mb-0">{{ item.start_time }}-{{ item.get_end_time }}</h6>
-                            <div class="d-flex flex-row justify-content-between mx-5 flex-grow-1">
-                                <h6 class="mb-0">{{ item.service }}</h6>
-                                <h6 class="mb-0">{{ item.worker }}</h6>
+                        <div class="card-footer d-flex flex-lg-row flex-column flex-grow-1">
+                            <h6 class="mb-0 col-lg-1 me-2">{{ item.start_time }}-{{ item.get_end_time }}</h6>
+                            <h6 class="mb-0 col-lg-3">{{ item.service }}</h6>
+                            <div class="col-lg-5">
+                                <h6 class="mb-0">{{ item.worker.full_name }}</h6>
+                                <h6 class="mb-0">{{ item.worker.position }}</h6>
                             </div>
-                            <h6 class="mb-0">{{ item.status }}</h6>
+                            <h6 class="mb-0 col-lg-2">{{ item.status }}</h6>
                             {% if user|has_group:"Master" %}
-                            <div>
+                            <div class="col-lg-1">
                                 <a href="{% url 'schedule_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
                                 <a href="{% url 'schedule_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
                             </div>

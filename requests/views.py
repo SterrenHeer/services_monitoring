@@ -138,7 +138,7 @@ class CreateRequest(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['service'].queryset = Service.objects.filter(service_type__title='Ремонтные работы')
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Заявка')
         return context
 
 
@@ -153,7 +153,7 @@ class CreateComment(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['service'].queryset = Service.objects.exclude(service_type__title='Ремонтные работы')
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature__in=['Замечание', 'Уборка'])
         return context
 
     def get_success_url(self):
@@ -171,6 +171,11 @@ class ManagerRequestCreate(CreateView):
             return self.form_invalid(form)
         return super(ManagerRequestCreate, self).form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Заявка')
+        return context
+
 
 class UpdateRequest(UpdateView):
     model = Request
@@ -182,6 +187,11 @@ class UpdateRequest(UpdateView):
             form.add_error('start_time', 'Введите правильное время.')
             return self.form_invalid(form)
         return super(UpdateRequest, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Заявка')
+        return context
 
 
 class ManagerUpdateRequest(UpdateView):

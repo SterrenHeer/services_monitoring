@@ -36,12 +36,6 @@
                 <div class="card mb-4">
                     <div class="card-footer d-flex flex-row justify-content-between">
                         <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5">{{ request.service }}</a>
-                        <h6 class="mb-0">{{ request.status }}</h6>
-                        {% if request.completion_date and request.status == 'Выполнена' %}
-                            <h6 class="mb-0">{{ request.completion_date }}</h6>
-                        {% else %}
-                            <h6 class="mb-0">{{ request.submission_date }}</h6>
-                        {% endif %}
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
                         <div>
                             {% if user|has_group:"Tenant" %}
@@ -54,6 +48,15 @@
                             <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
                         </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer d-flex flex-row justify-content-between">
+                        <h6 class="mb-0">{{ request.start_time }}-{{ request.end_time }}</h6>
+                        <h6 class="mb-0">{{ request.status }}</h6>
+                        {% if request.completion_date and request.status == 'Выполнена' %}
+                            <h6 class="mb-0 text-success">{{ request.completion_date }}</h6>
+                        {% else %}
+                            <h6 class="mb-0">{{ request.submission_date }}</h6>
                         {% endif %}
                     </div>
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}

@@ -10,7 +10,7 @@
     <div class="container">
         <div class="row">
             {% if user|has_group:"Tenant" %}
-                <a class="text-center" href="{% url 'comment_create' %}">Добавить новую рекомендацию</a>
+                <a class="btn btn-outline-primary mt-2" href="{% url 'comment_create' %}">Добавить новую рекомендацию</a>
             {% endif %}
             {% if comment_list %}
             {% for comment in comment_list %}
