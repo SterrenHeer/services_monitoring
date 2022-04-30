@@ -7,7 +7,7 @@
 {% block content %}
     <div class="text-center">
         <h1>Удаление заявки</h1>
-        <p>Вы уверены, что хотите удалить запись по услуге <strong>{{ improvementplan.service }}</strong>?</p>
+        <p>Вы уверены, что хотите удалить запись по услуге <strong>{{ annualplan.service }}</strong>?</p>
         <form action="" method="POST">
             {% csrf_token %}
             <button class="btn btn-outline-danger" type="submit">Да, я уверен(а)</button>

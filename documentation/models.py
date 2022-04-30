@@ -74,7 +74,7 @@ class CleaningSchedule(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     building = models.ForeignKey('Building', on_delete=models.CASCADE)
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
-    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True)
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(default=datetime.date.today)
     status = models.CharField(max_length=200, default="Запланирована")
     start_time = models.TimeField(default=datetime.time(8, 0))
@@ -97,7 +97,11 @@ class CleaningSchedule(models.Model):
         return self.date < datetime.date.today()
 
 
-class ImprovementPlan(models.Model):
+class AnnualPlan(models.Model):
+    TYPE_CHOICES = (
+        ('Благоустройство', 'Благоустройство'),
+        ('Ремонт', 'Ремонт'),
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     building = models.ForeignKey('Building', on_delete=models.CASCADE)
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
@@ -105,6 +109,10 @@ class ImprovementPlan(models.Model):
     date = models.DateField(default=datetime.date.today)
     status = models.CharField(max_length=200, default="Запланирована")
     start_time = models.TimeField(default=datetime.time(8, 0))
+    type = models.CharField(max_length=200, choices=TYPE_CHOICES, default="Благоустройство")
 
     def __str__(self):
         return f"{self.service} ({self.building})"
+
+    def get_current_date(self):
+        return self.date <= datetime.date.today()

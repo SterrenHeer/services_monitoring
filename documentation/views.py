@@ -4,7 +4,7 @@ from django.views.generic.base import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import CleaningSchedule
 from django.db.models import Q
-from .models import Service, ImprovementPlan
+from .models import Service, AnnualPlan
 import datetime
 
 
@@ -22,18 +22,24 @@ class CleaningScheduleListView(ListView):
             return CleaningSchedule.objects.filter(worker=self.request.user.worker).order_by('building', 'date')
 
 
-class ImprovementPlanListView(ListView):
-    model = ImprovementPlan
-    template_name = 'documentation/improvement_plan.html'
+class AnnualPlanListView(ListView):
+    model = AnnualPlan
+    template_name = 'documentation/annual_plan.html'
 
     def get_queryset(self):
         if self.request.user.groups.filter(name__in=['Master', 'Manager']).exists():
-            return ImprovementPlan.objects.all().order_by('building', 'date')
+            return AnnualPlan.objects.filter(type=self.kwargs['type']).order_by('building', 'date')
         elif self.request.user.groups.filter(name='Tenant').exists():
-            return ImprovementPlan.objects.filter(building_id=self.request.user.tenant.apartment.building)\
-                                   .order_by('date')
+            return AnnualPlan.objects.filter(building_id=self.request.user.tenant.apartment.building,
+                                             type=self.kwargs['type']).order_by('date')
         elif self.request.user.groups.filter(name='Worker').exists():
-            return ImprovementPlan.objects.filter(worker=self.request.user.worker).order_by('building', 'date')
+            return AnnualPlan.objects.filter(worker=self.request.user.worker,
+                                             type=self.kwargs['type']).order_by('building', 'date')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["type"] = self.kwargs['type']
+        return context
 
 
 class SearchByCleaningSchedule(ListView):
@@ -58,6 +64,24 @@ class SearchByCleaningSchedule(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["search"] = f"search={self.request.GET.get('search')}&"
+        return context
+
+
+class SearchByAnnualPlan(ListView):
+    template_name = 'documentation/annual_plan.html'
+
+    def get_queryset(self):
+        search = self.request.GET.get("search")
+        return AnnualPlan.objects.filter(Q(service__name__icontains=search) |
+                                         Q(date__icontains=search) |
+                                         Q(worker__full_name__icontains=search) |
+                                         Q(status__icontains=search) |
+                                         Q(building__street__name__icontains=search)).order_by('date')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["search"] = f"search={self.request.GET.get('search')}&"
+        context["type"] = self.kwargs['type']
         return context
 
 
@@ -91,8 +115,8 @@ class CreateScheduleItem(CreateView):
         return reverse_lazy('cleaning_schedule')
 
 
-class CreateImprovementItem(CreateView):
-    model = ImprovementPlan
+class CreatePlanItem(CreateView):
+    model = AnnualPlan
     template_name = 'documentation/create_plan_item.html'
     fields = ['building', 'service', 'date']
 
@@ -101,15 +125,21 @@ class CreateImprovementItem(CreateView):
             form.add_error('date', 'Введите правильную дату.')
             return self.form_invalid(form)
         form.instance.user = self.request.user
-        return super(CreateImprovementItem, self).form_valid(form)
+        form.instance.type = self.kwargs['type']
+        return super(CreatePlanItem, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Благоустройство')
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature=self.kwargs['type'])
         return context
 
+    def get_initial(self):
+        initial = super(CreatePlanItem, self).get_initial()
+        initial['building'] = self.request.GET.get("building")
+        return initial
+
     def get_success_url(self):
-        return reverse_lazy('improvement_plan')
+        return reverse_lazy('annual_plan', kwargs={'type': self.kwargs['type']})
 
 
 class UpdateScheduleItem(UpdateView):
@@ -130,8 +160,8 @@ class UpdateScheduleItem(UpdateView):
         return reverse_lazy('cleaning_schedule')
 
 
-class UpdateImprovementItem(UpdateView):
-    model = ImprovementPlan
+class UpdatePlanItem(UpdateView):
+    model = AnnualPlan
     template_name = 'documentation/update_schedule_item.html'
     fields = ['building', 'service', 'worker', 'date']
 
@@ -139,15 +169,18 @@ class UpdateImprovementItem(UpdateView):
         if form.cleaned_data['date'] < datetime.date.today():
             form.add_error('date', 'Введите правильную дату.')
             return self.form_invalid(form)
-        return super(UpdateImprovementItem, self).form_valid(form)
+        return super(UpdatePlanItem, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('improvement_plan')
+        return reverse_lazy('annual_plan', kwargs={'type': self.kwargs['type']})
 
 
 class ChangeStatus(View):
     def post(self, request, pk):
-        item = CleaningSchedule.objects.get(id=pk)
+        if self.request.POST.get("type"):
+            item = AnnualPlan.objects.get(id=pk)
+        else:
+            item = CleaningSchedule.objects.get(id=pk)
         if self.request.POST.get("completed"):
             if item.get_current_date():
                 item.status = self.request.POST.get("completed")
@@ -157,6 +190,8 @@ class ChangeStatus(View):
             else:
                 item.status = self.request.POST.get("cancelled")
         item.save(update_fields=['status'])
+        if self.request.POST.get("type"):
+            return redirect(reverse_lazy('annual_plan', kwargs={'type': self.request.POST.get("type")}))
         return redirect(reverse_lazy('cleaning_schedule'))
 
 
@@ -167,8 +202,8 @@ class DeleteScheduleItem(DeleteView):
         return reverse_lazy('cleaning_schedule')
 
 
-class DeleteImprovementItem(DeleteView):
-    model = ImprovementPlan
+class DeletePlanItem(DeleteView):
+    model = AnnualPlan
 
     def get_success_url(self):
-        return reverse_lazy('improvement_plan')
+        return reverse_lazy('annual_plan', kwargs={'type': self.kwargs['type']})

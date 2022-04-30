@@ -46,8 +46,12 @@
                             <h6 class="mb-0 col-lg-1 me-2">{{ item.start_time }}-{{ item.get_end_time }}</h6>
                             <h6 class="mb-0 col-lg-3">{{ item.service }}</h6>
                             <div class="col-lg-5">
+                                {% if item.worker %}
                                 <h6 class="mb-0">{{ item.worker.full_name }}</h6>
                                 <h6 class="mb-0">{{ item.worker.position }}</h6>
+                                {% else %}
+                                <h6 class="mb-0 text-info">Работник не назначен</h6>
+                                {% endif %}
                             </div>
                             {% if item.status != 'Выполнена' and item.get_overdue %}
                                 <h6 class="mb-0 col-lg-2 text-danger">{{ item.status }}</h6>

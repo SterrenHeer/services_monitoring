@@ -8,11 +8,11 @@
 
 {% block content %}
     <div class="container">
-        <form action="{% url 'search_schedule' %}" method="get">
+        <form action="{% url 'search_plan' type %}" method="get">
             <div class="d-flex flex-row justify-content-center mt-2">
-                <input type="text" class="border border-primary" placeholder="Поиск по расписанию" name="search" required>
+                <input type="text" class="border border-primary" placeholder="Поиск по плану" name="search" required>
                 <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
-                <a class="btn btn-outline-primary" href="{% url 'cleaning_schedule' %}"><span class="material-icons md-24">refresh</span></a>
+                <a class="btn btn-outline-primary" href="{% url 'annual_plan' type %}"><span class="material-icons md-24">refresh</span></a>
             </div>
         </form>
         {% if user|has_group:"Master" %}
@@ -21,11 +21,11 @@
             <a class="btn btn-outline-primary" href="{% url 'export_to_pdf' %}">Экспортировать в PDF</a>
         </div>
         <div class="d-flex justify-content-center my-2">
-            <a class="btn btn-outline-primary" href="{% url 'improvement_item_create' %}">Добавить новую запись</a>
+            <a class="btn btn-outline-primary" href="{% url 'plan_item_create' type %}">Добавить новую запись</a>
         </div>
         {% endif %}
-        {% if improvementplan_list %}
-        {% regroup improvementplan_list by building as building_list %}
+        {% if annualplan_list %}
+        {% regroup annualplan_list by building as building_list %}
         <div class="d-flex flex-column">
             {% for building in building_list %}
             <div class="d-flex flex-column my-2">
@@ -63,13 +63,14 @@
                             <div class="d-flex flex-row col-lg-2">
                                 <form action="{% url 'change_item_status' item.id %}" method="post">
                                     {% csrf_token %}
+                                    <input type="hidden" name="type" value="{{ type }}">
                                     <div>
                                         <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 text-primary">check_circle</button>
                                         <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 text-primary">cancel</button>
                                     </div>
                                 </form>
-                                <a href="{% url 'improvement_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
-                                <a href="{% url 'improvement_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
+                                <a href="{% url 'plan_item_update' type item.id %}"><i class="material-icons md-24">edit</i></a>
+                                <a href="{% url 'plan_item_delete' type item.id %}"><i class="material-icons md-24">delete</i></a>
                             </div>
                             {% endif %}
                         </div>
@@ -79,12 +80,12 @@
                 {% endfor %}
             </div>
             {% if user|has_group:"Master" %}
-            <a class="btn btn-outline-primary mb-3" href="{% url 'schedule_item_create' %}?building={{ building.grouper.id }}">Добавить новую запись для данного дома</a>
+            <a class="btn btn-outline-primary mb-3" href="{% url 'plan_item_create' type %}?building={{ building.grouper.id }}">Добавить новую запись для данного дома</a>
             {% endif %}
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-center">В плане благоустройства нет ни одной записи.</p>
+        <p class="text-center">В данном плане нет ни одной записи.</p>
         {% endif %}
     </div>
 {% endblock %}

@@ -278,8 +278,7 @@ class ChangeStatus(View):
                 comment.save()
             if self.request.POST.get("request_comment"):
                 return redirect(reverse_lazy('request_comments'))
-            else:
-                return redirect(reverse_lazy('comments'))
+            return redirect(reverse_lazy('comments'))
         else:
             request = Request.objects.get(id=pk)
             if self.request.POST.get("status"):
