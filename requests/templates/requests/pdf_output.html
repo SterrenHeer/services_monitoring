@@ -37,6 +37,14 @@
                 <td>{{ request.submission_date}}</td>
             </tr>
         {% endfor %}
+        {% for comment in comments %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ comment.service.name }}</td>
+                <td>{{ comment.tenant.full_name}}</td>
+                <td>{{ comment.submission_date}}</td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 </body>

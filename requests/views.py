@@ -370,16 +370,19 @@ def export_to_excel(request):
 
 
 def export_to_pdf(request):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
-    response['Content-Transfer-Encoding'] = 'binary'
-    requests = Request.objects.filter(status='В обработке')
-    html_string = render_to_string('requests/pdf_output.html', {'requests': requests})
-    html = HTML(string=html_string)
-    result = html.write_pdf()
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        output.write(result)
-        output.flush()
-        output.seek(0)
-        response.write(output.read())
-    return response
+    file = request.GET.get('file')
+    if file == 'request':
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
+        response['Content-Transfer-Encoding'] = 'binary'
+        requests = Request.objects.filter(status='Выполнена')
+        comments = Comment.objects.filter(status='Выполнена')
+        html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments})
+        html = HTML(string=html_string)
+        result = html.write_pdf()
+        with tempfile.NamedTemporaryFile(delete=True) as output:
+            output.write(result)
+            output.flush()
+            output.seek(0)
+            response.write(output.read())
+        return response
