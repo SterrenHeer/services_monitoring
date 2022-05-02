@@ -15,37 +15,68 @@
                 content: 'Страница ' counter(page) ' из ' counter(pages);
             }
 		}
+        html, body {
+            font-size: 14px;
+        }
+        h3, h4{
+           text-align: center;
+        }
+        table, td, tr{
+            border: 1px solid;
+        }
+        table{
+            width: 17cm;
+        }
 	</style>
 </head>
 <body>
-    <h2>Список заявок</h2>
+    <h3>Выполненные заявки</h3>
+    {% regroup requests by worker.full_name as worker_list %}
+    {% for request in worker_list %}
+    <h4>{{ request.grouper }}</h4>
     <table>
-        <thead>
+    {% for request in request.list %}
+        <tr>
             <tr>
-                <th>№</th>
-                <th>Услуга</th>
-                <th>Жилец</th>
-                <th>Дата подачи</th>
+                <td colspan="2">Услуга: {{ request.service.name }}</td>
+                <td>Стоимость: {{ request.service.price}}</td>
             </tr>
-        </thead>
-        <tbody>
-        {% for request in requests %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ request.service.name }}</td>
-                <td>{{ request.tenant.full_name}}</td>
-                <td>{{ request.submission_date}}</td>
+                <td>Заказчик: {{ request.tenant.full_name }}</td>
+                <td>Адрес: {{ request.tenant.apartment }}</td>
+                <td>Дата: {{ request.submission_date }}</td>
             </tr>
-        {% endfor %}
-        {% for comment in comments %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ comment.service.name }}</td>
-                <td>{{ comment.tenant.full_name}}</td>
-                <td>{{ comment.submission_date}}</td>
+                <td colspan="2">Исполнитель: {{ request.worker.full_name }}</td>
+                <td>Дата: {{ request.completion_date }}</td>
             </tr>
-        {% endfor %}
-        </tbody>
+        </tr>
+    {% endfor %}
     </table>
+    {% endfor %}
+    <h3>Выполненные рекомендации</h3>
+    {% regroup comments by worker.full_name as worker_list %}
+    {% for comment in worker_list %}
+    <h4>{{ comment.grouper }}</h4>
+    <table>
+    {% for comment in comment.list %}
+        <tr>
+            <tr>
+                <td colspan="2">Услуга: {{ comment.service.name }}</td>
+                <td>Стоимость: {{ comment.service.price}}</td>
+            </tr>
+            <tr>
+                <td>Заказчик: {{ comment.tenant.full_name }}</td>
+                <td>Адрес: {{ comment.tenant.apartment }}</td>
+                <td>Дата: {{ comment.submission_date }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Исполнитель: {{ comment.worker.full_name }}</td>
+                <td>Дата: {{ comment.completion_date }}</td>
+            </tr>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endfor %}
 </body>
 </html>

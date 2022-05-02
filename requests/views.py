@@ -375,8 +375,10 @@ def export_to_pdf(request):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
         response['Content-Transfer-Encoding'] = 'binary'
-        requests = Request.objects.filter(status='Выполнена')
-        comments = Comment.objects.filter(status='Выполнена')
+        # requests = Request.objects.all().order_by('worker', 'submission_date')
+        # comments = Comment.objects.all().order_by('worker', 'submission_date')
+        requests = Request.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
+        comments = Comment.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
         html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments})
         html = HTML(string=html_string)
         result = html.write_pdf()
