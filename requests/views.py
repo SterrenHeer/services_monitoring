@@ -3,10 +3,11 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Request, RequestComment, Comment
 from documentation.models import Service
+from users.models import Worker
 from users.models import Tenant
 from django.views.generic.base import View
 from .forms import RequestCommentForm, RequestForm, CommentForm
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import HttpResponse
 import xlwt
 import datetime
@@ -347,39 +348,55 @@ class SearchByRequests(ListView):
         return context
 
 
-def export_to_excel(request):
+def request_export_to_excel(request):
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.date.today()) + '.xls'
+    response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.datetime.now().time()) + '.xls'
     work_book = xlwt.Workbook(encoding='utf-8')
     sheet = work_book.add_sheet('Акт выполненных работ')
-    row_num = 0
+    row_number = 0
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
-    columns = ['Услуга', 'Жилец', 'Дата подачи']
-    for col_num in range(len(columns)):
-        sheet.write(row_num, col_num, columns[col_num], font_style)
-    font_style = xlwt.XFStyle()
-    rows = Request.objects.filter(status='В обработке')\
-                          .values_list('service__name', 'tenant__full_name', 'submission_date')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            sheet.write(row_num, col_num, str(row[col_num]), font_style)
+    labels = ['Услуга', 'Стоимость', 'Заказчик', 'Адрес', 'Исполнитель', 'Дата подачи', 'Дата выполнения']
+    for column_number in range(len(labels)):
+        sheet.write(row_number, column_number, labels[column_number], font_style)
+    rows = Request.objects.filter(status='Выполнена')\
+                          .values_list('service__name', 'service__price', 'tenant__full_name',
+                                       'worker__full_name', 'submission_date', 'completion_date')
+    row_number = form_rows_to_excel(rows, sheet, row_number)
+    rows = Comment.objects.filter(status='Выполнена') \
+                          .values_list('service__name', 'service__price', 'tenant__full_name',
+                                       'worker__full_name', 'submission_date', 'completion_date')
+    form_rows_to_excel(rows, sheet, row_number)
     work_book.save(response)
     return response
 
 
-def export_to_pdf(request):
+def form_rows_to_excel(rows, sheet, row_number):
+    font_style = xlwt.XFStyle()
+    for row in rows:
+        row_number += 1
+        for column_number in range(len(row)):
+            width = sheet.col(column_number).width
+            if (len(str(row[column_number])) * 265) > width:
+                sheet.col(column_number).width = (len(str(row[column_number])) * 265)
+            sheet.write(row_number, column_number, str(row[column_number]), font_style)
+    return row_number
+
+
+def request_export_to_pdf(request):
     file = request.GET.get('file')
     if file == 'request':
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
         response['Content-Transfer-Encoding'] = 'binary'
-        # requests = Request.objects.all().order_by('worker', 'submission_date')
-        # comments = Comment.objects.all().order_by('worker', 'submission_date')
-        requests = Request.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
+        requests = Request.objects.filter(status__in=['Выполнена', 'Принята', 'Отложена'])\
+                                  .order_by('worker', 'submission_date')
         comments = Comment.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
-        html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments})
+        total_requests = requests.aggregate(Sum('service__price'))['service__price__sum']
+        total_comments = comments.aggregate(Sum('service__price'))['service__price__sum']
+        html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments,
+                                                                    'total_requests': total_requests,
+                                                                    'total_comments': total_comments})
         html = HTML(string=html_string)
         result = html.write_pdf()
         with tempfile.NamedTemporaryFile(delete=True) as output:

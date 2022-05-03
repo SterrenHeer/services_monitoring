@@ -1,36 +1,48 @@
-<!DOCTYPE html>
+{% load static %}
+{% load custom_filters %}
 <html>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Экспорт в PDF</title>
-	<style>
-		@page{
-			size: a4;
-			margin: 2cm 1cm 2cm 3cm;
-			@top-center{
-				content: 'Акт выполненных работ';
-			}
+    <style>
+        @page{
+            size: a4;
+            margin: 2cm 1cm 2cm 3cm;
+            @top-center{
+                content: 'Акт выполненных работ';
+            }
             @bottom-right {
                 content: 'Страница ' counter(page) ' из ' counter(pages);
             }
-		}
+        }
         html, body {
             font-size: 14px;
         }
-        h3, h4{
+        h2, h4{
            text-align: center;
         }
-        table, td, tr{
+        h3{
+            text-align: right;
+            margin-right: 14mm;
+            margin-top: 3mm;
+        }
+        .blank{
+            border-bottom-color: white;
+            border-left-color: white;
+        }
+        td, tr{
             border: 1px solid;
         }
         table{
             width: 17cm;
+            border-collapse: collapse;
+            page-break-inside: avoid;
         }
-	</style>
+    </style>
 </head>
 <body>
-    <h3>Выполненные заявки</h3>
+    <h2>Выполненные заявки</h2>
     {% regroup requests by worker.full_name as worker_list %}
     {% for request in worker_list %}
     <h4>{{ request.grouper }}</h4>
@@ -38,8 +50,8 @@
     {% for request in request.list %}
         <tr>
             <tr>
-                <td colspan="2">Услуга: {{ request.service.name }}</td>
-                <td>Стоимость: {{ request.service.price}}</td>
+                <td colspan="2">Услуга {{ forloop.counter }}: {{ request.service.name }}</td>
+                <td>Стоимость, руб: {{ request.service.price}}</td>
             </tr>
             <tr>
                 <td>Заказчик: {{ request.tenant.full_name }}</td>
@@ -52,9 +64,15 @@
             </tr>
         </tr>
     {% endfor %}
+        <tr>
+            <td colspan="2" class="blank"></td>
+            {% get_worker request.grouper as worker %}
+            <td content="right">Итого, руб: {{ worker.get_requests_sum }}</td>
+        </tr>
     </table>
     {% endfor %}
-    <h3>Выполненные рекомендации</h3>
+    <h3>Итого, руб: {{ total_requests }}</h3>
+    <h2>Выполненные рекомендации</h2>
     {% regroup comments by worker.full_name as worker_list %}
     {% for comment in worker_list %}
     <h4>{{ comment.grouper }}</h4>
@@ -62,8 +80,8 @@
     {% for comment in comment.list %}
         <tr>
             <tr>
-                <td colspan="2">Услуга: {{ comment.service.name }}</td>
-                <td>Стоимость: {{ comment.service.price}}</td>
+                <td colspan="2">Услуга {{ forloop.counter }}: {{ comment.service.name }}</td>
+                <td>Стоимость, руб: {{ comment.service.price}}</td>
             </tr>
             <tr>
                 <td>Заказчик: {{ comment.tenant.full_name }}</td>
@@ -76,7 +94,13 @@
             </tr>
         </tr>
     {% endfor %}
+        <tr>
+            <td colspan="2" class="blank"></td>
+            {% get_worker comment.grouper as worker %}
+            <td content="right">Итого, руб: {{ worker.get_comments_sum }}</td>
+        </tr>
     </table>
     {% endfor %}
+    <h3>Итого, руб: {{ total_comments }}</h3>
 </body>
 </html>

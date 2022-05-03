@@ -17,8 +17,8 @@
         </form>
         {% if user|has_group:"Master" %}
         <div class="d-flex flex-row justify-content-center">
-            <a class="btn btn-outline-primary me-1" href="{% url 'export_to_excel' %}">Экспортировать в Excel</a>
-            <a class="btn btn-outline-primary" href="{% url 'export_to_pdf' %}">Экспортировать в PDF</a>
+            <a class="btn btn-outline-primary me-1" href="{% url 'schedule_export_to_excel' %}">Экспортировать в Excel</a>
+            <a class="btn btn-outline-primary" href="{% url 'schedule_export_to_pdf' %}">Экспортировать в PDF</a>
         </div>
         <div class="d-flex justify-content-center my-2">
             <a class="btn btn-outline-primary" href="{% url 'schedule_item_create' %}">Добавить новую запись</a>

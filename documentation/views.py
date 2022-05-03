@@ -2,10 +2,15 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic.base import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import CleaningSchedule
-from django.db.models import Q
-from .models import Service, AnnualPlan
+from .models import CleaningSchedule, Service, AnnualPlan
+from django.db.models import Q, Sum
+from requests.models import Request, Comment
 import datetime
+from django.http import HttpResponse
+import xlwt
+from weasyprint import HTML
+from django.template.loader import render_to_string
+import tempfile
 
 
 class CleaningScheduleListView(ListView):
@@ -207,3 +212,23 @@ class DeletePlanItem(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('annual_plan', kwargs={'type': self.kwargs['type']})
+
+
+def schedule_export_to_excel(request):
+    pass
+
+
+def form_rows_to_excel(rows, sheet, row_number):
+    font_style = xlwt.XFStyle()
+    for row in rows:
+        row_number += 1
+        for column_number in range(len(row)):
+            width = sheet.col(column_number).width
+            if (len(str(row[column_number])) * 265) > width:
+                sheet.col(column_number).width = (len(str(row[column_number])) * 265)
+            sheet.write(row_number, column_number, str(row[column_number]), font_style)
+    return row_number
+
+
+def schedule_export_to_pdf(request):
+    pass

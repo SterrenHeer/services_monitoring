@@ -23,8 +23,8 @@
                 <a href="{% url 'request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
                 {% elif user|has_group:"Master" %}
                 <div class="d-flex flex-row justify-content-center">
-                    <a href="{% url 'export_to_excel' %}" class="btn btn-outline-primary mx-1">Экспортировать в Excel</a>
-                    <a href="{% url 'export_to_pdf' %}?file=request" class="btn btn-outline-primary mx-1">Экспортировать в PDF</a>
+                    <a href="{% url 'request_export_to_excel' %}" class="btn btn-outline-primary mx-1">Экспортировать в Excel</a>
+                    <a href="{% url 'request_export_to_pdf' %}?file=request" class="btn btn-outline-primary mx-1">Экспортировать в PDF</a>
                 </div>
                 {% endif %}
             </div>

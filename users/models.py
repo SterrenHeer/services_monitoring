@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.db.models import Sum
+
 from documentation.models import Service, Position
 
 
@@ -28,3 +30,9 @@ class Worker(models.Model):
     def get_positions(self):
         return Position.objects.exclude(name__icontains='Мастер')\
                                .filter(service_type__in=self.position.service_type.all()).distinct()
+
+    def get_requests_sum(self):
+        return self.request_set.filter(status='Выполнена').aggregate(Sum('service__price'))['service__price__sum']
+
+    def get_comments_sum(self):
+        return self.comment_set.filter(status='Выполнена').aggregate(Sum('service__price'))['service__price__sum']
