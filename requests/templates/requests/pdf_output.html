@@ -10,7 +10,13 @@
             size: a4;
             margin: 2cm 1cm 2cm 3cm;
             @top-center{
+                {% if requests or comments %}
                 content: 'Акт выполненных работ';
+                {% elif schedule %}
+                content: 'График уборки';
+                {% else %}
+                content: 'План работ';
+                {% endif %}
             }
             @bottom-right {
                 content: 'Страница ' counter(page) ' из ' counter(pages);
@@ -42,6 +48,7 @@
     </style>
 </head>
 <body>
+    {% if requests %}
     <h2>Выполненные заявки</h2>
     {% regroup requests by worker.full_name as worker_list %}
     {% for request in worker_list %}
@@ -51,7 +58,7 @@
         <tr>
             <tr>
                 <td colspan="2">Услуга {{ forloop.counter }}: {{ request.service.name }}</td>
-                <td>Стоимость, руб: {{ request.service.price}}</td>
+                <td>Стоимость, руб: {{ request.service.price }}</td>
             </tr>
             <tr>
                 <td>Заказчик: {{ request.tenant.full_name }}</td>
@@ -72,6 +79,8 @@
     </table>
     {% endfor %}
     <h3>Итого, руб: {{ total_requests }}</h3>
+    {% endif %}
+    {% if comments %}
     <h2>Выполненные рекомендации</h2>
     {% regroup comments by worker.full_name as worker_list %}
     {% for comment in worker_list %}
@@ -81,7 +90,7 @@
         <tr>
             <tr>
                 <td colspan="2">Услуга {{ forloop.counter }}: {{ comment.service.name }}</td>
-                <td>Стоимость, руб: {{ comment.service.price}}</td>
+                <td>Стоимость, руб: {{ comment.service.price }}</td>
             </tr>
             <tr>
                 <td>Заказчик: {{ comment.tenant.full_name }}</td>
@@ -102,5 +111,48 @@
     </table>
     {% endfor %}
     <h3>Итого, руб: {{ total_comments }}</h3>
+    {% endif %}
+    {% if schedule %}
+    {% regroup schedule by building as buidling_list %}
+    {% for buidling in buidling_list %}
+    <h4>{{ buidling.grouper }}</h4>
+    <table>
+    {% for buidling in buidling.list %}
+        <tr>
+            <tr>
+                <td>Услуга: {{ buidling.service.name }}</td>
+                <td>Дата: {{ buidling.date }}</td>
+                <td>Время начала: {{ buidling.start_time}}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Исполнитель: {{ buidling.worker.full_name }}</td>
+                <td>Время завершения: {{ buidling.get_end_time }}</td>
+            </tr>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
+    {% if plan %}
+    {% regroup plan by building as buidling_list %}
+    {% for buidling in buidling_list %}
+    <h4>{{ buidling.grouper }}</h4>
+    <table>
+    {% for buidling in buidling.list %}
+        <tr>
+            <tr>
+                <td>Услуга: {{ buidling.service.name }}</td>
+                <td>Дата: {{ buidling.date }}</td>
+            </tr>
+            {% if buidling.worker %}
+            <tr>
+                <td colspan="2">Исполнитель: {{ buidling.worker.full_name }}</td>
+            </tr>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
 </body>
 </html>

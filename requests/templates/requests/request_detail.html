@@ -60,8 +60,10 @@
                 <span id="status_div">
                     <input type="radio" name="status" value="Отзыв" id="feedback" required checked>
                     <label for="feedback" class="editContent">Отзыв</label>
+                    {% if request.status != 'Выполнена' or request.get_valid_date %}
                     <input type="radio" name="status" value="На рассмотрении" id="complaint" required>
                     <label for="complaint" class="editContent">Замечание</label>
+                    {% endif %}
                 </span>
                 {% endif %}
                 <textarea class="form-control border border-primary" rows="3" name="text" id="comment" placeholder="Допустимая длина комментария - 600 символов" required></textarea>

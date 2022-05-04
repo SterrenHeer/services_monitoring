@@ -350,7 +350,7 @@ class SearchByRequests(ListView):
 
 def request_export_to_excel(request):
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.datetime.now().time()) + '.xls'
+    response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.date.today()) + '.xls'
     work_book = xlwt.Workbook(encoding='utf-8')
     sheet = work_book.add_sheet('Акт выполненных работ')
     row_number = 0
@@ -384,24 +384,22 @@ def form_rows_to_excel(rows, sheet, row_number):
 
 
 def request_export_to_pdf(request):
-    file = request.GET.get('file')
-    if file == 'request':
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
-        response['Content-Transfer-Encoding'] = 'binary'
-        requests = Request.objects.filter(status__in=['Выполнена', 'Принята', 'Отложена'])\
-                                  .order_by('worker', 'submission_date')
-        comments = Comment.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
-        total_requests = requests.aggregate(Sum('service__price'))['service__price__sum']
-        total_comments = comments.aggregate(Sum('service__price'))['service__price__sum']
-        html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments,
-                                                                    'total_requests': total_requests,
-                                                                    'total_comments': total_comments})
-        html = HTML(string=html_string)
-        result = html.write_pdf()
-        with tempfile.NamedTemporaryFile(delete=True) as output:
-            output.write(result)
-            output.flush()
-            output.seek(0)
-            response.write(output.read())
-        return response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    requests = Request.objects.filter(status__in=['Выполнена', 'Принята', 'Отложена'])\
+                              .order_by('worker', 'submission_date')
+    comments = Comment.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
+    total_requests = requests.aggregate(Sum('service__price'))['service__price__sum']
+    total_comments = comments.aggregate(Sum('service__price'))['service__price__sum']
+    html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments,
+                                                                'total_requests': total_requests,
+                                                                'total_comments': total_comments})
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output.seek(0)
+        response.write(output.read())
+    return response

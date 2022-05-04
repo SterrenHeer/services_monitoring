@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
@@ -39,6 +41,10 @@ class Request(models.Model):
 
     def get_complaint(self):
         return self.requestcomment_set.exclude(status__in=['Устранено', 'Ответ', 'Отклонено', 'Отзыв']).exists()
+
+    def get_valid_date(self):
+        if self.completion_date:
+            return self.completion_date.day + 3 <= datetime.date.today().day
 
 
 class RequestComment (models.Model):

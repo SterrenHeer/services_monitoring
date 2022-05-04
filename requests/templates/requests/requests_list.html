@@ -24,7 +24,7 @@
                 {% elif user|has_group:"Master" %}
                 <div class="d-flex flex-row justify-content-center">
                     <a href="{% url 'request_export_to_excel' %}" class="btn btn-outline-primary mx-1">Экспортировать в Excel</a>
-                    <a href="{% url 'request_export_to_pdf' %}?file=request" class="btn btn-outline-primary mx-1">Экспортировать в PDF</a>
+                    <a href="{% url 'request_export_to_pdf' %}" target="_blank" class="btn btn-outline-primary mx-1">Экспортировать в PDF</a>
                 </div>
                 {% endif %}
             </div>
@@ -39,7 +39,9 @@
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
                         <div>
                             {% if user|has_group:"Tenant" %}
+                            {% if request.status != 'Выполнена' %}
                             <a href="{% url 'request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
+                            {% endif %}
                             {% if request.status == 'На рассмотрении' %}
                             <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                             {% endif %}

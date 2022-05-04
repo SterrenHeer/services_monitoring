@@ -215,7 +215,48 @@ class DeletePlanItem(DeleteView):
 
 
 def schedule_export_to_excel(request):
-    pass
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=Grafik uborki.xls'
+    work_book = xlwt.Workbook(encoding='utf-8')
+    sheet = work_book.add_sheet('График уборки')
+    row_number = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    labels = ['Улица', 'Дом', 'Услуга', 'Дата', 'Начало в', 'Работник']
+    for column_number in range(len(labels)):
+        sheet.write(row_number, column_number, labels[column_number], font_style)
+    rows = CleaningSchedule.objects.all().values_list('building__street__name', 'building__number',
+                                                      'service__name', 'date', 'start_time', 'worker__full_name')\
+                                         .order_by('building', 'date')
+    form_rows_to_excel(rows, sheet, row_number)
+    work_book.save(response)
+    return response
+
+
+def plan_export_to_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    if request.GET.get('type') == 'Благоустройство':
+        response['Content-Disposition'] = 'attachment; filename=Plan blagoustroystva.xls'
+    else:
+        response['Content-Disposition'] = 'attachment; filename=Plan remonta.xls'
+    work_book = xlwt.Workbook(encoding='utf-8')
+    if request.GET.get('type') == 'Благоустройство':
+        sheet = work_book.add_sheet('План благоустройства')
+    else:
+        sheet = work_book.add_sheet('План ремонтных работ')
+    row_number = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    labels = ['Улица', 'Дом', 'Услуга', 'Дата', 'Работник']
+    for column_number in range(len(labels)):
+        sheet.write(row_number, column_number, labels[column_number], font_style)
+    rows = AnnualPlan.objects.filter(type=request.GET.get('type'))\
+                             .values_list('building__street__name', 'building__number',
+                                          'service__name', 'date', 'worker__full_name')\
+                             .order_by('building', 'date')
+    form_rows_to_excel(rows, sheet, row_number)
+    work_book.save(response)
+    return response
 
 
 def form_rows_to_excel(rows, sheet, row_number):
@@ -231,4 +272,35 @@ def form_rows_to_excel(rows, sheet, row_number):
 
 
 def schedule_export_to_pdf(request):
-    pass
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; attachment; filename=Grafik uborki.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    schedule = CleaningSchedule.objects.all().order_by('building', 'date')
+    html_string = render_to_string('requests/pdf_output.html', {'schedule': schedule})
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output.seek(0)
+        response.write(output.read())
+    return response
+
+
+def plan_export_to_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    if request.GET.get('type') == 'Благоустройство':
+        response['Content-Disposition'] = 'inline; attachment; filename=Grafik blagoustroystva.pdf'
+    else:
+        response['Content-Disposition'] = 'inline; attachment; filename=Grafik remonta.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    plan = AnnualPlan.objects.filter(type=request.GET.get('type')).order_by('building', 'date')
+    html_string = render_to_string('requests/pdf_output.html', {'plan': plan})
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output.seek(0)
+        response.write(output.read())
+    return response
