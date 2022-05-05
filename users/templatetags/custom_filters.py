@@ -1,6 +1,8 @@
 from django import template
 from django.contrib.auth.models import Group
+from django.db.models import Q
 from users.models import Worker
+from requests.models import Request, RequestComment
 
 register = template.Library()
 
@@ -14,3 +16,30 @@ def has_group(user, group_name):
 @register.simple_tag
 def get_worker(name):
     return Worker.objects.get(full_name=name)
+
+
+@register.simple_tag
+def get_requests_statuses(user):
+    if user.groups.filter(name='Manager').exists():
+        return Request.objects.all().values('status').distinct()
+    elif user.groups.filter(name='Tenant').exists():
+        return Request.objects.filter(tenant=user.tenant).values('status').distinct()
+    elif user.groups.filter(name='Master').exists():
+        service_types = user.worker.position.service_type.all()
+        return Request.objects.exclude(Q(status='На рассмотрении') |
+                                       Q(status='Отклонена')).filter(service__service_type__in=service_types)\
+                              .values('status').distinct()
+    elif user.groups.filter(name='Worker').exists():
+        return Request.objects.filter(worker=user.worker).values('status').distinct()
+
+
+@register.simple_tag
+def get_complaints_count():
+    return RequestComment.objects.filter(status='На рассмотрении').count()
+
+
+@register.simple_tag
+def get_request_comment_statuses():
+    return RequestComment.objects.exclude(Q(status='Ответ') |
+                                          Q(status='На рассмотрении') |
+                                          Q(status='Отзыв')).values('status').distinct()

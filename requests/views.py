@@ -24,7 +24,7 @@ class RequestCommentsListView(ListView):
         if self.request.user.groups.filter(name='Manager').exists():
             if not self.request.GET.get('status'):
                 return RequestComment.objects.exclude(Q(status='Ответ') |
-                                                      Q(status='На рассотрении') |
+                                                      Q(status='На рассмотрении') |
                                                       Q(status='Отзыв')).order_by('submission_date')
             return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('-submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
@@ -43,16 +43,9 @@ class RequestCommentsListView(ListView):
                                                  status__in=['Принято к устранению', 'Отложено', 'Устранено'])\
                                  .order_by('-submission_date')
 
-    @staticmethod
-    def get_statuses():
-        return RequestComment.objects.exclude(Q(status='Ответ') |
-                                              Q(status='На рассмотрении') |
-                                              Q(status='Отзыв')).values('status').distinct()
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
-        context["complaints_count"] = RequestComment.objects.filter(status='На рассмотрении').count()
         return context
 
 
@@ -61,40 +54,38 @@ class AllRequestsListView(ListView):
     template_name = 'requests/requests_list.html'
     paginate_by = 10
 
-    def get_statuses(self):
-        if self.request.user.groups.filter(name='Manager').exists():
-            return Request.objects.all().values('status').distinct()
-        elif self.request.user.groups.filter(name='Tenant').exists():
-            return Request.objects.filter(tenant=self.request.user.tenant).values('status').distinct()
-        elif self.request.user.groups.filter(name='Master').exists():
-            service_types = self.request.user.worker.position.service_type.all()
-            return Request.objects.exclude(Q(status='На рассмотрении') |
-                                           Q(status='Отклонена')).filter(service__service_type__in=service_types)\
-                                  .values('status').distinct()
-        elif self.request.user.groups.filter(name='Worker').exists():
-            return Request.objects.filter(worker=self.request.user.worker).values('status').distinct()
-
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
             if not self.request.GET.get('status'):
+                return Request.objects.filter(status='На рассмотрении').order_by('submission_date')
+            if self.request.GET.get('status') == 'all':
                 return Request.objects.all().order_by('submission_date')
             return Request.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
             if not self.request.GET.get('status'):
+                return Request.objects.filter(tenant=self.request.user.tenant,
+                                              status='На рассмотрении').order_by('submission_date')
+            if self.request.GET.get('status') == 'all':
                 return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
             return Request.objects.filter(tenant=self.request.user.tenant,
                                           status=self.request.GET.get('status')).order_by('submission_date')
         elif self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
             if not self.request.GET.get('status'):
+                return Request.objects.filter(service__service_type__in=service_types, status='В обработке')\
+                                      .order_by('submission_date')
+            if self.request.GET.get('status') == 'all':
                 return Request.objects.exclude(Q(status='На рассмотрении') |
-                                               Q(status='Отклонена'))\
-                                      .filter(service__service_type__in=service_types)\
+                                               Q(status='Отклонена')) \
+                                      .filter(service__service_type__in=service_types) \
                                       .order_by('submission_date')
             return Request.objects.filter(service__service_type__in=service_types,
                                           status=self.request.GET.get('status')).order_by('submission_date')
         elif self.request.user.groups.filter(name='Worker').exists():
             if not self.request.GET.get('status'):
+                return Request.objects.filter(worker=self.request.user.worker,
+                                              status='Принята').order_by('submission_date')
+            if self.request.GET.get('status') == 'all':
                 return Request.objects.filter(worker=self.request.user.worker).order_by('submission_date')
             return Request.objects.filter(worker=self.request.user.worker,
                                           status=self.request.GET.get('status')).order_by('submission_date')
@@ -280,7 +271,12 @@ class WorkerAppointment(View):
 
 class ChangeStatus(View):
     def post(self, request, pk):
-        if self.request.POST.get("request_comment") or self.request.POST.get("comment"):
+        if self.request.POST.get("processing"):
+            request = Request.objects.get(id=pk)
+            request.status = self.request.POST.get("processing")
+            request.save(update_fields=['status'])
+            return redirect(reverse_lazy('all_requests'))
+        elif self.request.POST.get("request_comment") or self.request.POST.get("comment"):
             if self.request.POST.get("request_comment"):
                 comment = RequestComment.objects.get(id=pk)
             else:
@@ -350,9 +346,11 @@ class SearchByRequests(ListView):
             return Request.objects.filter(Q(tenant__full_name__icontains=search) |
                                           Q(service__name__icontains=search) |
                                           Q(submission_date__icontains=search) |
+                                          Q(completion_date__icontains=search) |
                                           Q(tenant__user__username__icontains=search)).order_by('submission_date')
         if self.request.user.groups.filter(name='Tenant').exists():
             return Request.objects.filter(Q(service__name__icontains=search, tenant=self.request.user.tenant) |
+                                          Q(completion_date__icontains=search, tenant=self.request.user.tenant) |
                                           Q(submission_date__icontains=search, tenant=self.request.user.tenant))\
                                   .order_by('submission_date')
         if self.request.user.groups.filter(name='Master').exists():
@@ -360,7 +358,13 @@ class SearchByRequests(ListView):
             return Request.objects.exclude(Q(status='На рассмотрении') |
                                            Q(status='Отклонена'))\
                                   .filter(Q(service__name__icontains=search, service__service_type__in=service_types) |
+                                          Q(completion_date__icontains=search, service__service_type__in=service_types) |
                                           Q(submission_date__icontains=search, service__service_type__in=service_types))\
+                                  .order_by('submission_date')
+        if self.request.user.groups.filter(name='Worker').exists():
+            return Request.objects.filter(Q(service__name__icontains=search, worker=self.request.user.worker) |
+                                          Q(completion_date__icontains=search, worker=self.request.user.worker) |
+                                          Q(submission_date__icontains=search, worker=self.request.user.worker))\
                                   .order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):

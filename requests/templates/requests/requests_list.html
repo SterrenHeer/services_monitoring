@@ -13,7 +13,7 @@
                 <div class="d-flex flex-row justify-content-center">
                     <input type="text" class="border border-primary" placeholder="Поиск по заявкам" name="search" required>
                     <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
-                    <a href="{% url 'all_requests' %}" class="btn btn-outline-primary"><span class="material-icons md-24">refresh</span></a>
+                    <a href="{% url 'all_requests' %}?status=all" class="btn btn-outline-primary"><span class="material-icons md-24">refresh</span></a>
                 </div>
             </form>
             <div class="d-flex justify-content-center">
@@ -35,9 +35,9 @@
             <div class="col-lg-6 col-12">
                 <div class="card mb-4">
                     <div class="card-footer d-flex flex-row justify-content-between">
-                        <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5">{{ request.service }}</a>
+                        <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5 col-10">{{ request.service }}</a>
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
-                        <div>
+                        <div class="col-2 d-flex flex-row justify-content-end">
                             {% if user|has_group:"Tenant" %}
                             {% if request.status != 'Выполнена' %}
                             <a href="{% url 'request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
@@ -46,6 +46,12 @@
                             <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
                             {% elif user|has_group:"Manager" %}
+                            {% if request.status == 'На рассмотрении' %}
+                            <form action="{% url 'change_status' request.id %}" class="mb-0" method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="processing" value="В обработке" class="material-icons md-24 border-0 text-primary bg-light">send</button>
+                            </form>
+                            {% endif %}
                             <a href="{% url 'manager_request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
                             <a href="{% url 'request_delete' request.id %}"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
