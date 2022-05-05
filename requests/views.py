@@ -2,8 +2,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Request, RequestComment, Comment
-from documentation.models import Service
-from users.models import Worker
+from documentation.models import Service, CleaningSchedule
 from users.models import Tenant
 from django.views.generic.base import View
 from .forms import RequestCommentForm, RequestForm, CommentForm
@@ -121,6 +120,21 @@ class CommentListView(ListView):
             return Comment.objects.filter(worker=self.request.user.worker).order_by('submission_date')
 
 
+class CleaningCommentListView(ListView):
+    model = Comment
+    template_name = 'requests/cleaning_comment_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Comment.objects.filter(tenant__apartment__building=self.request.user.tenant.apartment.building,
+                                      service__service_type__nature='Уборка').order_by('submission_date')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["cleaning_schedule"] = CleaningSchedule.objects.filter(building_id=self.request.user.tenant.apartment.building).order_by('date')
+        return context
+
+
 class RequestDetailView(DetailView):
     model = Request
 
@@ -154,10 +168,15 @@ class CreateComment(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature__in=['Замечание', 'Уборка'])
+        if self.request.GET.get('cleaning'):
+            context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Уборка')
+        else:
+            context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature__in=['Замечание', 'Уборка'])
         return context
 
     def get_success_url(self):
+        if self.request.GET.get('cleaning'):
+            return reverse_lazy('cleaning_comments')
         return reverse_lazy('comments')
 
 
@@ -316,6 +335,8 @@ class DeleteComment(DeleteView):
     model = Comment
 
     def get_success_url(self):
+        if self.request.GET.get('cleaning'):
+            return reverse_lazy('cleaning_comments')
         return reverse_lazy('comments')
 
 

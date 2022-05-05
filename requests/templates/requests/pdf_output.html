@@ -81,7 +81,7 @@
     <h3>Итого, руб: {{ total_requests }}</h3>
     {% endif %}
     {% if comments %}
-    <h2>Выполненные рекомендации</h2>
+    <h2>Выполненные замечания</h2>
     {% regroup comments by worker.full_name as worker_list %}
     {% for comment in worker_list %}
     <h4>{{ comment.grouper }}</h4>

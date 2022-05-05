@@ -3,14 +3,14 @@
 {% load custom_filters %}
 
 {% block title %}
-    Рекомендации
+    Общие замечания
 {% endblock %}
 
 {% block content %}
     <div class="container">
         <div class="row">
             {% if user|has_group:"Tenant" %}
-                <a class="btn btn-outline-primary mt-2" href="{% url 'comment_create' %}">Добавить новую рекомендацию</a>
+                <a class="btn btn-outline-primary mt-2" href="{% url 'comment_create' %}">Добавить новое замечание</a>
             {% endif %}
             {% if comment_list %}
             {% for comment in comment_list %}
@@ -67,7 +67,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
                             <div class="d-flex flex-row">
-                                    <label for="{{ comment.id }}" class="h6">Статус рекомендации:</label>
+                                    <label for="{{ comment.id }}" class="h6">Статус замечания:</label>
                                     <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
                                         <option value="{{ comment.status }}">{{ comment.status }}</option>
                                         <option value="Принята">Принята</option>
@@ -88,7 +88,7 @@
             </div>
             {% endfor %}
             {% else %}
-            <p class="text-center">Не было подано ни одной рекомендации.</p>
+            <p class="text-center">Не было подано ни одного замечания.</p>
             {% endif %}
         </div>
     </div>
