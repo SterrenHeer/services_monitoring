@@ -15,7 +15,7 @@ class Street(models.Model):
 
 
 class Building(models.Model):
-    number = models.IntegerField("Жилец")
+    number = models.IntegerField("Номер здания")
     street = models.ForeignKey('Street', on_delete=models.CASCADE, verbose_name="Улица")
     apartments_quantity = models.IntegerField("Количество квартир")
 
@@ -63,6 +63,10 @@ class Service(models.Model):
         verbose_name = 'услугу'
         verbose_name_plural = 'Услуги'
 
+    def equipment_titles(self):
+        return f" %s" % (u", ".join([equipment.title for equipment in self.equipment.all()]))
+    equipment_titles.short_description = f'Наименования оборудования'
+
     def __str__(self):
         return self.name
 
@@ -93,6 +97,10 @@ class Position(models.Model):
     class Meta:
         verbose_name = 'должность'
         verbose_name_plural = 'Должности'
+
+    def service_types_titles(self):
+        return f" %s" % (u", ".join([service_type.title for service_type in self.service_type.all()]))
+    service_types_titles.short_description = f'Типы услуг'
 
     def __str__(self):
         return self.name
@@ -144,7 +152,6 @@ class AnnualPlan(models.Model):
                                null=True, blank=True, verbose_name="Работник")
     date = models.DateField("Дата проведения", default=datetime.date.today)
     status = models.CharField("Состояние", max_length=200, default="Запланирована")
-    start_time = models.TimeField("Время начала", default=datetime.time(8, 0))
     type = models.CharField("Характер", max_length=200, choices=TYPE_CHOICES, default="Благоустройство")
 
     class Meta:
