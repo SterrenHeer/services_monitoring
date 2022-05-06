@@ -24,7 +24,6 @@ class RequestCommentsListView(ListView):
         if self.request.user.groups.filter(name='Manager').exists():
             if not self.request.GET.get('status'):
                 return RequestComment.objects.exclude(Q(status='Ответ') |
-                                                      Q(status='На рассмотрении') |
                                                       Q(status='Отзыв')).order_by('submission_date')
             return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('-submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
@@ -38,10 +37,14 @@ class RequestCommentsListView(ListView):
                     return RequestComment.objects.filter(initial_id__in=user_comments).order_by('-submission_date')
                 return RequestComment.objects.filter(user=self.request.user,
                                                      status=self.request.GET.get('status')).order_by('-submission_date')
-        if self.request.user.groups.filter(name='Worker').exists():
+        elif self.request.user.groups.filter(name='Worker').exists():
             return RequestComment.objects.filter(request__worker=self.request.user.worker,
                                                  status__in=['Принято к устранению', 'Отложено', 'Устранено'])\
                                  .order_by('-submission_date')
+        elif self.request.user.groups.filter(name='Master').exists():
+            service_types = self.request.user.worker.position.service_type.all()
+            return RequestComment.objects.filter(request__service__service_type__in=service_types)\
+                                         .order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

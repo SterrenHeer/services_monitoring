@@ -12,7 +12,10 @@
             <div>
                 <ul class="navbar-nav justify-content-center">
                     {% if user.is_authenticated and user.first_name %}
-                    <li class="nav-item"><span class="nav-link text-light text-uppercase font-weight-bold px-3">Добро пожаловать, {{ request.user.first_name }}!</span></li>
+                    <li class="nav-item"><span class="nav-link text-light text-uppercase font-weight-bold px-3">Добро пожаловать, {{ user.first_name }}!</span></li>
+                    {% if  user|has_group:"Tenant" %}
+                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'logout' %}"><span class="material-icons md-24">logout</span></a></li>
                     {% else %}
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'signup' %}">Регистрация</a></li>
@@ -35,15 +38,18 @@
                     {% endif %}
                     {% if request.user|has_group:"Manager" %}
                         {% get_complaints_count as complaints_count %}
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=На рассмотрении">Новые замечания{% if complaints_count %}({{ complaints_count }}){% endif %}</a></li>
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Отзывы</a></li>
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
-                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
+                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания {% if complaints_count %}({{ complaints_count }}){% endif %}</a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{% url 'request_comments' %}">Все замечания</a>
                                 {% get_request_comment_statuses as requests %}
                                 {% for request in requests %}
+                                {% if request.status == 'На рассмотрении' and complaints_count%}
+                                <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">Текущие ({{ complaints_count }})</a>
+                                {% else %}
                                 <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">{{ request.status }}</a>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </li>
@@ -57,21 +63,28 @@
                         </li>
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a></li>
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы ЖЭУ</a></li>
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'tenant_update' user.tenant.id %}">Профиль</a></li>
-                    {% elif request.user|has_group:"Master"%}
+                    {% elif request.user|has_group:"Master" and not perms.requests %}
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Общие замечания</a></li>
+                    {% elif request.user|has_group:"Worker" or request.user|has_group:"Master" and perms.requests %}
+                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'comments' %}">Общие замечания</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' %}">Замечания по заявкам</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if request.user|has_group:"Master"%}
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'all_workers' %}">Работники участка</a></li>
-                    {% elif request.user|has_group:"Worker"%}
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Общие замечания</a></li>
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}">Замечания по заявкам</a></li>
                     {% endif %}
-                    {% if not perms.requests %}
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'cleaning_schedule' %}">График уборки</a></li>
-                    {% endif %}
-                    <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Планы</a>
+                    <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Плановые работы</a>
                         <div class="dropdown-menu">
+                            {% if not perms.requests %}
+                            <a class="dropdown-item" href="{% url 'cleaning_schedule' %}">График уборки</a>
                             <a class="dropdown-item" href="{% url 'annual_plan' 'Благоустройство' %}">План благоустройства</a>
+                            {% endif %}
+                            {% if perms.requests or not request.user|has_group:"Master" %}
                             <a class="dropdown-item" href="{% url 'annual_plan' 'Ремонт' %}">План ремонтных работ</a>
+                            {% endif %}
                         </div>
                     </li>
                 {% endif %}

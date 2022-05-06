@@ -41,5 +41,4 @@ def get_complaints_count():
 @register.simple_tag
 def get_request_comment_statuses():
     return RequestComment.objects.exclude(Q(status='Ответ') |
-                                          Q(status='На рассмотрении') |
                                           Q(status='Отзыв')).values('status').distinct()

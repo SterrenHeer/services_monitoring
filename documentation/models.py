@@ -156,3 +156,6 @@ class AnnualPlan(models.Model):
 
     def get_current_date(self):
         return self.date <= datetime.date.today()
+
+    def get_overdue(self):
+        return self.date < datetime.date.today()

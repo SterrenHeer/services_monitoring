@@ -53,7 +53,7 @@
                                 <h6 class="mb-0 text-info">Работник не назначен</h6>
                                 {% endif %}
                             </div>
-                            {% if item.status != 'Выполнена' and item.get_overdue %}
+                            {% if item.status == 'Запланирована' and item.get_overdue %}
                                 <h6 class="mb-0 col-lg-2 text-danger">{{ item.status }}</h6>
                             {% elif item.status == 'Выполнена' %}
                                 <h6 class="mb-0 col-lg-2 text-success">{{ item.status }}</h6>
