@@ -16,16 +16,21 @@ class Request(models.Model):
         ('Отложена', 'Отложена'),
         ('Выполнена', 'Выполнена'),
     )
-    service = models.ForeignKey('documentation.Service', on_delete=models.CASCADE)
-    tenant = models.ForeignKey('users.Tenant', on_delete=models.CASCADE)
-    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
-    submission_date = models.DateField(auto_now_add=True)
-    completion_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=200, choices=STATUS_CHOICES, default="На рассмотрении",
-                              help_text="Введите статус заявки")
-    start_time = models.TimeField(default=timezone.now)
-    end_time = models.TimeField(default=timezone.now)
-    answer = models.CharField(max_length=85, null=True, blank=True)
+    service = models.ForeignKey('documentation.Service', on_delete=models.CASCADE, verbose_name="Услуга")
+    tenant = models.ForeignKey('users.Tenant', on_delete=models.CASCADE, verbose_name="Жилец")
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL,
+                               null=True, blank=True, verbose_name="Работник")
+    submission_date = models.DateField("Дата подачи", auto_now_add=True)
+    completion_date = models.DateField("Дата выполнения", null=True, blank=True)
+    status = models.CharField("Состояние", max_length=200, choices=STATUS_CHOICES,
+                              default="На рассмотрении")
+    start_time = models.TimeField("Время начала", default=timezone.now)
+    end_time = models.TimeField("Время завершения", default=timezone.now)
+    answer = models.CharField("Ответ", max_length=85, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'заявку'
+        verbose_name_plural = 'Заявки'
 
     def __str__(self):
         return f"{self.service}"
@@ -48,13 +53,18 @@ class Request(models.Model):
 
 
 class RequestComment (models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    text = models.CharField(max_length=600, help_text="Введите комментарий")
-    status = models.CharField(max_length=200, default="Ответ", help_text="Введите статус заявки")
-    submission_date = models.DateField(auto_now_add=True)
-    request = models.ForeignKey('Request', on_delete=models.CASCADE)
-    initial = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
-    answer = models.CharField(max_length=85, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
+    text = models.CharField("Текст замечания", max_length=600)
+    status = models.CharField("Состояние", max_length=200, default="Ответ")
+    submission_date = models.DateField("Дата подачи", auto_now_add=True)
+    request = models.ForeignKey('Request', on_delete=models.CASCADE, verbose_name="Заявка")
+    initial = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True,
+                                null=True, verbose_name="Исходный комментарий")
+    answer = models.CharField("Ответ", max_length=85, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'комментарий по заявке'
+        verbose_name_plural = 'Комментарии по заявкам'
 
     def __str__(self):
         return f"{self.text} ({self.request})"
@@ -68,25 +78,22 @@ class RequestComment (models.Model):
 
 
 class Comment(models.Model):
-    text = models.CharField(max_length=85, help_text="Введите комментарий длиной не более 85 символов")
-    status = models.CharField(max_length=200, default="На рассмотрении", help_text="Введите статус заявки")
-    submission_date = models.DateField(auto_now_add=True)
-    completion_date = models.DateField(null=True, blank=True)
-    service = models.ForeignKey('documentation.Service', on_delete=models.CASCADE)
-    tenant = models.ForeignKey('users.Tenant', on_delete=models.CASCADE)
-    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True, blank=True)
-    answer = models.CharField(max_length=85, null=True, blank=True)
+    text = models.CharField("Текст замечания", max_length=85)
+    status = models.CharField("Состояние", max_length=200, default="На рассмотрении")
+    submission_date = models.DateField("Дата подачи", auto_now_add=True)
+    completion_date = models.DateField("Дата выполнения", null=True, blank=True)
+    service = models.ForeignKey('documentation.Service', on_delete=models.CASCADE, verbose_name="Услуга")
+    tenant = models.ForeignKey('users.Tenant', on_delete=models.CASCADE, verbose_name="Жилец")
+    worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True,
+                               blank=True, verbose_name="Работник")
+    answer = models.CharField("Ответ", max_length=85, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'замечание'
+        verbose_name_plural = 'Замечания'
 
     def __str__(self):
         return f"{self.text} ({self.service})"
 
     def get_workers(self):
         return Worker.objects.filter(position__service_type=self.service.service_type)
-
-
-class Recommendation(models.Model):
-    service = models.ForeignKey('documentation.Service', on_delete=models.SET_NULL, null=True)
-    building = models.ForeignKey('documentation.Building', on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return f"{self.service} ({self.building})"
