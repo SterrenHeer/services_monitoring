@@ -25,7 +25,7 @@
                             <div class="card-footer d-flex flex-lg-row flex-column flex-grow-1">
                                 <h6 class="mb-0 col-lg-2 me-2">{{ item.start_time }}-{{ item.get_end_time }}</h6>
                                 <h6 class="mb-0 col-lg-7 me-2">{{ item.service }}</h6>
-                                {% if item.status != 'Выполнена' and item.get_overdue %}
+                                {% if item.status == 'Запланирована' and item.get_overdue %}
                                     <h6 class="mb-0 col-lg-3 text-danger">{{ item.status }}</h6>
                                 {% elif item.status == 'Выполнена' %}
                                     <h6 class="mb-0 col-lg-3 text-success">{{ item.status }}</h6>

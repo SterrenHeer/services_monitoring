@@ -8,31 +8,32 @@
 
 {% block content %}
     <div class="container">
-        <div class="d-flex flex-column justify-content-center my-2">
-            <form action="{% url 'search_requests' %}" method="get">
+        <div class="d-flex flex-lg-row flex-column justify-content-center mt-1">
+            <div class="d-flex justify-content-center me-1 py-1">
+                {% if user|has_group:"Manager" %}
+                <a href="{% url 'manager_request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
+                {% elif user|has_group:"Tenant" %}
+                <a href="{% url 'request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
+                {% endif %}
+            </div>
+            <form action="{% url 'search_requests' %}" class="my-1" method="get">
                 <div class="d-flex flex-row justify-content-center">
                     <input type="text" class="border border-primary" placeholder="Поиск по заявкам" name="search" required>
                     <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
                     <a href="{% url 'all_requests' %}?status=all" class="btn btn-outline-primary"><span class="material-icons md-24">refresh</span></a>
                 </div>
             </form>
-            <div class="d-flex justify-content-center">
-                {% if user|has_group:"Manager" %}
-                <a href="{% url 'manager_request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
-                {% elif user|has_group:"Tenant" %}
-                <a href="{% url 'request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
-                {% elif user|has_group:"Master" %}
-                <div class="d-flex flex-row justify-content-center">
-                    <a href="{% url 'request_export_to_excel' %}" class="btn btn-outline-primary mx-1">Экспортировать в Excel</a>
-                    <a href="{% url 'request_export_to_pdf' %}" target="_blank" class="btn btn-outline-primary mx-1">Экспортировать в PDF</a>
-                </div>
-                {% endif %}
+            {% if user|has_group:"Master" %}
+            <div class="d-flex flex-row justify-content-center py-1">
+                <a href="{% url 'request_export_to_excel' %}" class="btn btn-outline-primary mx-1">Экспортировать в Excel</a>
+                <a href="{% url 'request_export_to_pdf' %}" target="_blank" class="btn btn-outline-primary">Экспортировать в PDF</a>
             </div>
+            {% endif %}
         </div>
         <div class="row d-flex justify-content-center">
             {% if request_list %}
             {% for request in request_list %}
-            <div class="col-lg-6 col-12">
+            <div class="col-lg-6 col-12 my-2">
                 <div class="card mb-4">
                     <div class="card-footer d-flex flex-row justify-content-between">
                         <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5 col-10">{{ request.service }}</a>
