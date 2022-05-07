@@ -1,5 +1,9 @@
-{% load custom_filters %}
-
+{% load custom_tags %}
+<style>
+    .active{
+        color: red;
+    }
+</style>
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
     <div class="container-fluid justify-content-center">
         <a href="/" class="navbar-brand position-absolute top-0 start-0 d-none d-lg-block">
@@ -56,13 +60,17 @@
                     {% elif  request.user|has_group:"Tenant" %}
                         <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'request_comments' %}">Замечания по заявкам</a>
                                 <a class="dropdown-item" href="{% url 'comments' %}">Общие замечания</a>
                                 <a class="dropdown-item" href="{% url 'cleaning_comments' %}">Замечания по уборке</a></a>
                             </div>
                         </li>
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a></li>
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы ЖЭУ</a></li>
+                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'request_comments' %}">Замечания по заявкам</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' %}?status=Ответ">Ответы ЖЭУ</a></a>
+                            </div>
+                        </li>
                     {% elif request.user|has_group:"Master" and not perms.requests %}
                         <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Общие замечания</a></li>
                     {% elif request.user|has_group:"Worker" or request.user|has_group:"Master" and perms.requests %}
@@ -93,3 +101,30 @@
         </div>
     </div>
 </nav>
+<script type="text/javascript">
+ $('document').ready(function() {
+    $('.nav-item a').each(function() {
+        {#window.location.href.includes($(this).attr('href'))#}
+        {#window.location.href.includes($(this).attr('href')) && $(this).attr('href')#}
+        if (window.location.pathname == $(this).attr('href'))
+        {
+            console.log($(this).attr('href'))
+            console.log(window.location.href)
+            console.log({{ request.get_path }})
+            $(this).addClass("border border-2 rounded border-primary").parent().parent().addClass("border border-2 rounded border-primary")
+        }
+        else if (window.location.href.includes($(this).attr('href')) && $(this).attr('href'))
+        {
+            $(this).addClass("border border-2 rounded border-danger").parent().parent().addClass("border border-2 rounded border-danger")
+            console.log('Hello')
+            console.log(window.location.href)
+            console.log($(this).attr('href')) ///allrequests/?status=all
+        }
+        else
+        {
+            console.log('bad day')
+            console.log($(this).attr('href')) ///allrequests/?status=На рассмотрении
+        }
+    });
+});
+ </script>

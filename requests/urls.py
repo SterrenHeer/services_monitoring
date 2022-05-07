@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('allrequests/', views.AllRequestsListView.as_view(), name='all_requests'),
-    path('comments/', views.CommentListView.as_view(), name='comments'),
+    path('allcomments/', views.CommentListView.as_view(), name='comments'),
     path('cleaning/comments/', views.CleaningCommentListView.as_view(), name='cleaning_comments'),
     path('search/requests/', views.SearchByRequests.as_view(), name='search_requests'),
     path('request/export/excel', views.request_export_to_excel, name='request_export_to_excel'),
