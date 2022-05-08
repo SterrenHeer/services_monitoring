@@ -11,7 +11,7 @@
         <form action="" method="POST">
             {% csrf_token %}
             <button class="btn btn-outline-danger" type="submit">Да, я уверен(а)</button>
-            <a class="btn btn-outline-primary" href="{% url 'comments' %}">Нет, отменить удаление</a>
+            <a class="btn btn-outline-primary" href="{% url 'comments' comment.status %}">Нет, отменить удаление</a>
         </form>
     </div>
 {% endblock %}

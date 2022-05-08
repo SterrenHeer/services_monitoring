@@ -50,9 +50,9 @@ def log_in(request):
                 login(request, user)
                 if request.user.groups.filter(name='Master').exists() and not request.user.has_perm(
                         'requests.change_repairrequest'):
-                    return redirect('comments')
+                    return redirect('comments', 'all')
                 else:
-                    return redirect('all_requests')
+                    return redirect('all_requests', 'none')
             else:
                 return redirect('signup')
     else:
@@ -78,7 +78,7 @@ class TenantUpdate(UpdateView):
         return super(TenantUpdate, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('all_requests')
+        return reverse_lazy('all_requests', kwargs={'status': 'all'})
 
 
 class WorkersListView(ListView):

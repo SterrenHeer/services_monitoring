@@ -10,7 +10,7 @@
     <div>
         <div>
             <br>
-            <h1 class="text-center">Создание нового общего замечания</h1>
+            <h1 class="text-center">Создание нового замечания</h1>
             <br>
             <div class="col-9 col-sm-9 col-md-6 col-lg-5 mx-auto bg-light">
                 <br>
@@ -18,7 +18,7 @@
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
-                    <button type="submit" name="button" class="btn btn-outline-primary d-block mx-auto">Создать общее замечание</button>
+                    <button type="submit" name="button" class="btn btn-outline-primary d-block mx-auto">Создать замечание</button>
                 </form>
             </div>
         </div>

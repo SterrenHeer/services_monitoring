@@ -56,7 +56,7 @@
                                 <h6 class="mb-0">{{ comment.submission_date }}</h6>
                             {% endif %}
                             {% if comment.status == 'На рассмотрении' %}
-                                <a href="{% url 'comment_delete' comment.id %}?cleaning=true"><i class="material-icons md-24">delete</i></a>
+                                <a href="{% url 'comment_delete' comment.id status %}?cleaning=true"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
                         </div>
                     </div>

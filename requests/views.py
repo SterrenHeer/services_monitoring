@@ -22,21 +22,21 @@ class RequestCommentsListView(ListView):
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
-            if not self.request.GET.get('status'):
+            if self.kwargs['status'] == 'all':
                 return RequestComment.objects.exclude(Q(status='Ответ') |
                                                       Q(status='Отзыв')).order_by('submission_date')
-            return RequestComment.objects.filter(status=self.request.GET.get('status')).order_by('-submission_date')
+            return RequestComment.objects.filter(status=self.kwargs['status']).order_by('-submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
-            if not self.request.GET.get('status'):
+            if self.kwargs['status'] == 'all':
                 return RequestComment.objects.exclude(Q(status='Ответ') |
                                                       Q(status='Отзыв')).filter(user=self.request.user)\
                                              .order_by('-submission_date')
             else:
-                if self.request.GET.get('status') == 'Ответ':
+                if self.kwargs['status'] == 'Ответ':
                     user_comments = RequestComment.objects.filter(user=self.request.user).values('id')
                     return RequestComment.objects.filter(initial_id__in=user_comments).order_by('-submission_date')
                 return RequestComment.objects.filter(user=self.request.user,
-                                                     status=self.request.GET.get('status')).order_by('-submission_date')
+                                                     status=self.kwargs['status']).order_by('-submission_date')
         elif self.request.user.groups.filter(name='Worker').exists():
             return RequestComment.objects.filter(request__worker=self.request.user.worker,
                                                  status__in=['Принято к устранению', 'Отложено', 'Устранено'])\
@@ -48,7 +48,7 @@ class RequestCommentsListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
+        context["status"] = self.kwargs['status']
         return context
 
 
@@ -59,43 +59,43 @@ class AllRequestsListView(ListView):
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
-            if not self.request.GET.get('status'):
+            if self.kwargs['status'] == 'none':
                 return Request.objects.filter(status='На рассмотрении').order_by('submission_date')
-            if self.request.GET.get('status') == 'all':
+            if self.kwargs['status'] == 'all':
                 return Request.objects.all().order_by('submission_date')
-            return Request.objects.filter(status=self.request.GET.get('status')).order_by('submission_date')
+            return Request.objects.filter(status=self.kwargs['status']).order_by('submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
-            if not self.request.GET.get('status'):
+            if not self.kwargs['status']:
                 return Request.objects.filter(tenant=self.request.user.tenant,
                                               status='На рассмотрении').order_by('submission_date')
-            if self.request.GET.get('status') == 'all':
+            if self.kwargs['status'] == 'all':
                 return Request.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
             return Request.objects.filter(tenant=self.request.user.tenant,
-                                          status=self.request.GET.get('status')).order_by('submission_date')
+                                          status=self.kwargs['status']).order_by('submission_date')
         elif self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
-            if not self.request.GET.get('status'):
+            if self.kwargs['status'] == 'none':
                 return Request.objects.filter(service__service_type__in=service_types, status='В обработке')\
                                       .order_by('submission_date')
-            if self.request.GET.get('status') == 'all':
+            if self.kwargs['status'] == 'all':
                 return Request.objects.exclude(Q(status='На рассмотрении') |
                                                Q(status='Отклонена')) \
                                       .filter(service__service_type__in=service_types) \
                                       .order_by('submission_date')
             return Request.objects.filter(service__service_type__in=service_types,
-                                          status=self.request.GET.get('status')).order_by('submission_date')
+                                          status=self.kwargs['status']).order_by('submission_date')
         elif self.request.user.groups.filter(name='Worker').exists():
-            if not self.request.GET.get('status'):
+            if self.kwargs['status'] == 'none':
                 return Request.objects.filter(worker=self.request.user.worker,
                                               status='Принята').order_by('submission_date')
-            if self.request.GET.get('status') == 'all':
+            if self.kwargs['status'] == 'all':
                 return Request.objects.filter(worker=self.request.user.worker).order_by('submission_date')
             return Request.objects.filter(worker=self.request.user.worker,
-                                          status=self.request.GET.get('status')).order_by('submission_date')
+                                          status=self.kwargs['status']).order_by('submission_date')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["status"] = ''.join([f"status={x}&" for x in self.request.GET.getlist("status")])
+        context["status"] = self.kwargs['status']
         return context
 
 
@@ -106,12 +106,19 @@ class CommentListView(ListView):
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Tenant').exists():
-            return Comment.objects.filter(tenant=self.request.user.tenant).order_by('submission_date')
+            return Comment.objects.exclude(service__service_type__nature='Уборка')\
+                                  .filter(tenant=self.request.user.tenant).order_by('submission_date')
         elif self.request.user.groups.filter(name='Master').exists():
             service_types = self.request.user.worker.position.service_type.all()
-            return Comment.objects.exclude(status='Выполнена').filter(service__service_type__in=service_types).order_by('submission_date')
+            return Comment.objects.exclude(status='Выполнена')\
+                                  .filter(service__service_type__in=service_types).order_by('submission_date')
         elif self.request.user.groups.filter(name='Worker').exists():
             return Comment.objects.filter(worker=self.request.user.worker).order_by('submission_date')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["status"] = self.kwargs['status']
+        return context
 
 
 class CleaningCommentListView(ListView):
@@ -126,6 +133,7 @@ class CleaningCommentListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["cleaning_schedule"] = CleaningSchedule.objects.filter(building_id=self.request.user.tenant.apartment.building).order_by('date')
+        context["status"] = self.kwargs['status']
         return context
 
 
@@ -165,13 +173,13 @@ class CreateComment(CreateView):
         if self.request.GET.get('cleaning'):
             context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Уборка')
         else:
-            context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature__in=['Замечание', 'Уборка'])
+            context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Замечание')
         return context
 
     def get_success_url(self):
         if self.request.GET.get('cleaning'):
-            return reverse_lazy('cleaning_comments')
-        return reverse_lazy('comments')
+            return reverse_lazy('cleaning_comments', kwargs={'status': 'all'})
+        return reverse_lazy('comments', kwargs={'status': 'all'})
 
 
 class ManagerRequestCreate(CreateView):
@@ -245,7 +253,7 @@ class WorkWithRequestComment(View):
 
 
 class WorkerAppointment(View):
-    def post(self, request, pk):
+    def post(self, request, pk, status):
         if self.request.POST.get("comment"):
             form = CommentForm(request.POST)
             comment = Comment.objects.get(id=pk)
@@ -257,7 +265,7 @@ class WorkerAppointment(View):
                     comment.worker_id = None
                     comment.status = 'На рассмотрении'
                 comment.save(update_fields=['worker', 'status'])
-            return redirect(reverse_lazy('comments'))
+            return redirect(reverse_lazy('comments', kwargs={'status': status}))
         else:
             form = RequestForm(request.POST)
             request = Request.objects.get(id=pk)
@@ -269,16 +277,16 @@ class WorkerAppointment(View):
                     request.worker_id = None
                     request.status = 'В обработке'
                 request.save(update_fields=['worker', 'status'])
-            return redirect(reverse_lazy('all_requests'))
+            return redirect(reverse_lazy('all_requests', kwargs={'status': status}))
 
 
 class ChangeStatus(View):
-    def post(self, request, pk):
+    def post(self, request, pk, status):
         if self.request.POST.get("processing"):
             request = Request.objects.get(id=pk)
             request.status = self.request.POST.get("processing")
             request.save(update_fields=['status'])
-            return redirect(reverse_lazy('all_requests'))
+            return redirect(reverse_lazy('all_requests', kwargs={'status': status}))
         elif self.request.POST.get("request_comment") or self.request.POST.get("comment"):
             if self.request.POST.get("request_comment"):
                 comment = RequestComment.objects.get(id=pk)
@@ -296,8 +304,8 @@ class ChangeStatus(View):
                     comment.answer = None
                 comment.save()
             if self.request.POST.get("request_comment"):
-                return redirect(reverse_lazy('request_comments'))
-            return redirect(reverse_lazy('comments'))
+                return redirect(reverse_lazy('request_comments', kwargs={'status': status}))
+            return redirect(reverse_lazy('comments', kwargs={'status': status}))
         else:
             request = Request.objects.get(id=pk)
             if self.request.POST.get("status"):
@@ -313,14 +321,14 @@ class ChangeStatus(View):
                 else:
                     request.answer = None
                 request.save(update_fields=['status', 'answer', 'completion_date'])
-            return redirect(reverse_lazy('all_requests'))
+            return redirect(reverse_lazy('all_requests', kwargs={'status': status}))
 
 
 class DeleteRequest(DeleteView):
     model = Request
 
     def get_success_url(self):
-        return reverse_lazy('all_requests')
+        return reverse_lazy('all_requests', kwargs={'status': self.kwargs['status']})
 
 
 class DeleteRequestComment(DeleteView):
@@ -335,8 +343,8 @@ class DeleteComment(DeleteView):
 
     def get_success_url(self):
         if self.request.GET.get('cleaning'):
-            return reverse_lazy('cleaning_comments')
-        return reverse_lazy('comments')
+            return reverse_lazy('cleaning_comments', kwargs={'status': self.kwargs['status']})
+        return reverse_lazy('comments', kwargs={'status': self.kwargs['status']})
 
 
 class SearchByRequests(ListView):
@@ -373,6 +381,7 @@ class SearchByRequests(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["search"] = f"search={self.request.GET.get('search')}&"
+        context["status"] = self.kwargs['status']
         return context
 
 

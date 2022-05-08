@@ -33,13 +33,13 @@
             {% endif %}
         </div>
         {% if not user|has_group:"Tenant" %}
-        <a href="{% url 'request_comments' %}" class="btn btn-outline-primary">Вернуться к списку замечаний</a><br>
+        <a href="{% url 'request_comments' 'all'%}" class="btn btn-outline-primary">Вернуться к списку замечаний</a><br>
         {% endif %}
-        <a href="{% url 'all_requests' %}" class="btn btn-outline-primary mt-2">Вернуться к списку заявок</a>
+        <a href="{% url 'all_requests' request.status %}" class="btn btn-outline-primary mt-2">Вернуться к списку заявок</a>
     </div>
     <div class="col-10 mx-auto col-md-4 col-lg-6">
         <h3 class="editContent text-center">Оставить комментарий</h3>
-        <form action="{% url 'request_comment_create' request.id %}" method="post" class="mt-4" id="comment_form">
+        <form action="{% url 'work_with_request_comment' request.id %}" method="post" class="mt-4" id="comment_form">
             {% csrf_token %}
             <input hidden name="initial" id="initial_comment" value="">
             <div class="form-group editContent">

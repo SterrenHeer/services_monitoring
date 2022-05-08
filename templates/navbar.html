@@ -1,9 +1,5 @@
 {% load custom_tags %}
-<style>
-    .active{
-        color: red;
-    }
-</style>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
     <div class="container-fluid justify-content-center">
         <a href="/" class="navbar-brand position-absolute top-0 start-0 d-none d-lg-block">
@@ -32,27 +28,27 @@
                     {% else %}
                         <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Заявки</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'all_requests' %}?status=all">Все заявки</a>
+                                <a class="dropdown-item" href="{% url 'all_requests' 'all' %}">Все заявки</a>
                                 {% get_requests_statuses request.user as requests %}
                                 {% for request in requests %}
-                                <a class="dropdown-item" href="{% url 'all_requests' %}?status={{ request.status }}">{{ request.status }}</a>
+                                <a class="dropdown-item" href="{% url 'all_requests' request.status %}">{{ request.status }}</a>
                                 {% endfor %}
                             </div>
                         </li>
                     {% endif %}
                     {% if request.user|has_group:"Manager" %}
                         {% get_complaints_count as complaints_count %}
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Отзыв">Отзывы</a></li>
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' %}?status=Ответ">Ответы</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' 'Отзыв' %}">Отзывы</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'request_comments' 'Ответ' %}">Ответы</a></li>
                         <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания {% if complaints_count %}({{ complaints_count }}){% endif %}</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'request_comments' %}">Все замечания</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' 'all' %}">Все замечания</a>
                                 {% get_request_comment_statuses as requests %}
                                 {% for request in requests %}
                                 {% if request.status == 'На рассмотрении' and complaints_count%}
-                                <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">Текущие ({{ complaints_count }})</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' request.status %}">Текущие ({{ complaints_count }})</a>
                                 {% else %}
-                                <a class="dropdown-item" href="{% url 'request_comments' %}?status={{ request.status }}">{{ request.status }}</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' request.status %}">{{ request.status }}</a>
                                 {% endif %}
                                 {% endfor %}
                             </div>
@@ -60,24 +56,24 @@
                     {% elif  request.user|has_group:"Tenant" %}
                         <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'comments' %}">Общие замечания</a>
-                                <a class="dropdown-item" href="{% url 'cleaning_comments' %}">Замечания по уборке</a></a>
+                                <a class="dropdown-item" href="{% url 'comments' 'all' %}">Общие замечания</a>
+                                <a class="dropdown-item" href="{% url 'cleaning_comments' 'cleaning' %}">Замечания по уборке</a>
                             </div>
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
+                        <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Комментарии</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'request_comments' %}">Замечания по заявкам</a>
-                                <a class="dropdown-item" href="{% url 'request_comments' %}?status=Отзыв">Мои отзывы</a>
-                                <a class="dropdown-item" href="{% url 'request_comments' %}?status=Ответ">Ответы ЖЭУ</a></a>
+                                <a class="dropdown-item" href="{% url 'request_comments' 'all' %}">Замечания по заявкам</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' 'Отзыв' %}">Отзывы к заявкам</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' 'Ответ' %}">Ответы ЖЭУ</a>
                             </div>
                         </li>
                     {% elif request.user|has_group:"Master" and not perms.requests %}
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' %}">Общие замечания</a></li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3" href="{% url 'comments' 'all' %}">Общие замечания</a></li>
                     {% elif request.user|has_group:"Worker" or request.user|has_group:"Master" and perms.requests %}
                         <li class="nav-item dropdown"><a class="nav-link text-light text-uppercase font-weight-bold px-3 dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'comments' %}">Общие замечания</a>
-                                <a class="dropdown-item" href="{% url 'request_comments' %}">Замечания по заявкам</a>
+                                <a class="dropdown-item" href="{% url 'comments' 'all' %}">Общие замечания</a>
+                                <a class="dropdown-item" href="{% url 'request_comments' 'cleaning' %}">Замечания по заявкам</a>
                             </div>
                         </li>
                     {% endif %}
@@ -104,26 +100,14 @@
 <script type="text/javascript">
  $('document').ready(function() {
     $('.nav-item a').each(function() {
-        {#window.location.href.includes($(this).attr('href'))#}
-        {#window.location.href.includes($(this).attr('href')) && $(this).attr('href')#}
-        if (window.location.pathname == $(this).attr('href'))
+        if (window.location.pathname === $(this).attr('href'))
         {
-            console.log($(this).attr('href'))
-            console.log(window.location.href)
-            console.log({{ request.get_path }})
-            $(this).addClass("border border-2 rounded border-primary").parent().parent().addClass("border border-2 rounded border-primary")
-        }
-        else if (window.location.href.includes($(this).attr('href')) && $(this).attr('href'))
-        {
-            $(this).addClass("border border-2 rounded border-danger").parent().parent().addClass("border border-2 rounded border-danger")
-            console.log('Hello')
-            console.log(window.location.href)
-            console.log($(this).attr('href')) ///allrequests/?status=all
-        }
-        else
-        {
-            console.log('bad day')
-            console.log($(this).attr('href')) ///allrequests/?status=На рассмотрении
+            let style = "border border-2 rounded border-primary"
+            $(this).addClass(style)
+            let grandpa = $(this).parent().parent()
+            console.log(grandpa.attr('class'))
+            if (grandpa.attr('class').includes('dropdown'))
+                grandpa.addClass(style)
         }
     });
 });
