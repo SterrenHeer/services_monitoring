@@ -55,7 +55,7 @@ class RequestCommentsListView(ListView):
 class AllRequestsListView(ListView):
     model = Request
     template_name = 'requests/requests_list.html'
-    paginate_by = 10
+    paginate_by = 8
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():

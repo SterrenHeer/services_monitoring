@@ -3,8 +3,7 @@
     margin: 0 auto
 }
 
-.pagination,
-.pagination__link {
+.pagination, .pagination__link {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-flow: row wrap;

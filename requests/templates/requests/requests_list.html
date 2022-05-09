@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="container">
-        <div class="d-flex flex-lg-row flex-column justify-content-center mt-1">
+        <div class="d-flex flex-md-row flex-column justify-content-center mt-1">
             <div class="d-flex justify-content-center me-1 py-1">
                 {% if user|has_group:"Manager" %}
                 <a href="{% url 'manager_request_create' %}" class="btn btn-outline-primary">Добавить новую заявку</a>
@@ -34,8 +34,8 @@
             {% if request_list %}
             {% for request in request_list %}
             <div class="col-lg-6 col-12 my-2">
-                <div class="card mb-4">
-                    <div class="card-footer d-flex flex-row justify-content-between">
+                <div class="card border-secondary mb-2">
+                    <div class="card-header d-flex flex-row justify-content-between">
                         <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5 col-10">{{ request.service }}</a>
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
                         <div class="col-2 d-flex flex-row justify-content-end">
@@ -59,7 +59,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="card-footer d-flex flex-row justify-content-between">
+                    <div class="card-body d-flex flex-row justify-content-between">
                         <h6 class="mb-0">{{ request.start_time }}-{{ request.end_time }}</h6>
                         <h6 class="mb-0">{{ request.status }}</h6>
                         {% if request.completion_date and request.status == 'Выполнена' %}
@@ -69,7 +69,7 @@
                         {% endif %}
                     </div>
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}
-                    <div class="card-footer d-flex justify-content-between">
+                    <div class="card-footer d-flex justify-content-center">
                         {% if user|has_group:"Master" %}
                         <form action="{% url 'worker_appointment' request.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
@@ -90,20 +90,20 @@
                         {% elif user|has_group:"Worker" %}
                         <form action="{% url 'change_status' request.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
-                            <div class="d-flex flex-row">
-                                <label for="{{ request.id }}">Статус заявки:</label>
-                                <select onchange="reply({{ request.id }})" name="status" id="{{ request.id }}" class="mx-2">
-                                    <option value="{{ request.status }}">{{ request.status }}</option>
-                                    <option value="Принята">Принята</option>
-                                    <option value="Отложена">Отложена</option>
-                                    <option value="Выполнена">Выполнена</option>
-                                </select>
-                                <input type="text" name="answer" id="answer{{ request.id }}" hidden placeholder="Введите ответ">
-                                <button type="submit" class="btn btn-outline-primary btn-sm mx-2">Изменить</button>
-                            </div>
-                            <div>
+                            <div class="d-flex flex-md-row flex-column">
+                                <div class="d-flex flex-row">
+                                    <label for="{{ request.id }}">Статус заявки:</label>
+                                    <select onchange="reply({{ request.id }})" name="status" id="{{ request.id }}" class="mx-1">
+                                        <option value="{{ request.status }}">{{ request.status }}</option>
+                                        <option value="Принята">Принята</option>
+                                        <option value="Отложена">Отложена</option>
+                                        <option value="Выполнена">Выполнена</option>
+                                    </select>
+                                    <input type="text" name="answer" id="answer{{ request.id }}" hidden placeholder="Введите ответ">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm mx-1">Изменить</button>
+                                </div>
                                 {% if request.get_complaint %}
-                                <p class="text-danger mb-0">Есть не устранённые замечания</p>
+                                <div id="complaint{{ request.id }}" class="text-danger mb-0 mx-2">Есть не устранённые замечания</div>
                                 {% endif %}
                             </div>
                         </form>
@@ -121,8 +121,9 @@
     <script>
         function reply(id) {
             let select = document.getElementById(id)
-            let answer = document.getElementById('answer' + id)
-            answer.hidden = select.options[select.selectedIndex].value === 'Принята'
+            let status = select.options[select.selectedIndex].value
+            document.getElementById('answer' + id).hidden = status  === 'Принята'
+            document.getElementById('complaint' + id).hidden = status !== 'Принята'
         }
     </script>
 {% endblock %}

@@ -10,16 +10,18 @@
     <div class="container">
         <div class="row">
             {% if user|has_group:"Tenant" %}
-                <a class="btn btn-outline-primary mt-2" href="{% url 'comment_create' %}">Добавить новое замечание</a>
+                <div class="d-flex justify-content-center">
+                    <a class="btn btn-outline-primary mt-2" href="{% url 'comment_create' %}">Добавить новое замечание</a>
+                </div>
             {% endif %}
             {% if comment_list %}
             {% for comment in comment_list %}
             <div class="col-12 mx-auto col-md-12 col-lg-6">
-                <div class="card my-2">
-                    <div class="card-footer d-flex justify-content-between">
+                <div class="card my-2 border-secondary">
+                    <div class="card-header d-flex justify-content-between">
                         <h5 class="text-primary mb-0">{{ comment.text }}</h5>
                     </div>
-                    <div class="card-footer d-flex justify-content-between">
+                    <div class="card-body d-flex justify-content-between">
                         <h6 class="mb-0">{{ comment.service }}</h6>
                         <h6 class="mb-0">{{ comment.status }}</h6>
                         {% if comment.completion_date and comment.status == 'Выполнена' %}
@@ -32,16 +34,14 @@
                         {% endif %}
                     </div>
                     {% if not user|has_group:"Tenant" %}
-                    <div class="card-footer d-flex justify-content-between">
+                    <div class="card-body d-flex justify-content-between">
                         <h6 class="mb-0">{{ comment.tenant.full_name }}</h6>
-                    </div>
-                    <div class="card-footer d-flex justify-content-start">
                         <h6 class="mb-0">{{ comment.tenant.apartment }}</h6>
-                        <h6 class="mb-0 mx-5">{{ comment.tenant.contact_details}}</h6>
+                        <h6 class="mb-0">{{ comment.tenant.contact_details}}</h6>
                     </div>
                     {% endif %}
                     {% if user|has_group:"Master" %}
-                    <div class="card-footer d-flex justify-content-between">
+                    <div class="card-footer d-flex justify-content-center">
                         <form action="{% url 'worker_appointment' comment.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
@@ -62,13 +62,13 @@
                     </div>
                     {% endif %}
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}
-                    <div class="card-footer">
+                    <div class="card-footer d-flex justify-content-center">
                         <form action="{% url 'change_status' comment.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
                             <div class="d-flex flex-row">
                                     <label for="{{ comment.id }}" class="h6">Статус замечания:</label>
-                                    <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-2">
+                                    <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-1">
                                         <option value="{{ comment.status }}">{{ comment.status }}</option>
                                         <option value="Принята">Принята</option>
                                         {% if user|has_group:"Master" %}
@@ -79,7 +79,7 @@
                                         {% endif %}
                                     </select>
                                     <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
-                                <button type="submit" class="btn btn-outline-primary btn-sm">Изменить</button>
+                                <button type="submit" class="btn btn-outline-primary btn-sm mx-1">Изменить</button>
                             </div>
                         </form>
                     </div>
