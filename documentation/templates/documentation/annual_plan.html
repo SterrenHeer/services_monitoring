@@ -10,21 +10,34 @@
     <div class="container">
         <div class="d-flex flex-lg-row flex-column justify-content-center mt-1">
             {% if user|has_group:"Master" %}
-            <div class="d-flex flex-row justify-content-center me-1 py-1">
+            <div class="text-center me-1 mt-1">
                 <a class="btn btn-outline-primary" href="{% url 'plan_item_create' type %}">Добавить новую запись</a>
             </div>
             {% endif %}
             <form action="{% url 'search_plan' type %}" class="my-1" method="get">
                 <div class="d-flex flex-row justify-content-center">
-                    <input type="text" class="border border-primary" placeholder="Поиск по плану" name="search" required>
+                    <input type="text" class="border rounded border-primary" placeholder="Поиск по плану" name="search" required>
                     <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
                     <a class="btn btn-outline-primary" href="{% url 'annual_plan' type %}"><span class="material-icons md-24">refresh</span></a>
                 </div>
             </form>
             {% if user|has_group:"Master" %}
-            <div class="d-flex flex-row justify-content-center py-1">
-                <a class="btn btn-outline-primary mx-1" href="{% url 'plan_export_to_excel' %}?type={{ type }}">Экспортировать в Excel</a>
-                <a class="btn btn-outline-primary" href="{% url 'plan_export_to_pdf' %}?type={{ type }}" target="_blank">Экспортировать в PDF</a>
+            <div class="d-flex flex-column justify-content-center">
+                <form action="{% url 'plan_export' %}" target="_blank" class="my-1" method="get">
+                    {% csrf_token %}
+                    <input hidden name="type" value="{{ type }}">
+                    <div class="d-flex flex-row justify-content-center">
+                        <button type="submit" name="excel" value="excel" class="btn btn-outline-primary ms-1">Экспортировать в Excel</button>
+                        <button type="submit" name="pdf" value="pdf" class="btn btn-outline-primary mx-1">Экспортировать в PDF</button>
+                        <button type="button" onclick="select()" class="btn btn-outline-primary"><span class="material-icons md-24">edit_calendar</span></button>
+                    </div>
+                    <div id="date" hidden class="text-center text-lg-start mt-1">
+                        {% get_previous_date as previous_date %}
+                        <input type="date" name="previous" class="border rounded border-primary ms-1" value="{{ previous_date }}">
+                        {% get_current_date as current_date %}
+                        <input type="date" name="current" class="border rounded border-primary" value="{{ current_date }}">
+                    </div>
+                </form>
             </div>
             {% endif %}
         </div>
@@ -94,4 +107,10 @@
         <p class="text-center">В данном плане нет ни одной записи.</p>
         {% endif %}
     </div>
+    <script>
+        function select() {
+            let date = document.getElementById('date')
+            date.hidden = date.hidden != true
+        }
+    </script>
 {% endblock %}

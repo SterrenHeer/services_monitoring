@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from django import template
 from django.contrib.auth.models import Group
 from django.db.models import Q
@@ -42,3 +43,13 @@ def get_complaints_count():
 def get_request_comment_statuses():
     return RequestComment.objects.exclude(Q(status='Ответ') |
                                           Q(status='Отзыв')).values('status').distinct()
+
+
+@register.simple_tag
+def get_current_date():
+    return date.today().strftime('%Y-%m-%d')
+
+
+@register.simple_tag
+def get_previous_date():
+    return (date.today() - timedelta(days=31)).strftime('%Y-%m-%d')

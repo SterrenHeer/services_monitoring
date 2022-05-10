@@ -385,27 +385,51 @@ class SearchByRequests(ListView):
         return context
 
 
-def request_export_to_excel(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.date.today()) + '.xls'
-    work_book = xlwt.Workbook(encoding='utf-8')
-    sheet = work_book.add_sheet('Акт выполненных работ')
-    row_number = 0
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-    labels = ['Услуга', 'Стоимость', 'Заказчик', 'Адрес', 'Исполнитель', 'Дата подачи', 'Дата выполнения']
-    for column_number in range(len(labels)):
-        sheet.write(row_number, column_number, labels[column_number], font_style)
-    rows = Request.objects.filter(status='Выполнена')\
-                          .values_list('service__name', 'service__price', 'tenant__full_name',
-                                       'worker__full_name', 'submission_date', 'completion_date')
-    row_number = form_rows_to_excel(rows, sheet, row_number)
-    rows = Comment.objects.filter(status='Выполнена') \
-                          .values_list('service__name', 'service__price', 'tenant__full_name',
-                                       'worker__full_name', 'submission_date', 'completion_date')
-    form_rows_to_excel(rows, sheet, row_number)
-    work_book.save(response)
-    return response
+def request_export(request):
+    previous_date = datetime.datetime.strptime(request.GET.get('previous'), "%Y-%m-%d").date()
+    current_date = datetime.datetime.strptime(request.GET.get('current'), "%Y-%m-%d").date()
+    if request.GET.get("excel"):
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=Akt za ' + str(datetime.date.today()) + '.xls'
+        work_book = xlwt.Workbook(encoding='utf-8')
+        sheet = work_book.add_sheet('Акт выполненных работ')
+        row_number = 0
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+        labels = ['Услуга', 'Стоимость', 'Заказчик', 'Адрес', 'Исполнитель', 'Дата подачи', 'Дата выполнения']
+        for column_number in range(len(labels)):
+            sheet.write(row_number, column_number, labels[column_number], font_style)
+        rows = Request.objects.filter(date__gte=previous_date, date__lte=current_date, status='Выполнена')\
+                              .values_list('service__name', 'service__price', 'tenant__full_name',
+                                           'worker__full_name', 'submission_date', 'completion_date')
+        row_number = form_rows_to_excel(rows, sheet, row_number)
+        rows = Comment.objects.filter(status='Выполнена') \
+                              .values_list('service__name', 'service__price', 'tenant__full_name',
+                                           'worker__full_name', 'submission_date', 'completion_date')
+        form_rows_to_excel(rows, sheet, row_number)
+        work_book.save(response)
+        return response
+    else:
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
+        response['Content-Transfer-Encoding'] = 'binary'
+        requests = Request.objects.filter(status__in=['Выполнена', 'Принята', 'Отложена']) \
+            .order_by('worker', 'submission_date')
+        comments = Comment.objects.filter(date__gte=previous_date, date__lte=current_date, status='Выполнена')\
+                                  .order_by('worker', 'submission_date')
+        total_requests = requests.aggregate(Sum('service__price'))['service__price__sum']
+        total_comments = comments.aggregate(Sum('service__price'))['service__price__sum']
+        html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments,
+                                                                    'total_requests': total_requests,
+                                                                    'total_comments': total_comments})
+        html = HTML(string=html_string)
+        result = html.write_pdf()
+        with tempfile.NamedTemporaryFile(delete=True) as output:
+            output.write(result)
+            output.flush()
+            output.seek(0)
+            response.write(output.read())
+        return response
 
 
 def form_rows_to_excel(rows, sheet, row_number):
@@ -418,25 +442,3 @@ def form_rows_to_excel(rows, sheet, row_number):
                 sheet.col(column_number).width = (len(str(row[column_number])) * 265)
             sheet.write(row_number, column_number, str(row[column_number]), font_style)
     return row_number
-
-
-def request_export_to_pdf(request):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
-    response['Content-Transfer-Encoding'] = 'binary'
-    requests = Request.objects.filter(status__in=['Выполнена', 'Принята', 'Отложена'])\
-                              .order_by('worker', 'submission_date')
-    comments = Comment.objects.filter(status='Выполнена').order_by('worker', 'submission_date')
-    total_requests = requests.aggregate(Sum('service__price'))['service__price__sum']
-    total_comments = comments.aggregate(Sum('service__price'))['service__price__sum']
-    html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments,
-                                                                'total_requests': total_requests,
-                                                                'total_comments': total_comments})
-    html = HTML(string=html_string)
-    result = html.write_pdf()
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        output.write(result)
-        output.flush()
-        output.seek(0)
-        response.write(output.read())
-    return response
