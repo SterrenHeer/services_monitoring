@@ -13,6 +13,7 @@ import datetime
 from weasyprint import HTML
 from django.template.loader import render_to_string
 import tempfile
+from django import forms
 
 
 class RequestCommentsListView(ListView):
@@ -156,6 +157,8 @@ class CreateRequest(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Заявка')
+        context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
+        context['form'].fields['end_time'].widget = forms.TimeInput(attrs={'type': 'time'})
         return context
 
 
@@ -196,6 +199,8 @@ class ManagerRequestCreate(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Заявка')
+        context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
+        context['form'].fields['end_time'].widget = forms.TimeInput(attrs={'type': 'time'})
         return context
 
 
@@ -213,6 +218,8 @@ class UpdateRequest(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Заявка')
+        context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
+        context['form'].fields['end_time'].widget = forms.TimeInput(attrs={'type': 'time'})
         return context
 
 
@@ -226,6 +233,12 @@ class ManagerUpdateRequest(UpdateView):
             form.add_error('start_time', 'Введите правильное время.')
             return self.form_invalid(form)
         return super(ManagerUpdateRequest, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
+        context['form'].fields['end_time'].widget = forms.TimeInput(attrs={'type': 'time'})
+        return context
 
 
 class WorkWithRequestComment(View):

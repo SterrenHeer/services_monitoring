@@ -3,14 +3,14 @@ from django.urls import reverse_lazy
 from django.views.generic.base import View
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import CleaningSchedule, Service, AnnualPlan
-from django.db.models import Q, Sum
-from requests.models import Request, Comment
+from django.db.models import Q
 import datetime
 from django.http import HttpResponse
 import xlwt
 from weasyprint import HTML
 from django.template.loader import render_to_string
 import tempfile
+from django import forms
 
 
 class CleaningScheduleListView(ListView):
@@ -109,6 +109,8 @@ class CreateScheduleItem(CreateView):
         context = super().get_context_data(**kwargs)
         service_types = self.request.user.worker.position.service_type.all()
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__in=service_types)
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
         return context
 
     def get_initial(self):
@@ -136,6 +138,7 @@ class CreatePlanItem(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature=self.kwargs['type'])
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
         return context
 
     def get_initial(self):
@@ -149,7 +152,7 @@ class CreatePlanItem(CreateView):
 
 class UpdateScheduleItem(UpdateView):
     model = CleaningSchedule
-    template_name = 'documentation/update_schedule_item.html'
+    template_name = 'documentation/update_planned_work.html'
     fields = ['building', 'service', 'worker', 'date', 'start_time']
 
     def form_valid(self, form):
@@ -161,13 +164,21 @@ class UpdateScheduleItem(UpdateView):
             return self.form_invalid(form)
         return super(UpdateScheduleItem, self).form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        service_types = self.request.user.worker.position.service_type.all()
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__in=service_types)
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
+        return context
+
     def get_success_url(self):
         return reverse_lazy('cleaning_schedule')
 
 
 class UpdatePlanItem(UpdateView):
     model = AnnualPlan
-    template_name = 'documentation/update_schedule_item.html'
+    template_name = 'documentation/update_planned_work.html'
     fields = ['building', 'service', 'worker', 'date']
 
     def form_valid(self, form):
@@ -175,6 +186,12 @@ class UpdatePlanItem(UpdateView):
             form.add_error('date', 'Введите правильную дату.')
             return self.form_invalid(form)
         return super(UpdatePlanItem, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature=self.kwargs['type'])
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        return context
 
     def get_success_url(self):
         return reverse_lazy('annual_plan', kwargs={'type': self.kwargs['type']})
