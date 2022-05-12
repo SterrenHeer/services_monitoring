@@ -109,7 +109,7 @@ class CreateScheduleItem(CreateView):
         context = super().get_context_data(**kwargs)
         service_types = self.request.user.worker.position.service_type.all()
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__in=service_types)
-        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
         context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
         return context
 
@@ -138,7 +138,7 @@ class CreatePlanItem(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature=self.kwargs['type'])
-        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
         return context
 
     def get_initial(self):
@@ -168,7 +168,7 @@ class UpdateScheduleItem(UpdateView):
         context = super().get_context_data(**kwargs)
         service_types = self.request.user.worker.position.service_type.all()
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__in=service_types)
-        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
         context['form'].fields['start_time'].widget = forms.TimeInput(attrs={'type': 'time'})
         return context
 
@@ -190,7 +190,7 @@ class UpdatePlanItem(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature=self.kwargs['type'])
-        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        context['form'].fields['date'].widget = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
         return context
 
     def get_success_url(self):

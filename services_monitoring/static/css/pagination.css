@@ -24,7 +24,7 @@
     transition: all .2s ease-in-out;
     font-family: Roboto, sans-serif;
     font-size: 16px;
-    color: #6163b9
+    color: #d3d3d3
 }
 
 @media only screen and (max-width: 767px) {
@@ -83,14 +83,14 @@
 @media only screen and (min-width: 1025px) {
     .pagination__item.active:hover,
     .pagination__link {
-        color: #fff;
-        background: #0d6efd
+        color: #0d6efd;
+        background: #d3d3d3;
     }
 }
 
 .pagination__item.active .pagination__link {
-    color: #fff;
-    background: #0d6efd
+    color: #0d6efd;
+    border: 2px solid #0d6efd;
 }
 
 .pagination__item--dots .pagination__link {

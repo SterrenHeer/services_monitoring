@@ -84,11 +84,12 @@ class TenantUpdate(UpdateView):
 class WorkersListView(ListView):
     model = Worker
     template_name = 'users/worker_list.html'
-    paginate_by = 10
+    paginate_by = 4
 
     def get_queryset(self):
         service_types = self.request.user.worker.position.service_type.all()
-        return Worker.objects.filter(user__isnull=False, position__service_type__in=service_types).distinct()
+        return Worker.objects.exclude(position__name__icontains='Мастер')\
+                             .filter(user__isnull=False, position__service_type__in=service_types).distinct()
 
 
 class PositionChanging(View):

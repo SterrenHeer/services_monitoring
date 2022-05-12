@@ -7,8 +7,8 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="d-flex justify-content-center my-2">
+    <div class="container-fluid px-lg-5 pt-3">
+        <div class="d-flex justify-content-center mb-2">
             <a class="btn btn-outline-primary" href="{% url 'signup' %}">Добавить нового работника</a>
         </div>
         <div class="row d-flex justify-content-center">
@@ -31,9 +31,7 @@
                             <select name="position" class="my-2">
                                 <option value="{{ worker.position_id }}">{{ worker.position }}</option>
                                 {% for position in worker.get_positions %}
-                                {% if position != worker.position %}
                                 <option value="{{ position.id }}">{{ position }}</option>
-                                {% endif %}
                                 {% endfor %}
                             </select>
                             <button type="submit" class="btn btn-outline-primary btn-sm">Назначить</button>
