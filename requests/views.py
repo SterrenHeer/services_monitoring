@@ -396,14 +396,16 @@ def request_export(request):
         row_number = 0
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
-        labels = ['Услуга', 'Стоимость', 'Заказчик', 'Адрес', 'Исполнитель', 'Дата подачи', 'Дата выполнения']
+        labels = ['Услуга', 'Стоимость', 'Заказчик', 'Исполнитель', 'Дата подачи', 'Дата выполнения']
         for column_number in range(len(labels)):
             sheet.write(row_number, column_number, labels[column_number], font_style)
-        rows = Request.objects.filter(date__gte=previous_date, date__lte=current_date, status='Выполнена')\
+        rows = Request.objects.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                      status='Выполнена',)\
                               .values_list('service__name', 'service__price', 'tenant__full_name',
                                            'worker__full_name', 'submission_date', 'completion_date')
         row_number = form_rows_to_excel(rows, sheet, row_number)
-        rows = Comment.objects.filter(status='Выполнена') \
+        rows = Comment.objects.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                      status='Выполнена') \
                               .values_list('service__name', 'service__price', 'tenant__full_name',
                                            'worker__full_name', 'submission_date', 'completion_date')
         form_rows_to_excel(rows, sheet, row_number)
@@ -413,15 +415,19 @@ def request_export(request):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'inline; attachment; filename=Akt za ' + str(datetime.date.today()) + '.pdf'
         response['Content-Transfer-Encoding'] = 'binary'
-        requests = Request.objects.filter(status__in=['Выполнена', 'Принята', 'Отложена']) \
-            .order_by('worker', 'submission_date')
-        comments = Comment.objects.filter(date__gte=previous_date, date__lte=current_date, status='Выполнена')\
+        requests = Request.objects.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                          status='Выполнена') \
+                                  .order_by('worker', 'submission_date')
+        comments = Comment.objects.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                          status='Выполнена')\
                                   .order_by('worker', 'submission_date')
         total_requests = requests.aggregate(Sum('service__price'))['service__price__sum']
         total_comments = comments.aggregate(Sum('service__price'))['service__price__sum']
         html_string = render_to_string('requests/pdf_output.html', {'requests': requests, 'comments': comments,
                                                                     'total_requests': total_requests,
-                                                                    'total_comments': total_comments})
+                                                                    'total_comments': total_comments,
+                                                                    'previous_date': previous_date,
+                                                                    'current_date': current_date})
         html = HTML(string=html_string)
         result = html.write_pdf()
         with tempfile.NamedTemporaryFile(delete=True) as output:

@@ -74,7 +74,13 @@
         <tr>
             <td colspan="2" class="blank"></td>
             {% get_worker request.grouper as worker %}
-            <td content="right">Итого, руб: {{ worker.get_requests_sum }}</td>
+            {% get_requests_sum worker previous_date current_date as requests_sum %}
+            <td content="right">Итого, руб: {{ requests_sum }}</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="blank"></td>
+            {% get_requests_worked_time_sum worker previous_date current_date as requests_time_sum %}
+            <td content="right">Итого, времени: {{ requests_time_sum }}</td>
         </tr>
     </table>
     {% endfor %}
@@ -106,8 +112,15 @@
         <tr>
             <td colspan="2" class="blank"></td>
             {% get_worker comment.grouper as worker %}
-            <td content="right">Итого, руб: {{ worker.get_comments_sum }}</td>
+            {% get_comments_sum worker previous_date current_date as comments_sum %}
+            <td content="right">Итого, руб: {{ comments_sum }}</td>
         </tr>
+        <tr>
+            <td colspan="2" class="blank"></td>
+            {% get_comments_worked_time_sum worker previous_date current_date as comments_time_sum %}
+            <td content="right">Итого, времени: {{ comments_time_sum }}</td>
+        </tr>
+
     </table>
     {% endfor %}
     <h3>Итого, руб: {{ total_comments }}</h3>

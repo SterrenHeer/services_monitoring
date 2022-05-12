@@ -1,9 +1,11 @@
+import datetime
 from datetime import date, timedelta
 from django import template
 from django.contrib.auth.models import Group
 from django.db.models import Q
 from users.models import Worker
 from requests.models import Request, RequestComment
+from django.db.models import Sum
 
 register = template.Library()
 
@@ -53,3 +55,35 @@ def get_current_date():
 @register.simple_tag
 def get_previous_date():
     return (date.today() - timedelta(days=31)).strftime('%Y-%m-%d')
+
+
+@register.simple_tag
+def get_requests_sum(worker, previous_date, current_date):
+    return worker.request_set.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                     status='Выполнена').aggregate(Sum('service__price'))['service__price__sum']
+
+
+@register.simple_tag
+def get_comments_sum(worker, previous_date, current_date):
+    return worker.comment_set.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                     status='Выполнена').aggregate(Sum('service__price'))['service__price__sum']
+
+
+@register.simple_tag
+def get_requests_worked_time_sum(worker, previous_date, current_date):
+    delta = worker.request_set.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                      status='Выполнена').aggregate(Sum('service__duration'))['service__duration__sum']
+    total_seconds = int(delta.total_seconds())
+    hours, remainder = divmod(total_seconds, 60 * 60)
+    minutes, seconds = divmod(remainder, 60)
+    return '{} ч. {} м.'.format(hours, minutes)
+
+
+@register.simple_tag
+def get_comments_worked_time_sum(worker, previous_date, current_date):
+    delta = worker.comment_set.filter(completion_date__gte=previous_date, completion_date__lte=current_date,
+                                      status='Выполнена').aggregate(Sum('service__duration'))['service__duration__sum']
+    total_seconds = int(delta.total_seconds())
+    hours, remainder = divmod(total_seconds, 60 * 60)
+    minutes, seconds = divmod(remainder, 60)
+    return '{} ч. {} м.'.format(hours, minutes)
