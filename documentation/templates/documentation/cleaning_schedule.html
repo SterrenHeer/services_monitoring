@@ -46,21 +46,21 @@
             {% for building in building_list %}
             <div class="card d-flex flex-column my-2 border-0">
                 {% if not user|has_group:"Tenant" %}
-                <div class="card-header d-flex flex-row justify-content-center border border-secondary">
+                <div class="card-header d-flex flex-row justify-content-center border border-2 border-secondary">
                     <h5 class="text-primary mb-0">{{ building.grouper }}</h5>
                 </div>
                 {% endif %}
                 {% regroup building.list by date as date_list %}
                 {% for date in date_list %}
                 <div class="card d-flex flex-row border-secondary mb-2">
-                    <div class="card-header d-flex flex-column justify-content-center col-lg-2 border-end">
+                    <div class="card-header d-flex flex-column justify-content-center col-lg-2 col-sm-4 border-end">
                         <h5 class="text-primary mb-0">{{ date.grouper }}</h5>
                     </div>
                     <div class="card-body d-flex flex-column flex-grow-1 col-lg-10 border-secondary p-1">
                         {% for item in date.list %}
                         <div class="card-text d-flex flex-lg-row flex-column flex-grow-1 border my-1">
                             <h6 class="mb-0 col-lg-1 me-2">{{ item.start_time }}-{{ item.get_end_time }}</h6>
-                            <h6 class="mb-0 col-lg-3">{{ item.service }}</h6>
+                            <h6 class="mb-0 {% if user|has_group:"Master" or user|has_group:"Worker" %}col-lg-3{% else %}col-lg-4{% endif %}">{{ item.service }}</h6>
                             <div class="col-lg-5">
                                 {% if item.worker %}
                                 <h6 class="mb-0">{{ item.worker.full_name }}</h6>
@@ -78,7 +78,9 @@
                             {% endif %}
                             {% if user|has_group:"Master" %}
                             <div class="col-lg-1">
+                                {% if not item.get_overdue %}
                                 <a href="{% url 'schedule_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
+                                {% endif %}
                                 <a href="{% url 'schedule_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
                             </div>
                             {% elif user|has_group:"Worker" %}
@@ -87,9 +89,9 @@
                                     {% csrf_token %}
                                     <div>
                                         {% if not item.status == 'Отменена' %}
-                                        <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 text-primary">check_circle</button>
+                                        <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 bg-white me-0 pe-0 text-primary">check_circle</button>
                                         {% endif %}
-                                        <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 text-primary">cancel</button>
+                                        <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 bg-white text-primary">cancel</button>
                                     </div>
                                 </form>
                             </div>
@@ -112,7 +114,7 @@
     <script>
         function select() {
             let date = document.getElementById('date')
-            date.hidden = date.hidden != true
+            date.hidden = date.hidden !== true
         }
     </script>
 {% endblock %}

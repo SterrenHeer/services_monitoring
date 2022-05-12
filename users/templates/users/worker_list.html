@@ -14,16 +14,17 @@
         <div class="row d-flex justify-content-center">
             {% if worker_list %}
             {% for worker in worker_list %}
-            {% if not worker.user|has_group:"Master" %}
-            <div class="col-lg-6 col-md-12 mb-3">
-                <div class="card-footer">
-                    <h5 class="text-primary mb-0">{{ worker.full_name }}</h5>
-                </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <div>
+            <div class="col-lg-6 col-md-12 mb-3 card-group">
+                <div class="card border-secondary mb-2">
+                    <div class="card-header">
+                        <h5 class="text-primary mb-0">{{ worker.full_name }}</h5>
+                    </div>
+                    <div class="card-body">
                         {% for service in worker.get_services %}
                         <h6 class="mb-0">{{ service }}</h6>
                         {% endfor %}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
                         {% if user|has_group:"Master" %}
                         <form action="{% url 'worker_update' worker.id %}" method="post" class="mt-2 mb-0">
                             {% csrf_token %}
@@ -40,7 +41,6 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
             {% endfor %}
             {% else %}
             <p class="text-center">В базе не зарегистрирован ни один работник данного участка.</p>

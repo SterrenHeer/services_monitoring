@@ -5,13 +5,21 @@
 {% endblock %}
 
 {% block content %}
-    <div class="text-center">
-        <h1>Удаление заявки</h1>
-        <p>Вы уверены, что хотите удалить заявку <strong>{{ request }}</strong>?</p>
-        <form action="" method="POST">
-            {% csrf_token %}
-            <button class="btn btn-outline-danger" type="submit">Да, я уверен(а)</button>
-            <a class="btn btn-outline-primary" href="{% url 'all_requests' request.status %}">Нет, отменить удаление</a>
-        </form>
+    <div class="container-fluid pt-4">
+        <div class="col-sm-11 col-md-9 col-lg-6 mx-auto bg-light">
+            <div class="form-inner">
+                <div class="text">
+                    <h3 class="text-center">Удаление заявки</h3>
+                    <p class="text-center">Вы уверены, что хотите удалить заявку по услуге <strong>{{ request }}</strong>?</p>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-flex flex-row justify-content-between">
+                        <button class="btn btn-outline-danger ms-4" type="submit">Да, подтвердить удаление</button>
+                        <a class="btn btn-outline-primary me-4" href="{% url 'all_requests' request.status %}">Нет, отменить удаление</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock %}
