@@ -9,16 +9,14 @@
 {% endblock %}
 
 {% block content %}
-
-    <div>
+    <div class="container-fluid pt-4">
         {% if not form.is_valid %}
-        <div>
-            <br>
-            <h1 class="text-center">Создайте новую учетную запись</h1>
-            <br>
-            <div class="col-9 col-sm-9 col-md-6 col-lg-5 mx-auto bg-light">
-                <br>
-                <p>Пожалуйста, введите следующую информацию, чтобы создать новую учетную запись</p>
+        <div class="col-sm-11 col-md-9 col-lg-6 mx-auto bg-light">
+            <div class="form-inner">
+                <div class="text text-center">
+                    <h3>Создание новой учетной записи</h3>
+                    <p>Пожалуйста, введите следующую информацию, чтобы создать новую учетную запись</p>
+                </div>
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
@@ -27,26 +25,23 @@
             </div>
         </div>
         {% else %}
-        <div class="mx-auto text-center">
-            <br>
-        {% if user|has_group:"Master" %}
-            <h1>Новый работник успешно зарегистрирован</h1>
-            <br>
-            <div>
-                <p>Новый профиль успешно зарегистрирован и готов к аутентификации</p>
-                <br>
-                <a href="{% url 'all_workers' %}" class="btn btn-outline-primary">Вернуться к списку работников</a>
-        {% else %}
-            <h1>Ваша учётная запись успешно создана</h1>
-            <br>
-            <div>
-                <p>Ваша учётная запись успешно создана и готова к использованию!</p>
-                <br>
-                <a href="{% url 'login' %}" class="btn btn-outline-primary">Перейти к авторизации</a>
-        {% endif %}
+        <div class="col-sm-11 col-md-9 col-lg-6 mx-auto bg-light">
+            <div class="form-inner">
+                {% if user|has_group:"Master" %}
+                <div class="text text-center">
+                    <h3>Новый работник успешно зарегистрирован</h3>
+                    <p>Новый профиль успешно зарегистрирован и готов к аутентификации</p>
+                    <a href="{% url 'all_workers' %}" class="btn btn-outline-primary">Вернуться к списку работников</a>
+                </div>
+                {% else %}
+                <div class="text text-center">
+                    <h3>Ваша учётная запись успешно создана</h3>
+                    <p>Ваша учётная запись успешно создана и готова к использованию!</p>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary">Перейти к авторизации</a>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endif %}
     </div>
-
 {% endblock %}

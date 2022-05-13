@@ -5,10 +5,10 @@ from .models import Tenant, Worker
 
 
 class SignUpTenantForm(UserCreationForm):
-    first_name = forms.CharField(max_length=100, required=True)
-    last_name = forms.CharField(max_length=100, required=True)
-    patronymic = forms.CharField(max_length=100, required=True)
-    email = forms.EmailField(max_length=250, help_text='eg.youremail.gmail.com')
+    last_name = forms.CharField(max_length=100, required=True, label='Фамилия')
+    first_name = forms.CharField(max_length=100, required=True, label='Имя')
+    patronymic = forms.CharField(max_length=100, required=True, label='Отчество')
+    email = forms.EmailField(max_length=250, help_text='eg.youremail.gmail.com', label='Электронная почта')
 
     class Meta:
         model = User
@@ -28,9 +28,9 @@ class SignUpTenantForm(UserCreationForm):
 
 
 class SignUpWorkerForm(UserCreationForm):
-    first_name = forms.CharField(max_length=100, required=True)
-    last_name = forms.CharField(max_length=100, required=True)
-    patronymic = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True, label='Фамилия')
+    first_name = forms.CharField(max_length=100, required=True, label='Имя')
+    patronymic = forms.CharField(max_length=100, required=True, label='Отчество')
 
     class Meta:
         model = User

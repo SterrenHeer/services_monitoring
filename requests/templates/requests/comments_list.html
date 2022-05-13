@@ -21,23 +21,29 @@
                     <div class="card-header d-flex justify-content-between">
                         <h5 class="text-primary mb-0">{{ comment.text }}</h5>
                     </div>
-                    <div class="card-body d-flex justify-content-between">
-                        <h6 class="mb-0">{{ comment.service }}</h6>
-                        <h6 class="mb-0">{{ comment.status }}</h6>
-                        {% if comment.completion_date and comment.status == 'Выполнена' %}
+                    <div class="card-body d-flex flex-md-row flex-column">
+                        <h6 class="me-2 text-primary">Заявка:</h6>
+                        <div class="d-flex flex-row justify-content-between flex-grow-1">
+                            <h6 class="mb-0">{{ comment.service }}</h6>
+                            <h6 class="mb-0">{{ comment.status }}</h6>
+                            {% if comment.completion_date and comment.status == 'Выполнена' %}
                             <h6 class="text-success font-italic mb-0">{{ comment.completion_date }}</h6>
-                        {% else %}
+                            {% else %}
                             <h6 class="mb-0">{{ comment.submission_date }}</h6>
-                        {% endif %}
-                        {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
+                            {% endif %}
+                            {% if user|has_group:"Tenant" and comment.status == 'На рассмотрении' %}
                             <a href="{% url 'comment_delete' comment.id status %}"><i class="material-icons md-24">delete</i></a>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                     {% if not user|has_group:"Tenant" %}
-                    <div class="card-body d-flex justify-content-between">
-                        <h6 class="mb-0">{{ comment.tenant.full_name }}</h6>
-                        <h6 class="mb-0">{{ comment.tenant.apartment }}</h6>
-                        <h6 class="mb-0">{{ comment.tenant.contact_details}}</h6>
+                    <div class="card-body d-flex flex-md-row flex-column">
+                        <h6 class="me-2 text-primary">Жилец:</h6>
+                        <div class="d-flex flex-row justify-content-between flex-grow-1">
+                            <h6 class="mb-0">{{ comment.tenant.full_name }}</h6>
+                            <h6 class="mb-0">{{ comment.tenant.apartment }}</h6>
+                            <h6 class="mb-0">{{ comment.tenant.contact_details}}</h6>
+                        </div>
                     </div>
                     {% endif %}
                     {% if user|has_group:"Master" %}
