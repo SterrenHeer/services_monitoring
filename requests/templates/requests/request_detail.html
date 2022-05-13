@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-10 mx-auto col-md-6 my-3 text-center">
+    <div class="col-10 mx-auto col-lg-7 my-3 text-center">
         <h1>{{ request.service }}</h1>
         <div class="border border-2 rounded border-primary text-start mb-2">
             {% if request.answer %}
@@ -32,12 +32,12 @@
             <p><strong>Контактные данные:</strong> {{ request.tenant.contact_details }}</p>
             {% endif %}
         </div>
-        {% if not user|has_group:"Tenant" %}
-        <a href="{% url 'request_comments' 'all'%}" class="btn btn-outline-primary">Вернуться к списку замечаний</a><br>
-        {% endif %}
-        <a href="{% url 'all_requests' request.status %}" class="btn btn-outline-primary mt-2">Вернуться к списку заявок</a>
+        <div class="d-flex flex-row justify-content-center">
+            <a href="{% url 'request_comments' 'all'%}" class="btn btn-outline-primary me-2">Вернуться к списку замечаний</a><br>
+            <a href="{% url 'all_requests' request.status %}" class="btn btn-outline-primary">Вернуться к списку заявок</a>
+        </div>
     </div>
-    <div class="col-10 mx-auto col-md-4 col-lg-6">
+    <div class="col-10 mx-auto col-lg-7">
         <h3 class="editContent text-center">Оставить комментарий</h3>
         <form action="{% url 'work_with_request_comment' request.id %}" method="post" class="mt-4" id="comment_form">
             {% csrf_token %}
@@ -73,20 +73,22 @@
         {% for comment in request.get_comments %}
         <div class="my-3 d-flex flex-row" id="{{ comment.id }}">
             <div class="flex-grow-1 border border-2 rounded {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
-                <h5>{{ comment.user.username }}</h5>
-                <p>{{ comment.submission_date }}</p>
+                <div class="d-flex flex-row">
+                    <h5>{{ comment.user.username }}</h5>
+                    <p class="ms-2 text-muted">{{ comment.submission_date }}</p>
+                </div>
                 <p>{{ comment.text }}</p>
                 <p class="mb-0"><strong>Статус комментария:</strong> {{ comment.status }}</p>
                 {% if comment.answer %}
                 <p><strong>Ответ от работника:</strong> {{ comment.answer }}</p>
                 {% endif %}
             </div>
-            {% if comment.status != 'Отзыв' %}
+            {% if comment.status != 'Ответ' and not user|has_group:"Manager" and not comment.requestcomment_set.exists or comment.status != 'Отзыв' and not user|has_group:"Tenant" and not comment.requestcomment_set.exists %}
             <div class="d-flex flex-column justify-content-center ms-1 border border-2 rounded {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
                 {% if comment.status != 'Отзыв' and user|has_group:"Manager" and not comment.user|has_group:"Manager" %}
                 <a href="#comment_form" onclick="reply('{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')"><i class="material-icons md-24">reply</i></a>
                 {% endif %}
-                {% if comment.user == user and not comment.requestcomment_set.exists %}
+                {% if comment.user == user %}
                 <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-24">edit</i></a>
                 <a href="{% url 'request_comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
                 {% endif %}

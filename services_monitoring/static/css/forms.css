@@ -26,6 +26,14 @@
    border-radius: 20px;
 }
 
+select.external, input.external {
+   background: #E9EFF6;
+   line-height: 20px;
+   padding-left: 10px;
+   border-width: 0;
+   border-radius: 20px;
+}
+
 .form-inner .btn {
    border-radius: 15px;
 }

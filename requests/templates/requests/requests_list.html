@@ -86,7 +86,7 @@
                         <form action="{% url 'worker_appointment' request.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <label for="worker" class="h6">Закреплённый работник:</label>
-                            <select name="worker" id="worker">
+                            <select name="worker" id="worker" class="external">
                                 {% if request.worker_id %}
                                 <option value="{{ request.worker_id }}">{{ request.worker.full_name }}</option>
                                 {% else %}
@@ -105,13 +105,13 @@
                             <div class="d-flex flex-md-row flex-column">
                                 <div class="d-flex flex-row">
                                     <label for="{{ request.id }}">Статус заявки:</label>
-                                    <select onchange="reply({{ request.id }})" name="status" id="{{ request.id }}" class="mx-1">
+                                    <select onchange="reply({{ request.id }})" name="status" id="{{ request.id }}" class="mx-1 external">
                                         <option value="{{ request.status }}">{{ request.status }}</option>
                                         <option value="Принята">Принята</option>
                                         <option value="Отложена">Отложена</option>
                                         <option value="Выполнена">Выполнена</option>
                                     </select>
-                                    <input type="text" name="answer" id="answer{{ request.id }}" hidden placeholder="Введите ответ">
+                                    <input type="text" name="answer" class="external" id="answer{{ request.id }}" hidden placeholder="Введите ответ">
                                     <button type="submit" class="btn btn-outline-primary btn-sm mx-1">Изменить</button>
                                 </div>
                                 {% if request.get_complaint %}

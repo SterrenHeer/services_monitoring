@@ -29,7 +29,7 @@
                         <form action="{% url 'worker_update' worker.id %}" method="post" class="mt-2 mb-0">
                             {% csrf_token %}
                             <label for="position" class="h6">Должность:</label>
-                            <select name="position" class="my-2">
+                            <select name="position" class="my-2 external">
                                 <option value="{{ worker.position_id }}">{{ worker.position }}</option>
                                 {% for position in worker.get_positions %}
                                 <option value="{{ position.id }}">{{ position }}</option>

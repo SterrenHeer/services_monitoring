@@ -21,8 +21,10 @@
                     <div class="card-header d-flex justify-content-between">
                         <h5 class="text-primary mb-0">{{ comment.text }}</h5>
                     </div>
-                    <div class="card-body d-flex flex-md-row flex-column">
-                        <h6 class="me-2 text-primary">Заявка:</h6>
+                    <div class="card-body d-flex flex-md-row flex-column py-2">
+                        {% if not user|has_group:"Tenant" %}
+                        <h6 class="me-2 text-primary">Замечание:</h6>
+                        {% endif %}
                         <div class="d-flex flex-row justify-content-between flex-grow-1">
                             <h6 class="mb-0">{{ comment.service }}</h6>
                             <h6 class="mb-0">{{ comment.status }}</h6>
@@ -37,7 +39,7 @@
                         </div>
                     </div>
                     {% if not user|has_group:"Tenant" %}
-                    <div class="card-body d-flex flex-md-row flex-column">
+                    <div class="card-body d-flex flex-md-row flex-column py-2 border border-top">
                         <h6 class="me-2 text-primary">Жилец:</h6>
                         <div class="d-flex flex-row justify-content-between flex-grow-1">
                             <h6 class="mb-0">{{ comment.tenant.full_name }}</h6>
@@ -52,7 +54,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
                             <label for="worker" class="h6">Закреплённый работник:</label>
-                            <select name="worker" id="worker">
+                            <select name="worker" id="worker" class="external">
                                 {% if comment.worker_id %}
                                 <option value="{{ comment.worker_id }}">{{ comment.worker.full_name }}</option>
                                 {% else %}
@@ -72,19 +74,19 @@
                         <form action="{% url 'change_status' comment.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment" value="true">
-                            <div class="d-flex flex-row">
-                                    <label for="{{ comment.id }}" class="h6">Статус замечания:</label>
-                                    <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-1">
-                                        <option value="{{ comment.status }}">{{ comment.status }}</option>
-                                        <option value="Принята">Принята</option>
-                                        {% if user|has_group:"Master" %}
-                                        <option value="Отклонена">Отклонена</option>
-                                        {% elif user|has_group:"Worker" %}
-                                        <option value="Отложена">Отложена</option>
-                                        <option value="Выполнена">Выполнена</option>
-                                        {% endif %}
-                                    </select>
-                                    <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
+                            <div>
+                                <label for="{{ comment.id }}" class="h6">Статус замечания:</label>
+                                <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-1 external">
+                                    <option value="{{ comment.status }}">{{ comment.status }}</option>
+                                    <option value="Принята">Принята</option>
+                                    {% if user|has_group:"Master" %}
+                                    <option value="Отклонена">Отклонена</option>
+                                    {% elif user|has_group:"Worker" %}
+                                    <option value="Отложена">Отложена</option>
+                                    <option value="Выполнена">Выполнена</option>
+                                    {% endif %}
+                                </select>
+                                <input type="text" name="answer" class="external" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
                                 <button type="submit" class="btn btn-outline-primary btn-sm mx-1">Изменить</button>
                             </div>
                         </form>

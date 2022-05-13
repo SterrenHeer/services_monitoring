@@ -1,5 +1,4 @@
 import datetime
-
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
@@ -42,14 +41,14 @@ class Request(models.Model):
         return self.requestcomment_set.filter(initial__isnull=True)
 
     def get_workers(self):
-        return Worker.objects.filter(position__service_type=self.service.service_type)
+        return Worker.objects.exclude(position__name__icontains='Мастер').filter(position__service_type=self.service.service_type)
 
     def get_complaint(self):
         return self.requestcomment_set.exclude(status__in=['Устранено', 'Ответ', 'Отклонено', 'Отзыв']).exists()
 
     def get_valid_date(self):
         if self.completion_date:
-            return self.completion_date.day + 3 <= datetime.date.today().day
+            return datetime.date.today() <= self.completion_date + datetime.timedelta(days=3)
 
 
 class RequestComment (models.Model):

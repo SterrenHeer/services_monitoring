@@ -46,13 +46,13 @@
                     </div>
                     {% endif %}
                     {% if user|has_group:"Worker" %}
-                    <div class="card-footer d-flex justify-content-between">
-                        <form action="{% url 'change_status' comment.id status %}" method="post">
+                    <div class="card-footer d-flex justify-content-center">
+                        <form action="{% url 'change_status' comment.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="request_comment" value="true">
-                            <div class="d-flex flex-row">
+                            <div>
                                 <label for="{{ comment.id }}">Статус замечания:</label>
-                                <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-1">
+                                <select onchange="reply({{ comment.id }})" name="status" id="{{ comment.id }}" class="mx-1 external">
                                     {% if comment.status == 'Принято к устранению' %}
                                     <option value="Принято к устранению">Принято</option>
                                     {% else %}
@@ -62,7 +62,7 @@
                                     <option value="Отложено">Отложено</option>
                                     <option value="Устранено">Устранено</option>
                                 </select>
-                                <input type="text" name="answer" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
+                                <input type="text" name="answer" class="external" id="answer{{ comment.id }}" hidden placeholder="Введите ответ">
                                 <button type="submit" class="btn btn-outline-primary btn-sm mx-1">Изменить</button>
                             </div>
                         </form>
