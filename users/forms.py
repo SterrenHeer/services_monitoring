@@ -5,9 +5,13 @@ from .models import Tenant, Worker
 
 
 class SignUpTenantForm(UserCreationForm):
-    last_name = forms.CharField(max_length=100, required=True, label='Фамилия')
-    first_name = forms.CharField(max_length=100, required=True, label='Имя')
-    patronymic = forms.CharField(max_length=100, required=True, label='Отчество')
+    last_name = forms.CharField(max_length=100, required=True, label='Фамилия',
+                                widget=forms.TextInput(attrs={'placeholder': 'Введите вашу фамилию'}))
+    first_name = forms.CharField(max_length=100, required=True, label='Имя',
+                                 widget=forms.TextInput(attrs={'placeholder': 'Введите ваше имя'}))
+    patronymic = forms.CharField(max_length=100, required=True, label='Отчество',
+                                 widget=forms.TextInput(attrs={'placeholder': 'Введите ваше отчество'}),
+                                 help_text='По вашему ФИО вы будете идентифицированы как жилец данного участка')
     email = forms.EmailField(max_length=250, help_text='eg.youremail.gmail.com', label='Электронная почта')
 
     class Meta:

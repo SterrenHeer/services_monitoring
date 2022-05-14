@@ -8,103 +8,117 @@
 
 {% block content %}
     <div class="col-10 mx-auto col-lg-7 my-3 text-center">
-        <h1>{{ request.service }}</h1>
-        <div class="border border-2 rounded border-primary text-start mb-2">
-            {% if request.answer %}
-            <p><strong>Ответ от работника:</strong> {{ request.answer }}</p>
-            {% endif %}
-            <p><strong>Дата подачи:</strong> {{ request.submission_date }}</p>
-            {% if request.completion_date %}
-                <p><strong>Дата выполнения:</strong> {{ request.completion_date }}</p>
-            {% endif %}
-            <p><strong>Состояние:</strong> {{ request.status }}</p>
-            <p><strong>Время начала:</strong> {{ request.start_time }}</p>
-            <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
-            <p><strong>Предполагаемая стоимость:</strong> {{ request.service.price }} руб.</p>
-            {% if not user|has_group:"Tenant" %}
-            {% if request.worker %}
-            <p><strong>Закреплённый работник:</strong> {{ request.worker.full_name }}</p>
-            {% endif %}
-            <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
-            <p><strong>Адрес:</strong> {{ request.tenant.apartment }}</p>
-            {% endif %}
-            {% if user|has_group:"Worker" %}
-            <p><strong>Контактные данные:</strong> {{ request.tenant.contact_details }}</p>
-            {% endif %}
-        </div>
-        <div class="d-flex flex-row justify-content-center">
-            <a href="{% url 'request_comments' 'all'%}" class="btn btn-outline-primary me-2">Вернуться к списку замечаний</a><br>
-            <a href="{% url 'all_requests' request.status %}" class="btn btn-outline-primary">Вернуться к списку заявок</a>
+        <div class="form-inner">
+            <div class="text">
+                <h3>Информация о заявке</h3>
+            </div>
+            <div class="text text-start ps-5 pt-4">
+                <p><strong>Название услуги:</strong> {{ request.service }}</p>
+                {% if request.answer %}
+                <p><strong>Ответ от работника:</strong> {{ request.answer }}</p>
+                {% endif %}
+                <p><strong>Дата подачи:</strong> {{ request.submission_date }}</p>
+                {% if request.completion_date %}
+                    <p><strong>Дата выполнения:</strong> {{ request.completion_date }}</p>
+                {% endif %}
+                <p><strong>Состояние:</strong> {{ request.status }}</p>
+                <p><strong>Время начала:</strong> {{ request.start_time }}</p>
+                <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
+                <p><strong>Предполагаемая стоимость:</strong> {{ request.service.price }} руб.</p>
+                {% if not user|has_group:"Tenant" %}
+                {% if request.worker %}
+                <p><strong>Закреплённый работник:</strong> {{ request.worker.full_name }}</p>
+                {% endif %}
+                <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
+                <p><strong>Адрес:</strong> {{ request.tenant.apartment }}</p>
+                {% endif %}
+                {% if user|has_group:"Worker" %}
+                <p><strong>Контактные данные:</strong> {{ request.tenant.contact_details }}</p>
+                {% endif %}
+            </div>
+            <div class="d-flex flex-row justify-content-center mt-3">
+                <a href="{% url 'request_comments' 'all'%}" class="btn btn-outline-primary me-2">Вернуться к списку замечаний</a><br>
+                <a href="{% url 'all_requests' request.status %}" class="btn btn-outline-primary">Вернуться к списку заявок</a>
+            </div>
         </div>
     </div>
     <div class="col-10 mx-auto col-lg-7">
-        <h3 class="editContent text-center">Оставить комментарий</h3>
-        <form action="{% url 'work_with_request_comment' request.id %}" method="post" class="mt-4" id="comment_form">
-            {% csrf_token %}
-            <input hidden name="initial" id="initial_comment" value="">
-            <div class="form-group editContent">
-                <label for="comment" class="editContent">Ваш комментарий *</label>
-                {% if user|has_group:"Manager" %}
-                <div id="new_status_div" hidden>
-                    <label for="new_status">Статус замечания:</label>
-                    <select name="new_status" id="new_status">
-                        <option id="initial_status" value="">Не изменять статус</option>
-                        <option value="На рассмотрении">На рассмотрении</option>
-                        <option value="Отклонено">Отклонено</option>
-                        <option value="Принято к устранению">Принято к устранению</option>
-                        <option value="Устранено">Устранено</option>
-                    </select>
-                </div>
-                {% endif %}
-                {% if user|has_group:"Tenant" %}
-                <span id="status_div">
-                    <input type="radio" name="status" value="Отзыв" id="feedback" required checked>
-                    <label for="feedback" class="editContent">Отзыв</label>
-                    {% if request.status != 'Выполнена' or request.get_valid_date %}
-                    <input type="radio" name="status" value="На рассмотрении" id="complaint" required>
-                    <label for="complaint" class="editContent">Замечание</label>
+        <div class="form-inner">
+            <div class="text text-center">
+                <h3>Комментарии по заявке</h3>
+            </div>
+            <form action="{% url 'work_with_request_comment' request.id %}" method="post" class="mt-4 external" id="comment_form">
+                {% csrf_token %}
+                <input hidden name="initial" id="initial_comment" value="">
+                <div class="form-group">
+                    {% if user|has_group:"Manager" %}
+                    <div id="new_status_div" class=" detail mb-1" hidden>
+                        <label for="new_status">Статус замечания:</label>
+                        <select name="new_status" id="new_status">
+                            <option id="initial_status" value="">Не изменять статус</option>
+                            <option value="На рассмотрении">На рассмотрении</option>
+                            <option value="Отклонено">Отклонено</option>
+                            <option value="Принято к устранению">Принято к устранению</option>
+                            <option value="Устранено">Устранено</option>
+                        </select>
+                    </div>
                     {% endif %}
-                </span>
-                {% endif %}
-                <textarea class="form-control border border-primary" rows="3" name="text" id="comment" placeholder="Допустимая длина комментария - 600 символов" required></textarea>
-                <button type="submit" class="col-12 btn btn-outline-primary d-block mx-auto mt-1">Отправить</button>
-            </div>
-        </form>
-        {% for comment in request.get_comments %}
-        <div class="my-3 d-flex flex-row" id="{{ comment.id }}">
-            <div class="flex-grow-1 border border-2 rounded {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
-                <div class="d-flex flex-row">
-                    <h5>{{ comment.user.username }}</h5>
-                    <p class="ms-2 text-muted">{{ comment.submission_date }}</p>
+                    {% if user|has_group:"Tenant" %}
+                    <span id="status_div">
+                        <div class="d-flex flex-row justify-content-start status_div detail">
+                            <label for="comment">Ваш комментарий: </label>
+                            <input type="radio" name="status" value="Отзыв" id="feedback" required checked>
+                            <label for="feedback">Отзыв</label>
+                            {% if request.status != 'Выполнена' or request.get_valid_date %}
+                            <input type="radio" name="status" value="На рассмотрении" id="complaint" required>
+                            <label for="complaint">Замечание</label>
+                            {% endif %}
+                        </div>
+                    </span>
+                    {% endif %}
+                    <textarea class="form-control border border-primary" rows="3" name="text" id="comment" placeholder="Допустимая длина комментария - 600 символов" required></textarea>
+                    <button type="submit" class="col-12 btn btn-outline-primary d-block mx-auto mt-1">Отправить</button>
                 </div>
-                <p>{{ comment.text }}</p>
-                <p class="mb-0"><strong>Статус комментария:</strong> {{ comment.status }}</p>
-                {% if comment.answer %}
-                <p><strong>Ответ от работника:</strong> {{ comment.answer }}</p>
+            </form>
+            {% for comment in request.get_comments %}
+            <div class="my-3 mx-auto d-flex detail" id="{{ comment.id }}">
+                <div class="flex-grow-1 border comment {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
+                    <div class="d-flex flex-row">
+                        <h5>{{ comment.user.username }}</h5>
+                        <p class="ms-2 text-muted">{{ comment.submission_date }}</p>
+                    </div>
+                    <p>{{ comment.text }}</p>
+                    <p class="mb-0"><strong>Статус комментария:</strong> {{ comment.status }}</p>
+                    {% if comment.answer %}
+                    <p><strong>Ответ от работника:</strong> {{ comment.answer }}</p>
+                    {% endif %}
+                </div>
+{#                {% if comment.status != 'Ответ' and not user|has_group:"Manager" or comment.status != 'Отзыв' and not user|has_group:"Tenant" %}#}
+                {% if comment.user == user and not comment.requestcomment_set.exists or comment.status != 'Отзыв' and not user|has_group:"Tenant" and comment.user|has_group:"Tenant" %}
+                <div class="d-flex flex-column justify-content-center ms-1 border comment {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
+                    {% if comment.status != 'Отзыв' and not user|has_group:"Tenant" and comment.user|has_group:"Tenant" %}
+                    <a href="#comment_form" onclick="reply('{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')"><i class="material-icons md-24">reply</i></a>
+                    {% endif %}
+                    {% if comment.user == user and not comment.requestcomment_set.exists %}
+                    <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-24">edit</i></a>
+                    <a href="{% url 'request_comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
-            {% if comment.status != 'Ответ' and not user|has_group:"Manager" and not comment.requestcomment_set.exists or comment.status != 'Отзыв' and not user|has_group:"Tenant" and not comment.requestcomment_set.exists %}
-            <div class="d-flex flex-column justify-content-center ms-1 border border-2 rounded {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
-                {% if comment.status != 'Отзыв' and user|has_group:"Manager" and not comment.user|has_group:"Manager" %}
-                <a href="#comment_form" onclick="reply('{{ comment.user.username }}', '{{ comment.id }}', '{{ comment.status }}')"><i class="material-icons md-24">reply</i></a>
-                {% endif %}
-                {% if comment.user == user %}
-                <a href="#comment_form" onclick="edit('{{ comment.text }}', '{{ comment.id }}')"><i class="material-icons md-24">edit</i></a>
-                <a href="{% url 'request_comment_delete' comment.id %}"><i class="material-icons md-24">delete</i></a>
-                {% endif %}
+            {% for comm in comment.requestcomment_set.all %}
+            <div class="ps-5 mx-auto detail" id="{{ comm.id }}">
+                <div class="comment border">
+                    <div class="d-flex flex-row">
+                        <h5>{{ comm.user.username }}</h5>
+                        <p class="ms-2 text-muted">{{ comm.submission_date }}</p>
+                    </div>
+                    <p>{{ comm.text }}</p>
+                </div>
             </div>
-            {% endif %}
+            {% endfor %}
+            {% endfor %}
         </div>
-        {% for comm in comment.requestcomment_set.all %}
-        <div class="ps-5" id="{{ comm.id }}">
-            <div class="border border-2 rounded">
-                <h5>{{ comm.user.username }}</h5>
-                <p>{{ comm.submission_date }}</p>
-                <p>{{ comm.text }}</p>
-            </div>
-        </div>
-        {% endfor %}
-        {% endfor %}
     </div>
     <script>
         function reply(username, id, status) {

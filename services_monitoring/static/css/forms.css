@@ -8,6 +8,29 @@
    border: 3px solid #d3d3d3;
 }
 
+form.external, div.detail {
+   max-width: 700px;
+}
+
+div.detail input {
+   width: 13px;
+   margin: 4px 4px 0px 8px;
+}
+
+div.detail select {
+   width: 230px;
+   margin: 0;
+   display: inline-block;
+}
+
+div.comment {;
+   position: relative;
+   padding: 10px;
+   background: white;
+   border-radius: 30px;
+   border: 3px solid;
+}
+
 .form-inner {
    padding: 20px;
    font-family: 'Roboto', sans-serif;
