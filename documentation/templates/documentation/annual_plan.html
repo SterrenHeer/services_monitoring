@@ -69,7 +69,7 @@
                                 <h6 class="mb-0 text-info">Работник не назначен</h6>
                             {% endif %}
                             </div>
-                            {% if item.status == 'Запланирована' and item.get_overdue %}
+                            {% if item.status == 'Запланирована' and item.get_overdue or item.status == 'Утверждена' and item.get_overdue%}
                                 <h6 class="mb-0 col-lg-2 text-danger">{{ item.status }}</h6>
                             {% elif item.status == 'Выполнена' %}
                                 <h6 class="mb-0 col-lg-2 text-success">{{ item.status }}</h6>
@@ -82,7 +82,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="type" value="{{ type }}">
                                     <div class="d-flex flex-row">
-                                        {% if not item.status == 'Отменена' %}
+                                        {% if not item.status == 'Отменена' and item.status == 'Утверждена' and item.worker %}
                                         <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 text-primary bg-white me-0 pe-0">check_circle</button>
                                         {% endif %}
                                         <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 text-primary bg-white">cancel</button>
@@ -91,7 +91,9 @@
                                 {% if not item.get_overdue %}
                                 <a href="{% url 'plan_item_update' type item.id %}"><i class="material-icons md-24">edit</i></a>
                                 {% endif %}
+                                {% if not item.status == 'Утверждена' %}
                                 <a href="{% url 'plan_item_delete' type item.id %}"><i class="material-icons md-24">delete</i></a>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>

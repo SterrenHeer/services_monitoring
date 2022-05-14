@@ -300,9 +300,9 @@ def plan_export(request):
     else:
         response = HttpResponse(content_type='application/pdf')
         if request.GET.get('type') == 'Благоустройство':
-            response['Content-Disposition'] = 'inline; attachment; filename=Grafik blagoustroystva.pdf'
+            response['Content-Disposition'] = 'inline; attachment; filename=Plan blagoustroystva.pdf'
         else:
-            response['Content-Disposition'] = 'inline; attachment; filename=Grafik remonta.pdf'
+            response['Content-Disposition'] = 'inline; attachment; filename=Plan remonta.pdf'
         response['Content-Transfer-Encoding'] = 'binary'
         plan = AnnualPlan.objects.filter(date__gte=previous_date, date__lte=current_date,
                                          type=request.GET.get('type')).order_by('building', 'date')
