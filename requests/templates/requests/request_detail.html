@@ -25,10 +25,11 @@
                 <p><strong>Время начала:</strong> {{ request.start_time }}</p>
                 <p><strong>Время завершения:</strong> {{ request.end_time }}</p>
                 <p><strong>Предполагаемая стоимость:</strong> {{ request.service.price }} руб.</p>
-                {% if not user|has_group:"Tenant" %}
-                {% if request.worker %}
+                {% if request.worker and not user|has_group:"Worker" %}
                 <p><strong>Закреплённый работник:</strong> {{ request.worker.full_name }}</p>
+                <p><strong>Контактные данные:</strong> {{ request.worker.contact_details }}</p>
                 {% endif %}
+                {% if not user|has_group:"Tenant" %}
                 <p><strong>Подал заявку:</strong> {{ request.tenant }}</p>
                 <p><strong>Адрес:</strong> {{ request.tenant.apartment }}</p>
                 {% endif %}
@@ -93,7 +94,6 @@
                     <p><strong>Ответ от работника:</strong> {{ comment.answer }}</p>
                     {% endif %}
                 </div>
-{#                {% if comment.status != 'Ответ' and not user|has_group:"Manager" or comment.status != 'Отзыв' and not user|has_group:"Tenant" %}#}
                 {% if comment.user == user and not comment.requestcomment_set.exists or comment.status != 'Отзыв' and not user|has_group:"Tenant" and comment.user|has_group:"Tenant" %}
                 <div class="d-flex flex-column justify-content-center ms-1 border comment {% if comment.status == 'На рассмотрении' %}border-danger{% elif comment.status == 'Отзыв'%}border-success{% else %}border-info{% endif %}">
                     {% if comment.status != 'Отзыв' and not user|has_group:"Tenant" and comment.user|has_group:"Tenant" %}

@@ -76,6 +76,8 @@
                         <h6 class="mb-0">{{ request.status }}</h6>
                         {% if request.completion_date and request.status == 'Выполнена' %}
                             <h6 class="mb-0 text-success">{{ request.completion_date }}</h6>
+                        {% elif request.status != 'Отклонена' and request.get_overdue %}
+                            <h6 class="mb-0 text-danger">{{ request.submission_date }}</h6>
                         {% else %}
                             <h6 class="mb-0">{{ request.submission_date }}</h6>
                         {% endif %}

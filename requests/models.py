@@ -50,6 +50,9 @@ class Request(models.Model):
         if self.completion_date:
             return datetime.date.today() <= self.completion_date + datetime.timedelta(days=3)
 
+    def get_overdue(self):
+        return datetime.date.today() > self.submission_date + datetime.timedelta(days=7)
+
 
 class RequestComment (models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
@@ -75,6 +78,9 @@ class RequestComment (models.Model):
             summary = self.text
         return summary
 
+    def get_overdue(self):
+        return datetime.date.today() > self.submission_date + datetime.timedelta(days=3)
+
 
 class Comment(models.Model):
     text = models.CharField("Текст замечания", max_length=85)
@@ -96,3 +102,6 @@ class Comment(models.Model):
 
     def get_workers(self):
         return Worker.objects.filter(position__service_type=self.service.service_type)
+
+    def get_overdue(self):
+        return datetime.date.today() > self.submission_date + datetime.timedelta(days=7)

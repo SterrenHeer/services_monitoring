@@ -16,8 +16,9 @@
             {% for worker in worker_list %}
             <div class="col-lg-6 col-md-12 mb-3 card-group">
                 <div class="card border-secondary mb-2">
-                    <div class="card-header">
+                    <div class="card-header d-flex flex-row justify-content-between">
                         <h5 class="text-primary mb-0">{{ worker.full_name }}</h5>
+                        <h5 class="mb-0">{{ worker.contact_details }}</h5>
                     </div>
                     <div class="card-body">
                         {% for service in worker.get_services %}

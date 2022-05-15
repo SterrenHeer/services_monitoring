@@ -252,6 +252,9 @@ class WorkWithRequestComment(View):
             form.user = self.request.user
             if self.request.POST.get("status"):
                 form.status = self.request.POST.get("status")
+                if self.request.POST.get("status") == 'На рассмотрении' and request.status == 'Выполнена':
+                    request.status = 'Принята'
+                    request.save(update_fields=['status'])
             if self.request.POST.get("initial"):
                 initial_comment = RequestComment.objects.get(id=int(self.request.POST.get("initial")))
                 if self.request.POST.get("new_status") and self.request.POST.get("text"):

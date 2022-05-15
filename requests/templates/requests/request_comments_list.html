@@ -26,7 +26,13 @@
                             <h6 class="mb-0">{{ comment.status }}</h6>
                             {% endif %}
                         {% endif %}
-                        <h6>{{ comment.submission_date }}</h6>
+                        {% if comment.status == 'Устранено' %}
+                            <h6 class="mb-0 text-success">{{ comment.submission_date }}</h6>
+                        {% elif comment.status != 'Отклонено' and comment.get_overdue %}
+                            <h6 class="mb-0 text-danger">{{ comment.submission_date }}</h6>
+                        {% else %}
+                            <h6 class="mb-0">{{ comment.submission_date }}</h6>
+                        {% endif %}
                     </div>
                     {% if comment.status == 'Отложено' or comment.status == 'Устранено' %}
                     <div class="card-footer d-flex justify-content-center">
