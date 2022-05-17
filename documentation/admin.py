@@ -57,7 +57,7 @@ class PositionAdmin(admin.ModelAdmin):
 class CleaningScheduleAdmin(admin.ModelAdmin):
     list_display = ('building', 'date', 'service', 'status', 'start_time', 'worker')
     list_filter = ('building', 'date', 'status')
-    search_fields = ('service', 'worker')
+    search_fields = ('service__name', 'worker__full_name')
     actions = ['export_pdf', 'export_excel']
 
     @admin.action(description='Экспортировать данные в Excel')
@@ -98,11 +98,12 @@ class CleaningScheduleAdmin(admin.ModelAdmin):
 class AnnualPlanAdmin(admin.ModelAdmin):
     list_display = ('building', 'service', 'date', 'status', 'type', 'worker')
     list_filter = ('type', 'date', 'status', 'building')
-    search_fields = ('service', 'worker')
+    search_fields = ('service__name', 'worker__full_name')
     actions = ['approve', 'export_pdf', 'export_excel']
 
     @admin.action(description='Утвердить к выполнению')
     def approve(self, request, queryset):
+
         queryset.update(status='Утверждена')
 
     @admin.action(description='Экспортировать данные в Excel')

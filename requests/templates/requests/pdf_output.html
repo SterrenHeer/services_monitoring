@@ -25,13 +25,8 @@
         html, body {
             font-size: 14px;
         }
-        h2, h4{
+        h2, h3, h4{
            text-align: center;
-        }
-        h3{
-            text-align: right;
-            margin-right: 14mm;
-            margin-top: 3mm;
         }
         .blank{
             border-bottom-color: white;
@@ -48,8 +43,12 @@
     </style>
 </head>
 <body>
+    {% if requests or comments %}
+    <h2>Акт выполненных работ</h2>
+    <h4>от {% now "d E Y" %} года</h4>
+    {% endif %}
     {% if requests %}
-    <h2>Выполненные заявки</h2>
+    <h3>Выполненные заявки</h3>
     {% regroup requests by worker.full_name as worker_list %}
     {% for request in worker_list %}
     <h4>{{ request.grouper }}</h4>
@@ -84,10 +83,13 @@
         </tr>
     </table>
     {% endfor %}
-    <h3>Итого, руб: {{ total_requests }}</h3>
+    <p>Всего оказано услуг (в рублях) на сумму: {{ total_requests }} рублей.<br>
+       Вышеперечисленные работы (услуги) выполнены полностью и в срок.<br>
+       Заказчики претензий по объему, качеству и срокам оказания услуг претензий не имеют.
+    </p>
     {% endif %}
     {% if comments %}
-    <h2>Выполненные замечания</h2>
+    <h3>Выполненные замечания</h3>
     {% regroup comments by worker.full_name as worker_list %}
     {% for comment in worker_list %}
     <h4>{{ comment.grouper }}</h4>
@@ -120,20 +122,24 @@
             {% get_comments_worked_time_sum worker previous_date current_date as comments_time_sum %}
             <td content="right">Итого, времени: {{ comments_time_sum }}</td>
         </tr>
-
     </table>
     {% endfor %}
-    <h3>Итого, руб: {{ total_comments }}</h3>
+    <p>Всего оказано услуг (в рублях) на сумму: {{ total_comments }} рублей.<br>
+       Вышеперечисленные работы (услуги) выполнены полностью и в срок.<br>
+       Заказчики претензий по объему, качеству и срокам оказания услуг претензий не имеют.
+    </p>
     {% endif %}
     {% if schedule %}
+    <h2>График уборки</h2>
+    <h4>от {% now "d E Y" %} года</h4>
     {% regroup schedule by building as buidling_list %}
     {% for buidling in buidling_list %}
-    <h4>{{ buidling.grouper }}</h4>
+    <p>По адресу <strong>{{ buidling.grouper }}</strong></p>
     <table>
     {% for buidling in buidling.list %}
         <tr>
             <tr>
-                <td>Услуга: {{ buidling.service.name }}</td>
+                <td>Услуга {{ forloop.counter }}: {{ buidling.service.name }}</td>
                 <td>Дата: {{ buidling.date }}</td>
                 <td>Время начала: {{ buidling.start_time}}</td>
             </tr>
@@ -148,13 +154,15 @@
     {% endif %}
     {% if plan %}
     {% regroup plan by building as buidling_list %}
+    <h2>План работ по ремонту и благоустройству</h2>
+    <h4>от {% now "d E Y" %} года</h4>
     {% for buidling in buidling_list %}
-    <h4>{{ buidling.grouper }}</h4>
+    <p>По адресу <strong>{{ buidling.grouper }}</strong></p>
     <table>
     {% for buidling in buidling.list %}
         <tr>
             <tr>
-                <td>Услуга: {{ buidling.service.name }}</td>
+                <td>Услуга {{ forloop.counter }}: {{ buidling.service.name }}</td>
                 <td>Дата: {{ buidling.date }}</td>
             </tr>
             {% if buidling.worker %}

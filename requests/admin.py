@@ -14,6 +14,8 @@ from django.db.models import Sum, Max, Min
 class RequestAdmin(admin.ModelAdmin):
     list_display = ('service', 'submission_date', 'completion_date', 'status',
                     'start_time', 'end_time', 'answer', 'tenant', 'worker')
+    list_filter = ('status',)
+    search_fields = ('service__name', 'worker__full_name', 'tenant__full_name')
     actions = ['export_pdf', 'export_excel']
 
     @admin.action(description='Экспортировать данные в Excel')
@@ -65,7 +67,9 @@ class RequestCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('text', 'status', 'submission_date', 'completion_date', 'service', 'tenant', 'answer')
+    list_display = ('text', 'status', 'submission_date', 'completion_date', 'service', 'tenant', 'worker', 'answer')
+    list_filter = ('status',)
+    search_fields = ('service__name', 'worker__full_name', 'tenant__full_name')
     actions = ['export_pdf', 'export_excel']
 
     @admin.action(description='Экспортировать данные в Excel')
