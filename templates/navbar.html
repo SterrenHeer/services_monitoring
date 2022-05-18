@@ -65,7 +65,7 @@
                     </li>
                 {% endif %}
                 {% if request.user|has_group:"Master"%}
-                    <li class="nav-item"><a class="nav-link text-uppercase" href="{% url 'all_workers' %}">Работники участка</a></li>
+                    <li class="nav-item"><a class="nav-link text-uppercase" href="{% url 'all_workers' %}">Работники</a></li>
                 {% endif %}
                 <li class="nav-item dropdown"><a class="nav-link text-uppercase dropdown-toggle" data-bs-toggle="dropdown" href="">Плановые работы</a>
                     <div class="dropdown-menu">
@@ -76,6 +76,18 @@
                         {% if perms.requests or not request.user|has_group:"Master" %}
                         <a class="dropdown-item" href="{% url 'annual_plan' 'Ремонт' %}">План ремонтных работ</a>
                         {% endif %}
+                    </div>
+                </li>
+                <li class="nav-item dropdown"><a class="nav-link text-uppercase dropdown-toggle" data-bs-toggle="dropdown" href="">Контакты</a>
+                    <div class="dropdown-menu">
+                        {% get_managers_emails as emails %}
+                        {% for email in emails %}
+                        <div class="dropdown-item">{{ email.email }}</div>
+                        {% endfor %}
+                        {% get_contact_details as contact_details %}
+                        {% for contact in contact_details %}
+                        <div class="dropdown-item">{{ contact.contact_details }}</div>
+                        {% endfor %}
                     </div>
                 </li>
             {% endif %}
@@ -89,6 +101,18 @@
                 {% endif %}
                 <li class="nav-item"><a class="nav-link text-uppercase me-3" href="{% url 'logout' %}"><span class="material-icons md-24">logout</span></a></li>
                 {% else %}
+                <li class="nav-item dropdown"><a class="nav-link text-uppercase dropdown-toggle" data-bs-toggle="dropdown" href="">Контакты</a>
+                    <div class="dropdown-menu">
+                        {% get_managers_emails as emails %}
+                        {% for email in emails %}
+                        <div class="dropdown-item">{{ email.email }}</div>
+                        {% endfor %}
+                        {% get_contact_details as contact_details %}
+                        {% for contact in contact_details %}
+                        <div class="dropdown-item">{{ contact.contact_details }}</div>
+                        {% endfor %}
+                    </div>
+                </li>
                 <li class="nav-item"><a class="nav-link text-uppercase" href="{% url 'signup' %}">Регистрация</a></li>
                 <li class="nav-item"><a class="nav-link text-uppercase me-3" href="{% url 'login' %}">Авторизация</a></li>
                 {% endif %}

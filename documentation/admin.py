@@ -1,5 +1,4 @@
 import datetime
-
 from django.contrib import admin
 from .models import Street, Building, Apartment, ServiceType, Service, Equipment, Position, CleaningSchedule, AnnualPlan
 from django.http import HttpResponse
@@ -38,7 +37,6 @@ class ServiceAdmin(admin.ModelAdmin):
     list_filter = ('service_type',)
     search_fields = ('name',)
     filter_horizontal = ('equipment',)
-    raw_id_fields = ('service_type',)
 
 
 @admin.register(Equipment)

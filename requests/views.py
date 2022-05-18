@@ -66,7 +66,7 @@ class AllRequestsListView(ListView):
                 return Request.objects.all().order_by('submission_date')
             return Request.objects.filter(status=self.kwargs['status']).order_by('submission_date')
         elif self.request.user.groups.filter(name='Tenant').exists():
-            if not self.kwargs['status']:
+            if self.kwargs['status'] == 'none':
                 return Request.objects.filter(tenant=self.request.user.tenant,
                                               status='На рассмотрении').order_by('submission_date')
             if self.kwargs['status'] == 'all':

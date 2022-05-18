@@ -86,3 +86,13 @@ def get_comments_worked_time_sum(worker, previous_date, current_date):
     hours, remainder = divmod(total_seconds, 60 * 60)
     minutes, seconds = divmod(remainder, 60)
     return '{} ч. {} м.'.format(hours, minutes)
+
+
+@register.simple_tag
+def get_contact_details():
+    return Worker.objects.all().values('contact_details')[0:3]
+
+
+@register.simple_tag
+def get_managers_emails():
+    return Group.objects.get(name='Manager').user_set.values('email')
