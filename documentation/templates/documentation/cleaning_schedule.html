@@ -70,7 +70,7 @@
                                 {% endif %}
                             </div>
                             {% if item.status == 'Запланирована' and item.get_overdue %}
-                                <h6 class="mb-0 col-lg-2 text-danger">{{ item.status }}</h6>
+                                <h6 class="mb-0 col-lg-2 text-danger">Просрочена</h6>
                             {% elif item.status == 'Выполнена' %}
                                 <h6 class="mb-0 col-lg-2 text-success">{{ item.status }}</h6>
                             {% else %}
@@ -88,7 +88,7 @@
                                 <form action="{% url 'change_item_status' item.id %}" method="post">
                                     {% csrf_token %}
                                     <div>
-                                        {% if not item.status == 'Отменена' %}
+                                        {% if not item.status == 'Отменена' and not item.status == 'Выполнена' %}
                                         <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 bg-white me-0 pe-0 text-primary">check_circle</button>
                                         {% endif %}
                                         <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 bg-white text-primary">cancel</button>

@@ -12,29 +12,31 @@ import xlwt
 @admin.register(Street)
 class StreetAdmin(admin.ModelAdmin):
     list_display = ('name',)
+    search_fields = ('name',)
 
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
     list_display = ('number', 'street', 'apartments_quantity')
-    list_filter = ('street',)
+    list_filter = (('street', admin.RelatedOnlyFieldListFilter),)
 
 
 @admin.register(Apartment)
 class ApartmentAdmin(admin.ModelAdmin):
     list_display = ('building', 'apartment_number', 'area', 'tenants_quantity')
-    list_filter = ('building',)
+    list_filter = (('building', admin.RelatedOnlyFieldListFilter),)
 
 
 @admin.register(ServiceType)
 class ServiceTypeAdmin(admin.ModelAdmin):
     list_display = ('title', 'nature')
+    list_filter = ('nature',)
 
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'service_type', 'duration', 'equipment_titles')
-    list_filter = ('service_type',)
+    list_display = ('name', 'price', 'duration', 'equipment_titles', 'service_type')
+    list_filter = (('service_type', admin.RelatedOnlyFieldListFilter),)
     search_fields = ('name',)
     filter_horizontal = ('equipment',)
 
@@ -48,13 +50,15 @@ class EquipmentAdmin(admin.ModelAdmin):
 @admin.register(Position)
 class PositionAdmin(admin.ModelAdmin):
     list_display = ('name', 'service_types_titles')
+    search_fields = ('name', 'service_type__title')
     filter_horizontal = ('service_type',)
 
 
 @admin.register(CleaningSchedule)
 class CleaningScheduleAdmin(admin.ModelAdmin):
     list_display = ('building', 'date', 'service', 'status', 'start_time', 'worker')
-    list_filter = ('building', 'date', 'status')
+    list_filter = (('service__service_type', admin.RelatedOnlyFieldListFilter),
+                   ('building', admin.RelatedOnlyFieldListFilter), 'date', 'status')
     search_fields = ('service__name', 'worker__full_name')
     actions = ['export_pdf', 'export_excel']
 
@@ -79,7 +83,8 @@ class CleaningScheduleAdmin(admin.ModelAdmin):
     @admin.action(description='Экспортировать данные в PDF')
     def export_pdf(self, request, queryset):
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; attachment; filename=Grafik uborki ot ' + str(datetime.date.today()) + '.pdf'
+        response['Content-Disposition'] = 'inline; attachment; filename=Grafik uborki ot ' + str(
+            datetime.date.today()) + '.pdf'
         response['Content-Transfer-Encoding'] = 'binary'
         html_string = render_to_string('requests/pdf_output.html', {'schedule': queryset})
         html = HTML(string=html_string)
@@ -95,14 +100,14 @@ class CleaningScheduleAdmin(admin.ModelAdmin):
 @admin.register(AnnualPlan)
 class AnnualPlanAdmin(admin.ModelAdmin):
     list_display = ('building', 'service', 'date', 'status', 'type', 'worker')
-    list_filter = ('type', 'date', 'status', 'building')
+    list_filter = ('type', ('service__service_type', admin.RelatedOnlyFieldListFilter), 'date',
+                   'status', ('building', admin.RelatedOnlyFieldListFilter))
     search_fields = ('service__name', 'worker__full_name')
     actions = ['approve', 'export_pdf', 'export_excel']
 
     @admin.action(description='Утвердить к выполнению')
     def approve(self, request, queryset):
-
-        queryset.update(status='Утверждена')
+        queryset.filter(status='Запланирована').update(status='Утверждена')
 
     @admin.action(description='Экспортировать данные в Excel')
     def export_excel(self, request, queryset):
@@ -125,7 +130,8 @@ class AnnualPlanAdmin(admin.ModelAdmin):
     @admin.action(description='Экспортировать данные в PDF')
     def export_pdf(self, request, queryset):
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; attachment; filename=Plan rabot ot ' + str(datetime.date.today()) + '.pdf'
+        response['Content-Disposition'] = 'inline; attachment; filename=Plan rabot ot ' + str(
+            datetime.date.today()) + '.pdf'
         response['Content-Transfer-Encoding'] = 'binary'
         plan = queryset.order_by('building', 'date')
         html_string = render_to_string('requests/pdf_output.html', {'plan': plan})
@@ -137,7 +143,3 @@ class AnnualPlanAdmin(admin.ModelAdmin):
             output.seek(0)
             response.write(output.read())
         return response
-
-
-
-
