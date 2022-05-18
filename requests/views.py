@@ -165,7 +165,7 @@ class CreateRequest(CreateView):
 class CreateComment(CreateView):
     model = Comment
     template_name = 'requests/create_comment.html'
-    fields = ['text', 'service']
+    fields = ['text', 'service', 'image']
 
     def form_valid(self, form):
         form.instance.tenant = Tenant.objects.get(user=self.request.user)

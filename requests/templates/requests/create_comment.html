@@ -14,11 +14,14 @@
                     <h3 class="text-center">Создание нового замечания</h3>
                     <p class="text-center">Пожалуйста, введите следующую информацию, чтобы создать новое замечание</p>
                 </div>
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
                     <button type="submit" name="button" class="btn btn-outline-primary d-block mx-auto">Создать замечание</button>
                 </form>
+                {% if comment %}
+                  <img src="{{ comment.image.url}}" alt="connect" style="max-height:300px">
+                {% endif %}
             </div>
         </div>
     </div>

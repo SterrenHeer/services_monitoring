@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
 from users.models import Worker
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
 
 class Request(models.Model):
@@ -92,6 +94,7 @@ class Comment(models.Model):
     worker = models.ForeignKey('users.Worker', on_delete=models.SET_NULL, null=True,
                                blank=True, verbose_name="Работник")
     answer = models.CharField("Ответ", max_length=85, null=True, blank=True)
+    image = models.ImageField("Фотография", upload_to='comments', blank=True)
 
     class Meta:
         verbose_name = 'замечание'
@@ -105,3 +108,9 @@ class Comment(models.Model):
 
     def get_overdue(self):
         return datetime.date.today() > self.submission_date + datetime.timedelta(days=7)
+
+
+@receiver(pre_delete, sender=Comment)
+def image_model_delete(sender, instance, **kwargs):
+    if instance.image.name:
+        instance.image.delete(False)
