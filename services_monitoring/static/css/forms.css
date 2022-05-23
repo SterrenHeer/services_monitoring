@@ -74,3 +74,7 @@ select.external, input.external {
 .form-inner h4 {
    font-size: 21px;
 }
+
+input.file-input {
+   padding-left: 40px;
+}

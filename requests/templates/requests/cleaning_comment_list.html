@@ -42,6 +42,9 @@
                     <div class="card my-2{% if request.user.tenant == comment.tenant %} border-primary{% else %} border-secondary{% endif %}">
                         <div class="card-header d-flex justify-content-between">
                             <h6 class="text-primary mb-0">{{ comment.text }}</h6>
+                            {% if comment.image %}
+                            <button onclick="expand({{ comment.id }})" class="material-icons md-24 border-0 bg-light text-primary pe-0">image</button>
+                            {% endif %}
                         </div>
                         <div class="card-body d-flex justify-content-between">
                             <h6 class="mb-0">{{ comment.service }}</h6>
@@ -57,6 +60,11 @@
                                 <a href="{% url 'comment_delete' comment.id status %}?cleaning=true"><i class="material-icons md-24">delete</i></a>
                             {% endif %}
                         </div>
+                        {% if comment.image %}
+                        <div id="image{{ comment.id }}" class="card-footer text-center" hidden>
+                            <img class="img-fluid" src="{{ comment.image.url }}">
+                        </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
                 </div>
@@ -70,4 +78,10 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        function expand(id) {
+            let image = document.getElementById('image'+ id)
+            image.hidden = image.hidden != true
+        }
+    </script>
 {% endblock %}

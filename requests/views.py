@@ -178,6 +178,7 @@ class CreateComment(CreateView):
         else:
             context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Замечание')
         context['form'].fields['text'].widget = forms.Textarea(attrs={'placeholder': 'Введите текст замечания длиной не более 85 символов', 'rows': 2})
+        context['form'].fields['image'].widget = forms.FileInput(attrs={'class': 'file-input'})
         return context
 
     def get_success_url(self):

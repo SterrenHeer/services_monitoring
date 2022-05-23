@@ -111,6 +111,6 @@ class Comment(models.Model):
 
 
 @receiver(pre_delete, sender=Comment)
-def image_model_delete(sender, instance, **kwargs):
+def comment_model_delete(sender, instance, **kwargs):
     if instance.image.name:
         instance.image.delete(False)
