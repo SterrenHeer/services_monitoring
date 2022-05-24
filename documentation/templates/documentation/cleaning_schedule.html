@@ -16,9 +16,14 @@
             {% endif %}
             <form action="{% url 'search_schedule' %}" class="my-1" method="get">
                 <div class="d-flex flex-row justify-content-center">
-                    <input type="text" class="border rounded border-primary" placeholder="Поиск по расписанию" name="search" required>
-                    <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
-                    <a class="btn btn-outline-primary" href="{% url 'cleaning_schedule' %}"><span class="material-icons md-24">refresh</span></a>
+                    <input type="text" placeholder="Поиск по расписанию" name="search" required
+                           class="border rounded border-primary">
+                    <button type="submit" class="btn btn-outline-primary mx-1">
+                        <span class="material-icons md-24">search</span>
+                    </button>
+                    <a class="btn btn-outline-primary" href="{% url 'cleaning_schedule' %}">
+                        <span class="material-icons md-24">refresh</span>
+                    </a>
                 </div>
             </form>
             {% if user|has_group:"Master" %}
@@ -26,15 +31,21 @@
                 <form action="{% url 'schedule_export' %}" target="_blank" class="my-1" method="get">
                     {% csrf_token %}
                     <div class="d-flex flex-row justify-content-center">
-                        <button type="submit" name="excel" value="excel" class="btn btn-outline-primary ms-1">Экспортировать в Excel</button>
-                        <button type="submit" name="pdf" value="pdf" class="btn btn-outline-primary mx-1">Экспортировать в PDF</button>
-                        <button type="button" onclick="select()" class="btn btn-outline-primary"><span class="material-icons md-24">edit_calendar</span></button>
+                        <button type="submit" name="excel" value="excel"
+                                class="btn btn-outline-primary ms-1">Экспортировать в Excel</button>
+                        <button type="submit" name="pdf" value="pdf"
+                                class="btn btn-outline-primary mx-1">Экспортировать в PDF</button>
+                        <button type="button" onclick="select()" class="btn btn-outline-primary">
+                            <span class="material-icons md-24">edit_calendar</span>
+                        </button>
                     </div>
                     <div id="date" hidden class="text-center text-lg-start mt-1">
                         {% get_previous_date as previous_date %}
-                        <input type="date" name="previous" class="border rounded border-primary ms-1" value="{{ previous_date }}">
+                        <input type="date" name="previous"
+                               class="border rounded border-primary ms-1" value="{{ previous_date }}">
                         {% get_current_date as current_date %}
-                        <input type="date" name="current" class="border rounded border-primary" value="{{ current_date }}">
+                        <input type="date" name="current"
+                               class="border rounded border-primary" value="{{ current_date }}">
                     </div>
                 </form>
             </div>
@@ -69,19 +80,23 @@
                                 <h6 class="mb-0 text-info">Работник не назначен</h6>
                                 {% endif %}
                             </div>
-                            {% if item.status == 'Запланирована' and item.get_overdue %}
+                                {% if item.status == 'Запланирована' and item.get_overdue %}
                                 <h6 class="mb-0 col-lg-2 text-danger">Просрочена</h6>
-                            {% elif item.status == 'Выполнена' %}
+                                {% elif item.status == 'Выполнена' %}
                                 <h6 class="mb-0 col-lg-2 text-success">{{ item.status }}</h6>
-                            {% else %}
+                                {% else %}
                                 <h6 class="mb-0 col-lg-2">{{ item.status }}</h6>
-                            {% endif %}
+                                {% endif %}
                             {% if user|has_group:"Master" %}
                             <div class="col-lg-1">
                                 {% if not item.get_overdue %}
-                                <a href="{% url 'schedule_item_update' item.id %}"><i class="material-icons md-24">edit</i></a>
+                                <a href="{% url 'schedule_item_update' item.id %}">
+                                    <i class="material-icons md-24">edit</i>
+                                </a>
                                 {% endif %}
-                                <a href="{% url 'schedule_item_delete' item.id %}"><i class="material-icons md-24">delete</i></a>
+                                <a href="{% url 'schedule_item_delete' item.id %}">
+                                    <i class="material-icons md-24">delete</i>
+                                </a>
                             </div>
                             {% elif user|has_group:"Worker" %}
                             <div class="col-lg-1">
@@ -89,9 +104,11 @@
                                     {% csrf_token %}
                                     <div>
                                         {% if not item.status == 'Отменена' and not item.status == 'Выполнена' %}
-                                        <button type="submit" name="completed" value="Выполнена" class="material-icons md-24 border-0 bg-white me-0 pe-0 text-primary">check_circle</button>
+                                        <button class="material-icons md-24 border-0 bg-white me-0 pe-0 text-primary"
+                                                type="submit" name="completed" value="Выполнена">check_circle</button>
                                         {% endif %}
-                                        <button type="submit" name="cancelled" value="Отменена" class="material-icons md-24 border-0 bg-white text-primary">cancel</button>
+                                        <button class="material-icons md-24 border-0 bg-white text-primary"
+                                                type="submit" name="cancelled" value="Отменена">cancel</button>
                                     </div>
                                 </form>
                             </div>
@@ -103,7 +120,8 @@
                 {% endfor %}
             </div>
             {% if user|has_group:"Master" %}
-            <a class="btn btn-outline-primary mb-3" href="{% url 'schedule_item_create' %}?building={{ building.grouper.id }}">Добавить новую запись для данного дома</a>
+            <a href="{% url 'schedule_item_create' %}?building={{ building.grouper.id }}"
+               class="btn btn-outline-primary mb-3">Добавить новую запись для данного дома</a>
             {% endif %}
             {% endfor %}
         </div>

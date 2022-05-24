@@ -10,7 +10,9 @@
             <div class="form-inner">
                 <div class="text">
                     <h3 class="text-center">Удаление заявки</h3>
-                    <p class="text-center">Вы уверены, что хотите удалить заявку по услуге <strong>{{ request }}</strong>?</p>
+                    <p class="text-center">
+                        Вы уверены, что хотите удалить заявку по услуге <strong>{{ request }}
+                    </strong>?</p>
                 </div>
                 <form method="POST">
                     {% csrf_token %}

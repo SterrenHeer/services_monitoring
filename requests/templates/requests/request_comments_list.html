@@ -14,24 +14,24 @@
             <div class="col-12 mx-auto col-md-12 col-lg-6 card-group">
                 <div class="card my-2 border-secondary">
                     <div class="card-header">
-                        <a href="{{ comment.request.get_absolute_url }}#{{ comment.id }}"><h5 class="font-weight-bold mb-0 text-center">{{ comment.get_summary }}</h5></a>
+                        <a href="{{ comment.request.get_absolute_url }}#{{ comment.id }}">
+                            <h5 class="font-weight-bold mb-0 text-center">{{ comment.get_summary }}</h5>
+                        </a>
                     </div>
                     <div class="card-body d-flex justify-content-between">
                         {% if user|has_group:"Manager" %}
                         <h6>{{ comment.user }}</h6>
                         {% endif %}
                         <h6 class="mb-0">{{ comment.request }}</h6>
-                        {% if user|has_group:"Tenant" %}
-                            {% if comment.status != 'Отзыв' and comment.status != 'Ответ'%}
-                            <h6 class="mb-0">{{ comment.status }}</h6>
-                            {% endif %}
+                        {% if user|has_group:"Tenant" and comment.status != 'Отзыв' and comment.status != 'Ответ'%}
+                        <h6 class="mb-0">{{ comment.status }}</h6>
                         {% endif %}
                         {% if comment.status == 'Устранено' %}
-                            <h6 class="mb-0 text-success">{{ comment.submission_date }}</h6>
+                        <h6 class="mb-0 text-success">{{ comment.submission_date }}</h6>
                         {% elif comment.status != 'Отклонено' and comment.get_overdue %}
-                            <h6 class="mb-0 text-danger">{{ comment.submission_date }}</h6>
+                        <h6 class="mb-0 text-danger">{{ comment.submission_date }}</h6>
                         {% else %}
-                            <h6 class="mb-0">{{ comment.submission_date }}</h6>
+                        <h6 class="mb-0">{{ comment.submission_date }}</h6>
                         {% endif %}
                     </div>
                     {% if comment.status == 'Отложено' or comment.status == 'Устранено' %}

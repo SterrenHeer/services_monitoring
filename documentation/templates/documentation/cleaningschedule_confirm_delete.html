@@ -10,13 +10,16 @@
             <div class="form-inner">
                 <div class="text">
                     <h3 class="text-center">Удаление записи</h3>
-                    <p class="text-center">Вы уверены, что хотите удалить запись по услуге <strong>{{ cleaningschedule.service }}</strong>?</p>
+                    <p class="text-center">
+                        Вы уверены, что хотите удалить запись по услуге <strong>{{ cleaningschedule.service }}</strong>?
+                    </p>
                 </div>
                 <form method="POST">
                     {% csrf_token %}
                     <div class="d-flex flex-row justify-content-between">
                         <button class="btn btn-outline-danger ms-4" type="submit">Да, подтвердить удаление</button>
-                        <a class="btn btn-outline-primary me-4" href="{% url 'cleaning_schedule' %}">Нет, отменить удаление</a>
+                        <a href="{% url 'cleaning_schedule' %}"
+                           class="btn btn-outline-primary me-4">Нет, отменить удаление</a>
                     </div>
                 </form>
             </div>

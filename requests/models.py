@@ -43,7 +43,8 @@ class Request(models.Model):
         return self.requestcomment_set.filter(initial__isnull=True)
 
     def get_workers(self):
-        return Worker.objects.exclude(position__name__icontains='Мастер').filter(position__service_type=self.service.service_type)
+        return Worker.objects.exclude(position__name__icontains='Мастер')\
+                             .filter(position__service_type=self.service.service_type)
 
     def get_complaint(self):
         return self.requestcomment_set.exclude(status__in=['Устранено', 'Ответ', 'Отклонено', 'Отзыв']).exists()

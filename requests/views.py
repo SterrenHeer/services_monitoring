@@ -133,7 +133,8 @@ class CleaningCommentListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["cleaning_schedule"] = CleaningSchedule.objects.filter(building_id=self.request.user.tenant.apartment.building).order_by('date')
+        building = self.request.user.tenant.apartment.building
+        context["cleaning_schedule"] = CleaningSchedule.objects.filter(building_id=building).order_by('date')
         context["status"] = self.kwargs['status']
         return context
 
@@ -177,7 +178,8 @@ class CreateComment(CreateView):
             context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Уборка')
         else:
             context['form'].fields['service'].queryset = Service.objects.filter(service_type__nature='Замечание')
-        context['form'].fields['text'].widget = forms.Textarea(attrs={'placeholder': 'Введите текст замечания длиной не более 85 символов', 'rows': 2})
+        context['form'].fields['text'].widget = forms.Textarea(
+            attrs={'placeholder': 'Введите текст замечания длиной не более 85 символов', 'rows': 2})
         context['form'].fields['image'].widget = forms.FileInput(attrs={'class': 'file-input'})
         return context
 

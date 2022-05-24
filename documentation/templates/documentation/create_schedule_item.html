@@ -17,7 +17,8 @@
                 <form method="POST">
                     {% csrf_token %}
                     <p>{{ form | crispy}}</p>
-                    <button type="submit" name="button" class="btn btn-outline-primary d-block mx-auto">Создать запись</button>
+                    <button type="submit" name="button"
+                            class="btn btn-outline-primary d-block mx-auto">Создать запись</button>
                 </form>
             </div>
         </div>

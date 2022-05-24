@@ -25,8 +25,8 @@
                         <h6 class="mb-0">{{ service }}</h6>
                         {% endfor %}
                     </div>
+                    {% if user|has_group:"Master" %}
                     <div class="card-footer d-flex justify-content-between">
-                        {% if user|has_group:"Master" %}
                         <form action="{% url 'worker_update' worker.id %}" method="post" class="mt-2 mb-0">
                             {% csrf_token %}
                             <label for="position" class="h6">Должность:</label>
@@ -38,8 +38,8 @@
                             </select>
                             <button type="submit" class="btn btn-outline-primary btn-sm in">Назначить</button>
                         </form>
-                        {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

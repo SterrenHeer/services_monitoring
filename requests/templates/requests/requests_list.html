@@ -18,9 +18,14 @@
             </div>
             <form action="{% url 'search_requests' 'all' %}" class="my-1" method="get">
                 <div class="d-flex flex-row justify-content-center">
-                    <input type="text" class="border rounded border-primary" placeholder="Поиск по заявкам" name="search" required>
-                    <button type="submit" class="btn btn-outline-primary mx-1"><span class="material-icons md-24">search</span></button>
-                    <a href="{% url 'all_requests' 'all' %}" class="btn btn-outline-primary"><span class="material-icons md-24">refresh</span></a>
+                    <input type="text" placeholder="Поиск по заявкам" name="search" required
+                           class="border rounded border-primary">
+                    <button type="submit" class="btn btn-outline-primary mx-1">
+                        <span class="material-icons md-24">search</span>
+                    </button>
+                    <a href="{% url 'all_requests' 'all' %}" class="btn btn-outline-primary">
+                        <span class="material-icons md-24">refresh</span>
+                    </a>
                 </div>
             </form>
             {% if user|has_group:"Master" %}
@@ -28,15 +33,21 @@
                 <form action="{% url 'request_export' %}" target="_blank" class="my-1" method="get">
                     {% csrf_token %}
                     <div class="d-flex flex-row justify-content-center">
-                        <button type="submit" name="excel" value="excel" class="btn btn-outline-primary ms-1">Экспортировать в Excel</button>
-                        <button type="submit" name="pdf" value="pdf" class="btn btn-outline-primary mx-1">Экспортировать в PDF</button>
-                        <button type="button" onclick="select()" class="btn btn-outline-primary"><span class="material-icons md-24">edit_calendar</span></button>
+                        <button type="submit" name="excel" value="excel"
+                                class="btn btn-outline-primary ms-1">Экспортировать в Excel</button>
+                        <button type="submit" name="pdf" value="pdf"
+                                class="btn btn-outline-primary mx-1">Экспортировать в PDF</button>
+                        <button type="button" onclick="select()" class="btn btn-outline-primary">
+                            <span class="material-icons md-24">edit_calendar</span>
+                        </button>
                     </div>
                     <div id="date" hidden class="text-center text-lg-start mt-1">
                         {% get_previous_date as previous_date %}
-                        <input type="date" name="previous" class="border rounded border-primary ms-1" value="{{ previous_date }}">
+                        <input type="date" name="previous"
+                               class="border rounded border-primary ms-1" value="{{ previous_date }}">
                         {% get_current_date as current_date %}
-                        <input type="date" name="current" class="border rounded border-primary" value="{{ current_date }}">
+                        <input type="date" name="current"
+                               class="border rounded border-primary" value="{{ current_date }}">
                     </div>
                 </form>
             </div>
@@ -48,25 +59,35 @@
             <div class="col-lg-6 col-12 my-2">
                 <div class="card border-secondary mb-2">
                     <div class="card-header d-flex flex-row justify-content-between">
-                        <a href="{{ request.get_absolute_url }}" class="font-weight-bold mb-0 h5 col-10">{{ request.service }}</a>
+                        <a href="{{ request.get_absolute_url }}"
+                           class="font-weight-bold mb-0 h5 col-10">{{ request.service }}</a>
                         {% if user|has_group:"Tenant" or user|has_group:"Manager"%}
                         <div class="col-2 d-flex flex-row justify-content-end">
                             {% if user|has_group:"Tenant" %}
                             {% if request.status != 'Выполнена' %}
-                            <a href="{% url 'request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
+                            <a href="{% url 'request_update' request.id %}">
+                                <i class="material-icons md-24">edit</i>
+                            </a>
                             {% endif %}
                             {% if request.status == 'На рассмотрении' %}
-                            <a href="{% url 'request_delete' request.id status %}"><i class="material-icons md-24">delete</i></a>
+                            <a href="{% url 'request_delete' request.id status %}">
+                                <i class="material-icons md-24">delete</i>
+                            </a>
                             {% endif %}
                             {% elif user|has_group:"Manager" %}
                             {% if request.status == 'На рассмотрении' %}
                             <form action="{% url 'change_status' request.id status %}" class="mb-0" method="post">
                             {% csrf_token %}
-                            <button type="submit" name="processing" value="В обработке" class="material-icons md-24 border-0 text-primary bg-light">send</button>
+                            <button type="submit" name="processing" value="В обработке"
+                                    class="material-icons md-24 border-0 text-primary bg-light">send</button>
                             </form>
                             {% endif %}
-                            <a href="{% url 'manager_request_update' request.id %}"><i class="material-icons md-24">edit</i></a>
-                            <a href="{% url 'request_delete' request.id status %}"><i class="material-icons md-24">delete</i></a>
+                            <a href="{% url 'manager_request_update' request.id %}">
+                                <i class="material-icons md-24">edit</i>
+                            </a>
+                            <a href="{% url 'request_delete' request.id status %}">
+                                <i class="material-icons md-24">delete</i>
+                            </a>
                             {% endif %}
                         </div>
                         {% endif %}
@@ -75,11 +96,11 @@
                         <h6 class="mb-0">{{ request.start_time }}-{{ request.end_time }}</h6>
                         <h6 class="mb-0">{{ request.status }}</h6>
                         {% if request.completion_date and request.status == 'Выполнена' %}
-                            <h6 class="mb-0 text-success">{{ request.completion_date }}</h6>
+                        <h6 class="mb-0 text-success">{{ request.completion_date }}</h6>
                         {% elif request.status != 'Отклонена' and request.get_overdue %}
-                            <h6 class="mb-0 text-danger">{{ request.submission_date }}</h6>
+                        <h6 class="mb-0 text-danger">{{ request.submission_date }}</h6>
                         {% else %}
-                            <h6 class="mb-0">{{ request.submission_date }}</h6>
+                        <h6 class="mb-0">{{ request.submission_date }}</h6>
                         {% endif %}
                     </div>
                     {% if user|has_group:"Master" or user|has_group:"Worker" %}
@@ -117,7 +138,8 @@
                                     <button type="submit" class="btn btn-outline-primary btn-sm mx-1">Изменить</button>
                                 </div>
                                 {% if request.get_complaint %}
-                                <div id="complaint{{ request.id }}" class="text-danger mb-0 mx-2">Есть не устранённые замечания</div>
+                                <div id="complaint{{ request.id }}"
+                                     class="text-danger mb-0 mx-2">Есть не устранённые замечания</div>
                                 {% endif %}
                             </div>
                         </form>
@@ -141,7 +163,7 @@
         }
         function select() {
             let date = document.getElementById('date')
-            date.hidden = date.hidden != true
+            date.hidden = date.hidden !== true
         }
     </script>
 {% endblock %}
