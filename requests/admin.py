@@ -8,6 +8,7 @@ import tempfile
 from .views import form_rows_to_excel
 import xlwt
 from django.db.models import Sum, Max, Min
+from django.utils.safestring import mark_safe
 
 
 @admin.register(Request)
@@ -71,6 +72,11 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('service__name', 'worker__full_name', 'tenant__full_name')
     actions = ['export_pdf', 'export_excel']
+    readonly_fields = ["preview"]
+
+    @staticmethod
+    def preview(obj):
+        return mark_safe(f'<img src="{obj.image.url}" height=300px>')
 
     @admin.action(description='Экспортировать данные в Excel')
     def export_excel(self, request, queryset):

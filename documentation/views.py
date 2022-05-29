@@ -207,7 +207,7 @@ class ChangeStatus(View):
             if item.get_current_date():
                 item.status = self.request.POST.get("completed")
         else:
-            if item.status == 'Отменена':
+            if item.status == 'Отменена' or item.status == 'Отложена':
                 item.status = 'Запланирована'
             else:
                 item.status = self.request.POST.get("cancelled")

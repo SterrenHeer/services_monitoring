@@ -103,12 +103,12 @@
                                 <form action="{% url 'change_item_status' item.id %}" method="post">
                                     {% csrf_token %}
                                     <div>
-                                        {% if not item.status == 'Отменена' and not item.status == 'Выполнена' %}
+                                        {% if not item.status == 'Отложена' and not item.status == 'Выполнена' %}
                                         <button class="material-icons md-24 border-0 bg-white me-0 pe-0 text-primary"
                                                 type="submit" name="completed" value="Выполнена">check_circle</button>
                                         {% endif %}
                                         <button class="material-icons md-24 border-0 bg-white text-primary"
-                                                type="submit" name="cancelled" value="Отменена">cancel</button>
+                                                type="submit" name="cancelled" value="Отложена">cancel</button>
                                     </div>
                                 </form>
                             </div>
