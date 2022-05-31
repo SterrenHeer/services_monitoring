@@ -15,7 +15,8 @@ from django.utils.safestring import mark_safe
 class RequestAdmin(admin.ModelAdmin):
     list_display = ('service', 'submission_date', 'completion_date', 'status',
                     'start_time', 'end_time', 'answer', 'tenant', 'worker')
-    list_filter = ('status',)
+    list_filter = ('status', ('service__service_type', admin.RelatedOnlyFieldListFilter),
+                   'completion_date', 'submission_date')
     search_fields = ('service__name', 'worker__full_name', 'tenant__full_name')
     actions = ['export_pdf', 'export_excel']
 
@@ -64,12 +65,15 @@ class RequestAdmin(admin.ModelAdmin):
 @admin.register(RequestComment)
 class RequestCommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'text', 'status', 'submission_date', 'request', 'answer')
+    list_filter = ('status',)
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('text', 'status', 'submission_date', 'completion_date', 'service', 'tenant', 'worker', 'answer')
-    list_filter = ('status',)
+    list_display = ('text', 'status', 'submission_date', 'completion_date', 'service',
+                    'tenant', 'worker', 'answer')
+    list_filter = ('status', ('service__service_type', admin.RelatedOnlyFieldListFilter),
+                   'completion_date', 'submission_date')
     search_fields = ('service__name', 'worker__full_name', 'tenant__full_name')
     actions = ['export_pdf', 'export_excel']
     readonly_fields = ["preview"]

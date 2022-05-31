@@ -28,7 +28,7 @@
                         {% endif %}
                         {% if comment.status == 'Устранено' %}
                         <h6 class="mb-0 text-success">{{ comment.submission_date }}</h6>
-                        {% elif comment.status != 'Отклонено' and comment.get_overdue %}
+                        {% elif comment.status != 'Отклонено' and comment.status != 'Отзыв' and comment.status != 'Ответ' and comment.get_overdue %}
                         <h6 class="mb-0 text-danger">{{ comment.submission_date }}</h6>
                         {% else %}
                         <h6 class="mb-0">{{ comment.submission_date }}</h6>

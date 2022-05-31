@@ -306,7 +306,7 @@ def plan_export(request):
         response['Content-Transfer-Encoding'] = 'binary'
         plan = AnnualPlan.objects.filter(date__gte=previous_date, date__lte=current_date,
                                          type=request.GET.get('type')).order_by('building', 'date')
-        html_string = render_to_string('requests/pdf_output.html', {'plan': plan})
+        html_string = render_to_string('requests/pdf_output.html', {'plan': plan, 'type': request.GET.get('type')})
         html = HTML(string=html_string)
         result = html.write_pdf()
         with tempfile.NamedTemporaryFile(delete=True) as output:

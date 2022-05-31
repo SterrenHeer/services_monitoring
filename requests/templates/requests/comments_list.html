@@ -100,6 +100,23 @@
                         </form>
                     </div>
                     {% endif %}
+                    {% if comment.status == 'Отложена' or comment.status == 'Выполнена' %}
+                    <div class="card-footer d-flex justify-content-center">
+                        {% if comment.answer and comment.status == 'Отложена' %}
+                        <p class="text-danger mb-0">{{ comment.answer }}</p>
+                        {% elif comment.answer %}
+                        <p class="text-success mb-0">{{ comment.answer }}</p>
+                        {% endif %}
+                    </div>
+                    {% elif user|has_group:"Worker" %}
+                    <div class="card-footer d-flex justify-content-center">
+                        <p class="mb-0 text-muted">Оставьте свой ответ на данное замечание</p>
+                    </div>
+                    {% else %}
+                    <div class="card-footer d-flex justify-content-center">
+                        <p class="mb-0 text-muted">Здесь отобразится ответ от работника</p>
+                    </div>
+                    {% endif %}
                     {% if comment.image %}
                     <div id="image{{ comment.id }}" class="card-footer text-center" hidden>
                         <img class="img-fluid" src="{{ comment.image.url }}" alt="{{ comment.image.name}}">

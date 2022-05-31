@@ -55,7 +55,7 @@
                     </div>
                 </li>
                 {% elif request.user|has_group:"Master" and not perms.requests %}
-                <li class="nav-item"><a class="nav-link text-uppercase" href="{% url 'comments' 'all' %}">Общие замечания</a></li>
+                <li class="nav-item"><a class="nav-link text-uppercase" href="{% url 'comments' 'all' %}">Замечания</a></li>
                 {% elif request.user|has_group:"Worker" or request.user|has_group:"Master" and perms.requests %}
                 <li class="nav-item dropdown"><a class="nav-link text-uppercase dropdown-toggle" data-bs-toggle="dropdown" href="">Замечания</a>
                     <div class="dropdown-menu">

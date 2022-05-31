@@ -148,7 +148,13 @@
         {% endif %}
         {% if plan %}
         {% regroup plan by building as buidling_list %}
-        <h2>План работ по ремонту и благоустройству</h2>
+        {% if type == 'Ремонт' %}
+        <h2>План работ по ремонту</h2>
+        {% elif type == 'Благоустройство' %}
+        <h2>План работ по благоустройству</h2>
+        {% else %}
+        <h2>План работ по ремонту и  благоустройству</h2>
+        {% endif %}
         <h4>от {% now "d E Y" %} года</h4>
         {% for buidling in buidling_list %}
         <p>По адресу <strong>{{ buidling.grouper }}</strong></p>

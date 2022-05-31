@@ -19,7 +19,7 @@ from django import forms
 class RequestCommentsListView(ListView):
     model = RequestComment
     template_name = 'requests/request_comments_list.html'
-    paginate_by = 10
+    paginate_by = 8
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Manager').exists():
@@ -103,7 +103,7 @@ class AllRequestsListView(ListView):
 class CommentListView(ListView):
     model = Comment
     template_name = 'requests/comments_list.html'
-    paginate_by = 6
+    paginate_by = 8
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Tenant').exists():
